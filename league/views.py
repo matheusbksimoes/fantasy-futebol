@@ -81,83 +81,113 @@ def make_pick(request, draft_id: int):
             "draft": draft,
             "current_pick": None,
             "available_players": [],
-            "error": "Não há pick atual (draft não iniciado ou já terminou)."
+            "error": "Não há pick atual (draft não iniciado ou já terminou).",
+            "positions": Player.POSITION_CHOICES,
+            "teams_filter": [],
+            "selected_position": "",
+            "selected_real_team": "",
         })
 
-    # ✅ Permissão: só o dono do time (ou superuser) pode pickar
+    # Permissão: superuser OU dono do time do pick
     if not request.user.is_superuser:
         if current_pick.team.user_id is None or current_pick.team.user_id != request.user.id:
             return HttpResponseForbidden(
                 "Você não está na vez (ou o time ainda não está vinculado a um usuário)."
             )
 
-    # ✅ Jogadores disponíveis = ainda não foram draftados neste draft
-    drafted_ids = (
-        DraftPick.objects
-        .filter(draft=draft, player__isnull=False)
-        .values_list("player_id", flat=True)
-    )
+    # filtros (opcionais) vindos por GET
+    selected_position = request.GET.get("position", "").strip()
+    selected_real_team = request.GET.get("real_team", "").strip()
 
-    available_players = (
-        Player.objects
-        .exclude(id__in=drafted_ids)
-        .order_by("name")
+    # jogadores já draftados neste draft
+    drafted_ids = DraftPick.objects.filter(
+        draft=draft, player__isnull=False
+    ).values_list("player_id", flat=True)
+
+    qs = Player.objects.exclude(id__in=drafted_ids).order_by("name")
+
+    if selected_position:
+        qs = qs.filter(position=selected_position)
+
+    if selected_real_team:
+        qs = qs.filter(real_team=selected_real_team)
+
+    available_players = list(qs[:500])  # evita ficar gigante na tela
+
+    # lista de times reais pra dropdown
+    teams_filter = (
+        Player.objects.order_by("real_team")
+        .values_list("real_team", flat=True)
+        .distinct()
     )
 
     if request.method == "POST":
         player_id = request.POST.get("player_id")
-
         if not player_id:
             return render(request, "league/make_pick.html", {
                 "draft": draft,
                 "current_pick": current_pick,
                 "available_players": available_players,
-                "error": "Selecione um jogador."
+                "error": "Selecione um jogador.",
+                "positions": Player.POSITION_CHOICES,
+                "teams_filter": teams_filter,
+                "selected_position": selected_position,
+                "selected_real_team": selected_real_team,
             })
 
-        # garante que o jogador existe e ainda está disponível
         player = get_object_or_404(Player, id=player_id)
-        if DraftPick.objects.filter(draft=draft, player=player).exists():
+
+        # segurança: não deixar draftar jogador já escolhido
+        already_taken = DraftPick.objects.filter(
+            draft=draft, player=player
+        ).exists()
+        if already_taken:
             return render(request, "league/make_pick.html", {
                 "draft": draft,
                 "current_pick": current_pick,
                 "available_players": available_players,
-                "error": "Esse jogador já foi draftado."
+                "error": "Esse jogador já foi draftado.",
+                "positions": Player.POSITION_CHOICES,
+                "teams_filter": teams_filter,
+                "selected_position": selected_position,
+                "selected_real_team": selected_real_team,
             })
 
-        # ✅ Faz o pick
+        # 1) salva o pick
         current_pick.player = player
-        current_pick.made_at = timezone.now()
         current_pick.is_current = False
         current_pick.save()
 
+        # 2) cria roster spot
         RosterSpot.objects.create(
-    draft=draft,
-    team=current_pick.team,
-    player=player,
-    acquired_via="DRAFT",
-)
+            draft=draft,
+            team=current_pick.team,
+            player=player,
+            acquired_via="DRAFT",
+        )
 
-        # ✅ Define o próximo pick vazio como current
+        # 3) avança para o próximo pick
         next_pick = (
             DraftPick.objects
-            .filter(draft=draft, player__isnull=True)
+            .filter(draft=draft, overall_number__gt=current_pick.overall_number)
             .order_by("overall_number")
             .first()
         )
-
         if next_pick:
             next_pick.is_current = True
-            next_pick.save(update_fields=["is_current"])
+            next_pick.save()
 
         return redirect("draft_board", draft_id=draft.id)
 
-    # GET: mostrar tela de seleção
     return render(request, "league/make_pick.html", {
         "draft": draft,
         "current_pick": current_pick,
         "available_players": available_players,
-        "error": None
+        "error": "",
+        "positions": Player.POSITION_CHOICES,
+        "teams_filter": teams_filter,
+        "selected_position": selected_position,
+        "selected_real_team": selected_real_team,
     })
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
