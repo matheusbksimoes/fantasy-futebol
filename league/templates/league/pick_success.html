@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pick realizado</title>
+  <style> body { font-family: Arial, sans-serif; margin: 16px; } </style>
+</head>
+<body>
+  <h1>Pick realizado ✅</h1>
+  <p><b>{{ team.name }}</b> escolheu <b>{{ picked_player.name }}</b>.</p>
+
+  {% if next_pick %}
+    <p>Próximo pick: #{{ next_pick.overall_number }} — <b>{{ next_pick.team.name }}</b></p>
+  {% else %}
+    <p>Draft finalizado 🎉</p>
+  {% endif %}
+
+  <p><a href="/draft/{{ draft.id }}/board/">Voltar para a board</a></p>
+</body>
+</html>

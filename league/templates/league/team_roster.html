@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <title>Roster</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 16px; }
+    h1 { margin: 0 0 6px 0; }
+    .meta { color: #666; margin-bottom: 10px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ddd; padding: 8px; }
+    th { background: #f5f5f5; }
+  </style>
+</head>
+<body>
+  <h1>Roster — {{ team.name }}</h1>
+
+  <div class="meta">
+    Draft: <b>{{ draft.id }}</b> • Liga: <b>{{ draft.league }}</b>
+  </div>
+
+  <p><a href="/draft/{{ draft.id }}/board/">Voltar para a board</a></p>
+
+  {% if players %}
+    <table>
+      <thead>
+        <tr>
+          <th>Posição</th>
+          <th>Jogador</th>
+          <th>Time real</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in players %}
+          <tr>
+            <td>{{ p.get_position_display }}</td>
+            <td><b>{{ p.name }}</b></td>
+            <td>{{ p.real_team }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>Nenhum jogador draftado por esse time ainda.</p>
+  {% endif %}
+</body>
+</html>

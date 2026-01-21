@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fazer Pick</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 16px; max-width: 800px; }
+    .error { color: #b00020; margin: 12px 0; }
+    .meta { color: #666; margin: 6px 0 14px 0; }
+    .box {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 12px;
+      margin: 12px 0;
+      background: #fafafa;
+    }
+    label { font-weight: 600; }
+    input, select, button { padding: 8px; font-size: 14px; }
+    input { width: 220px; }
+    select { min-width: 240px; }
+    button { cursor: pointer; }
+    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .small { font-size: 12px; color: #777; margin-top: 6px; }
+    a { color: #0b57d0; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <h1>Fazer Pick</h1>
+
+  <div class="meta">
+    <a href="/draft/{{ draft.id }}/board/">← Voltar para a board</a>
+  </div>
+
+  {% if error %}
+    <div class="error">{{ error }}</div>
+  {% endif %}
+
+  {% if not current_pick %}
+    <p>Não há pick atual.</p>
+  {% else %}
+    <div class="box">
+      <b>Pick atual:</b> #{{ current_pick.overall_number }} — {{ current_pick.team.name }}
+    </div>
+
+    <!-- 🔎 FORM DE FILTROS (GET) -->
+    <div class="box">
+      <form method="get">
+        <div class="row">
+          <div>
+            <label for="q">Buscar</label><br>
+            <input type="text" id="q" name="q" value="{{ q }}" placeholder="Ex: Hulk, Arrascaeta">
+          </div>
+
+          <div>
+            <label for="pos">Posição</label><br>
+            <select id="pos" name="pos">
+              <option value="">Todas</option>
+              <option value="GOL" {% if pos == "GOL" %}selected{% endif %}>Goleiro</option>
+              <option value="LAT" {% if pos == "LAT" %}selected{% endif %}>Lateral</option>
+              <option value="ZAG" {% if pos == "ZAG" %}selected{% endif %}>Zagueiro</option>
+              <option value="MEI" {% if pos == "MEI" %}selected{% endif %}>Meia</option>
+              <option value="ATA" {% if pos == "ATA" %}selected{% endif %}>Atacante</option>
+              <option value="TEC" {% if pos == "TEC" %}selected{% endif %}>Técnico</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="team">Time</label><br>
+            <select id="team" name="team">
+              <option value="">Todos</option>
+              {% for t in teams %}
+                <option value="{{ t }}" {% if team == t %}selected{% endif %}>{{ t }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div style="margin-top: 18px;">
+            <button type="submit">Filtrar</button>
+            <a href="/draft/{{ draft.id }}/pick/" style="margin-left:10px;">Limpar</a>
+          </div>
+        </div>
+
+        <div class="small">
+          Dica: use Buscar + Posição + Time para reduzir a lista (você tem muitos jogadores importados).
+        </div>
+      </form>
+    </div>
+
+    <!-- 🏈 FORM DO PICK (POST) -->
+    <div class="box">
+      <form method="post">
+        {% csrf_token %}
+
+        <label for="player_id">Jogador</label><br><br>
+
+        <select name="player_id" id="player_id" required>
+          <option value="">-- selecione --</option>
+          {% for p in available_players %}
+            <option value="{{ p.id }}">{{ p.name }} — {{ p.position }} — {{ p.real_team }}</option>
+          {% endfor %}
+        </select>
+
+        <br><br>
+        <button type="submit">Confirmar Pick</button>
+      </form>
+    </div>
+  {% endif %}
+</body>
+</html>
+

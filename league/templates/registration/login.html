@@ -1,0 +1,43 @@
+<h1>LOGIN OK</h1>
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 16px; max-width: 420px; }
+    label { display:block; margin-top: 10px; }
+    input { width: 100%; padding: 8px; margin-top: 4px; }
+    button { margin-top: 14px; padding: 10px; width: 100%; }
+    .error { color: #b00020; margin-top: 10px; }
+    .hint { color: #666; font-size: 12px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Login</h1>
+
+  {% if form.errors %}
+    <div class="error">Usuário ou senha inválidos.</div>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    <label for="id_username">Usuário</label>
+    <input type="text" name="username" id="id_username" required>
+
+    <label for="id_password">Senha</label>
+    <input type="password" name="password" id="id_password" required>
+
+    {% if next %}
+      <input type="hidden" name="next" value="{{ next }}">
+    {% endif %}
+
+    <button type="submit">Entrar</button>
+  </form>
+
+  <p class="hint">
+    Dica: para testar com seu admin, use o mesmo usuário/senha do Django Admin.
+  </p>
+</body>
+</html>
