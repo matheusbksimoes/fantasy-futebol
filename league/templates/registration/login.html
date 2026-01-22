@@ -1,42 +1,49 @@
-<h1>LOGIN OK</h1>
+<h1>Bem-vindo ao Fantasy Futebol ⚽</h1>
 <!doctype html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Login</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 16px; max-width: 420px; }
-    label { display:block; margin-top: 10px; }
-    input { width: 100%; padding: 8px; margin-top: 4px; }
-    button { margin-top: 14px; padding: 10px; width: 100%; }
-    .error { color: #b00020; margin-top: 10px; }
-    .hint { color: #666; font-size: 12px; margin-top: 10px; }
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bem-vindo • Fantasy Futebol</title>
 </head>
+
 <body>
-  <h1>Login</h1>
+  <h1>Bem-vindo ao Fantasy Futebol ⚽</h1>
+  <p>
+    Faça login para acessar o draft e gerenciar seu time.
+  </p>
 
   {% if form.errors %}
-    <div class="error">Usuário ou senha inválidos.</div>
+    <p style="color: red;">
+      Não foi possível entrar. Verifique usuário e senha e tente novamente.
+    </p>
   {% endif %}
+
+  <h2>Login</h2>
 
   <form method="post">
     {% csrf_token %}
-    <label for="id_username">Usuário</label>
-    <input type="text" name="username" id="id_username" required>
 
-    <label for="id_password">Senha</label>
-    <input type="password" name="password" id="id_password" required>
+    <div>
+      <label for="id_username">Usuário</label><br />
+      <input type="text" name="username" autofocus autocapitalize="none" autocomplete="username"
+             maxlength="150" required id="id_username">
+    </div>
 
-    {% if next %}
-      <input type="hidden" name="next" value="{{ next }}">
-    {% endif %}
+    <br />
+
+    <div>
+      <label for="id_password">Senha</label><br />
+      <input type="password" name="password" autocomplete="current-password"
+             required id="id_password">
+    </div>
+
+    <br />
 
     <button type="submit">Entrar</button>
   </form>
 
-  <p class="hint">
+  <p style="margin-top: 16px; font-size: 0.9em;">
     Dica: para testar com seu admin, use o mesmo usuário/senha do Django Admin.
   </p>
 </body>
