@@ -1,0 +1,9900 @@
+[
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$UW8ofTDYS32bZqcZ9M5Rds$z1aLPSEjrxKlQnFUrK7Ww1k//GlvroeMdAEZPcn7Jxw=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "dir",
+    "first_name": "",
+    "last_name": "",
+    "email": "matheusbksimos@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-01-20T22:54:56.798Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$pguP56utupKloqKxpOqmLL$20SG0L3mnptGb1pJVoow0hntmg7yTAJk3fhGcrtC3TI=",
+    "last_login": "2026-01-22T03:24:31.039Z",
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-01-20T23:02:04.287Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$4ibkHuMdeEo3sx0XJeCFvx$GktWVNOhabIJ3U13xkq0XcefCbp3FuwFj4sH0EpG3zM=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "lorenzogarra",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-01-21T02:19:48.196Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$0CDuqOv6LrYhEeDQys07ut$tV9lStBS6rCJaA0bO65HQ7tHXV9gPNQGl9sXUfaqRnE=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "vbacchin",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-01-21T02:20:29.276Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$c8oQSHqhtM7X8Fjix3m8Uy$q+3s0EOEPwGx+Fpa3Es6WYZ2k93wUIGOIJL/ninebV8=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "mauricioapovian",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-01-21T02:21:15.071Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$z3lG4ss216BG2YX4tRzuZt$UZU7ktyd2k08ocZefBrU+21p89o0xwQG1Ry1aqThp80=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "Ade",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-01-21T02:22:28.899Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$cKJ8aB4p3wa4whdIXEGrMR$VBsNoajMXJvEsrdjqx7Jvw39boi5ZCj7gh0KHNw2/D4=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "Andremattos",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-01-21T02:26:13.813Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$Lh3nKLjiuSfhtuRtzhhyj5$a4mY4qBqPjK8ayML4NTxQAUpM9pdecR3XygjNTMgdpo=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "Chinaglia",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-01-21T20:44:05.897Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$gATrMa10alrIoHHFpXMlWM$HLbhn7kg4e0dwILs3kptoGXWQsju+hSGvujKVGzMSH8=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "Isaac",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-01-21T20:44:50.378Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$VBZ8rE2o6t8wVjmMGNGwlK$CC0JxCcur6eAFD2+8OllrVaGnI1sNKET+D/NmQ2weZc=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "victorfc",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-01-21T20:47:00.804Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$pFzJnLRdK8vNcij20bSSU0$2S+59pL5rtsI6f9syLgoOV9a9skUebLHnE0Uzyk1myg=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "marcelo09",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-01-21T22:14:10.062Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$k0HIg7JhsrZeh7kPKILoxz$vSaZbI/bqZ2G7K6FuHvZFqLjsM4Zqxo0ro/Y4JmCho8=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "mathe",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-01-22T03:13:12.677Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "league.league",
+  "pk": 1,
+  "fields": {
+    "name": "Sleeper by Zinho",
+    "season": 2026
+  }
+},
+{
+  "model": "league.team",
+  "pk": 1,
+  "fields": {
+    "league": 1,
+    "user": [
+      "admin"
+    ],
+    "name": "time a",
+    "budget": 100
+  }
+},
+{
+  "model": "league.team",
+  "pk": 2,
+  "fields": {
+    "league": 1,
+    "user": [
+      "admin"
+    ],
+    "name": "time b",
+    "budget": 100
+  }
+},
+{
+  "model": "league.team",
+  "pk": 3,
+  "fields": {
+    "league": 1,
+    "user": [
+      "admin"
+    ],
+    "name": "time c",
+    "budget": 100
+  }
+},
+{
+  "model": "league.team",
+  "pk": 4,
+  "fields": {
+    "league": 1,
+    "user": [
+      "admin"
+    ],
+    "name": "time d",
+    "budget": 100
+  }
+},
+{
+  "model": "league.team",
+  "pk": 5,
+  "fields": {
+    "league": 1,
+    "user": [
+      "admin"
+    ],
+    "name": "time f",
+    "budget": 100
+  }
+},
+{
+  "model": "league.team",
+  "pk": 6,
+  "fields": {
+    "league": 1,
+    "user": [
+      "admin"
+    ],
+    "name": "time e",
+    "budget": 100
+  }
+},
+{
+  "model": "league.team",
+  "pk": 7,
+  "fields": {
+    "league": 1,
+    "user": [
+      "admin"
+    ],
+    "name": "time g",
+    "budget": 100
+  }
+},
+{
+  "model": "league.team",
+  "pk": 8,
+  "fields": {
+    "league": 1,
+    "user": [
+      "admin"
+    ],
+    "name": "time h",
+    "budget": 100
+  }
+},
+{
+  "model": "league.team",
+  "pk": 9,
+  "fields": {
+    "league": 1,
+    "user": [
+      "admin"
+    ],
+    "name": "time i",
+    "budget": 100
+  }
+},
+{
+  "model": "league.team",
+  "pk": 10,
+  "fields": {
+    "league": 1,
+    "user": [
+      "admin"
+    ],
+    "name": "time j",
+    "budget": 100
+  }
+},
+{
+  "model": "league.player",
+  "pk": 1,
+  "fields": {
+    "cartola_id": null,
+    "name": "Zezinho",
+    "position": "GK",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 2,
+  "fields": {
+    "cartola_id": null,
+    "name": "Wilson",
+    "position": "GK",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 3,
+  "fields": {
+    "cartola_id": null,
+    "name": "Fernando",
+    "position": "DEF",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 4,
+  "fields": {
+    "cartola_id": null,
+    "name": "Thiago",
+    "position": "GK",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 5,
+  "fields": {
+    "cartola_id": 97735,
+    "name": "Giovanni Pavani",
+    "position": "MEI",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 6,
+  "fields": {
+    "cartola_id": 98224,
+    "name": "Jáderson",
+    "position": "MEI",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 7,
+  "fields": {
+    "cartola_id": 111945,
+    "name": "Diego Hernández",
+    "position": "MEI",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 8,
+  "fields": {
+    "cartola_id": 107172,
+    "name": "Patrick de Paula",
+    "position": "MEI",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 9,
+  "fields": {
+    "cartola_id": 104257,
+    "name": "João Lucas",
+    "position": "LAT",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 10,
+  "fields": {
+    "cartola_id": 107700,
+    "name": "Eduardo Melo",
+    "position": "ATA",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 11,
+  "fields": {
+    "cartola_id": 96831,
+    "name": "Carlinhos",
+    "position": "ATA",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 12,
+  "fields": {
+    "cartola_id": 97795,
+    "name": "Marcelinho",
+    "position": "LAT",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 13,
+  "fields": {
+    "cartola_id": 95555,
+    "name": "Sávio",
+    "position": "LAT",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 14,
+  "fields": {
+    "cartola_id": 117338,
+    "name": "Yago Ferreira",
+    "position": "MEI",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 15,
+  "fields": {
+    "cartola_id": 102911,
+    "name": "Zé Ricardo",
+    "position": "MEI",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 16,
+  "fields": {
+    "cartola_id": 101717,
+    "name": "Marrony",
+    "position": "ATA",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 17,
+  "fields": {
+    "cartola_id": 68822,
+    "name": "Rafael Santos",
+    "position": "GOL",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 18,
+  "fields": {
+    "cartola_id": 143455,
+    "name": "PH Gama",
+    "position": "MEI",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 19,
+  "fields": {
+    "cartola_id": 142593,
+    "name": "Nicolás Ferreira",
+    "position": "ATA",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 20,
+  "fields": {
+    "cartola_id": 141386,
+    "name": "Marcos Alexandre",
+    "position": "GOL",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 21,
+  "fields": {
+    "cartola_id": 146040,
+    "name": "João Pedro",
+    "position": "ATA",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 22,
+  "fields": {
+    "cartola_id": 145782,
+    "name": "Cristian Tassano",
+    "position": "ZAG",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 23,
+  "fields": {
+    "cartola_id": 122441,
+    "name": "Kayky Almeida",
+    "position": "ZAG",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 24,
+  "fields": {
+    "cartola_id": 68938,
+    "name": "Giovanni Augusto",
+    "position": "MEI",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 25,
+  "fields": {
+    "cartola_id": 70958,
+    "name": "Jean Carlos",
+    "position": "MEI",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 26,
+  "fields": {
+    "cartola_id": 141385,
+    "name": "João Victor",
+    "position": "GOL",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 27,
+  "fields": {
+    "cartola_id": 88293,
+    "name": "Neto Pessoa",
+    "position": "ATA",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 28,
+  "fields": {
+    "cartola_id": 83048,
+    "name": "Rafael Thyere",
+    "position": "ZAG",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 29,
+  "fields": {
+    "cartola_id": 97432,
+    "name": "Victor Caetano",
+    "position": "ZAG",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 30,
+  "fields": {
+    "cartola_id": 71043,
+    "name": "Léo Vieira",
+    "position": "GOL",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 31,
+  "fields": {
+    "cartola_id": 72491,
+    "name": "Bressan",
+    "position": "ZAG",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 32,
+  "fields": {
+    "cartola_id": 94286,
+    "name": "Perotti",
+    "position": "ATA",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 33,
+  "fields": {
+    "cartola_id": 73481,
+    "name": "Gilmar Dal Pozzo",
+    "position": "TEC",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 34,
+  "fields": {
+    "cartola_id": 95620,
+    "name": "Bruno Leonardo",
+    "position": "ZAG",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 35,
+  "fields": {
+    "cartola_id": 95332,
+    "name": "Marcinho",
+    "position": "ATA",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 36,
+  "fields": {
+    "cartola_id": 97969,
+    "name": "Marcos Vinícius",
+    "position": "LAT",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 37,
+  "fields": {
+    "cartola_id": 105664,
+    "name": "Walter Clar",
+    "position": "LAT",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 38,
+  "fields": {
+    "cartola_id": 101393,
+    "name": "Eduardo Doma",
+    "position": "ZAG",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 39,
+  "fields": {
+    "cartola_id": 107516,
+    "name": "Ênio",
+    "position": "ATA",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 40,
+  "fields": {
+    "cartola_id": 104519,
+    "name": "Camilo",
+    "position": "MEI",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 41,
+  "fields": {
+    "cartola_id": 104470,
+    "name": "Everton",
+    "position": "LAT",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 42,
+  "fields": {
+    "cartola_id": 103987,
+    "name": "Higor Meritão",
+    "position": "MEI",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 43,
+  "fields": {
+    "cartola_id": 109336,
+    "name": "Rafael Carvalheira",
+    "position": "MEI",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 44,
+  "fields": {
+    "cartola_id": 102906,
+    "name": "Anderson",
+    "position": "GOL",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 45,
+  "fields": {
+    "cartola_id": 122138,
+    "name": "João Vitor",
+    "position": "MEI",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 46,
+  "fields": {
+    "cartola_id": 116066,
+    "name": "Rubens",
+    "position": "ATA",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 47,
+  "fields": {
+    "cartola_id": 107453,
+    "name": "João Paulo",
+    "position": "ZAG",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 48,
+  "fields": {
+    "cartola_id": 111802,
+    "name": "Jhonnathan",
+    "position": "ZAG",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 49,
+  "fields": {
+    "cartola_id": 111279,
+    "name": "Mancha",
+    "position": "LAT",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 50,
+  "fields": {
+    "cartola_id": 121870,
+    "name": "Gustavo Talles",
+    "position": "LAT",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 51,
+  "fields": {
+    "cartola_id": 51413,
+    "name": "Walter",
+    "position": "GOL",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 52,
+  "fields": {
+    "cartola_id": 130843,
+    "name": "Arthur Dias",
+    "position": "ZAG",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 53,
+  "fields": {
+    "cartola_id": 123625,
+    "name": "Ítalo",
+    "position": "ATA",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 54,
+  "fields": {
+    "cartola_id": 130806,
+    "name": "Kauan",
+    "position": "ZAG",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 55,
+  "fields": {
+    "cartola_id": 110426,
+    "name": "Bernabéi",
+    "position": "LAT",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 56,
+  "fields": {
+    "cartola_id": 140438,
+    "name": "David",
+    "position": "MEI",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 57,
+  "fields": {
+    "cartola_id": 130619,
+    "name": "Mailson",
+    "position": "ATA",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 58,
+  "fields": {
+    "cartola_id": 141812,
+    "name": "Palacios",
+    "position": "ATA",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 59,
+  "fields": {
+    "cartola_id": 97900,
+    "name": "Vitão",
+    "position": "ZAG",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 60,
+  "fields": {
+    "cartola_id": 68708,
+    "name": "Eduardo",
+    "position": "MEI",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 61,
+  "fields": {
+    "cartola_id": 99147,
+    "name": "Rodrigo Rodrigues",
+    "position": "ATA",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 62,
+  "fields": {
+    "cartola_id": 99552,
+    "name": "Rossi",
+    "position": "GOL",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 63,
+  "fields": {
+    "cartola_id": 124674,
+    "name": "Felipe Negrucci",
+    "position": "MEI",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 64,
+  "fields": {
+    "cartola_id": 89837,
+    "name": "Lucho Acosta",
+    "position": "MEI",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 65,
+  "fields": {
+    "cartola_id": 112709,
+    "name": "Kaiki Bruno",
+    "position": "LAT",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 66,
+  "fields": {
+    "cartola_id": 78850,
+    "name": "Reinaldo",
+    "position": "LAT",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 67,
+  "fields": {
+    "cartola_id": 51772,
+    "name": "Everton Ribeiro",
+    "position": "MEI",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 68,
+  "fields": {
+    "cartola_id": 89368,
+    "name": "Braithwaite",
+    "position": "ATA",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 69,
+  "fields": {
+    "cartola_id": 80287,
+    "name": "Luciano",
+    "position": "ATA",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 70,
+  "fields": {
+    "cartola_id": 141776,
+    "name": "Gustavo Henrique",
+    "position": "MEI",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 71,
+  "fields": {
+    "cartola_id": 126471,
+    "name": "Barreal",
+    "position": "MEI",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 72,
+  "fields": {
+    "cartola_id": 100652,
+    "name": "Yuri Alberto",
+    "position": "ATA",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 73,
+  "fields": {
+    "cartola_id": 89274,
+    "name": "Andreas Pereira",
+    "position": "MEI",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 74,
+  "fields": {
+    "cartola_id": 39148,
+    "name": "Hulk",
+    "position": "ATA",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 75,
+  "fields": {
+    "cartola_id": 122781,
+    "name": "Caballero",
+    "position": "ATA",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 76,
+  "fields": {
+    "cartola_id": 147297,
+    "name": "William Fernando",
+    "position": "LAT",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 77,
+  "fields": {
+    "cartola_id": 122127,
+    "name": "Fernando",
+    "position": "ATA",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 78,
+  "fields": {
+    "cartola_id": 115025,
+    "name": "Miguelito",
+    "position": "MEI",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 79,
+  "fields": {
+    "cartola_id": 133673,
+    "name": "Mateus Xavier",
+    "position": "ATA",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 80,
+  "fields": {
+    "cartola_id": 144423,
+    "name": "Nicolas Pontes",
+    "position": "LAT",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 81,
+  "fields": {
+    "cartola_id": 117842,
+    "name": "Vitinho",
+    "position": "MEI",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 82,
+  "fields": {
+    "cartola_id": 115563,
+    "name": "Rodriguinho",
+    "position": "MEI",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 83,
+  "fields": {
+    "cartola_id": 142049,
+    "name": "Bruno Alves",
+    "position": "ZAG",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 84,
+  "fields": {
+    "cartola_id": 94583,
+    "name": "Pedro",
+    "position": "ATA",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 85,
+  "fields": {
+    "cartola_id": 103445,
+    "name": "Kaio Jorge",
+    "position": "ATA",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 86,
+  "fields": {
+    "cartola_id": 123649,
+    "name": "Janderson",
+    "position": "ZAG",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 87,
+  "fields": {
+    "cartola_id": 146991,
+    "name": "Rhuan Gabriel",
+    "position": "MEI",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 88,
+  "fields": {
+    "cartola_id": 146992,
+    "name": "Cauan Baptistella",
+    "position": "MEI",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 89,
+  "fields": {
+    "cartola_id": 128433,
+    "name": "Johan Rojas",
+    "position": "MEI",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 90,
+  "fields": {
+    "cartola_id": 106104,
+    "name": "Enamorado",
+    "position": "ATA",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 91,
+  "fields": {
+    "cartola_id": 147287,
+    "name": "Kaiquy Luiz",
+    "position": "ZAG",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 92,
+  "fields": {
+    "cartola_id": 78946,
+    "name": "Dória",
+    "position": "ZAG",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 93,
+  "fields": {
+    "cartola_id": 86292,
+    "name": "Bolasie",
+    "position": "ATA",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 94,
+  "fields": {
+    "cartola_id": 142130,
+    "name": "Marcelo Eráclito",
+    "position": "GOL",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 95,
+  "fields": {
+    "cartola_id": 114802,
+    "name": "Vitor Roque",
+    "position": "ATA",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 96,
+  "fields": {
+    "cartola_id": 112367,
+    "name": "Thalisson Gabriel",
+    "position": "ZAG",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 97,
+  "fields": {
+    "cartola_id": 101908,
+    "name": "Willian Machado",
+    "position": "ZAG",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 98,
+  "fields": {
+    "cartola_id": 91639,
+    "name": "Igor Cariús",
+    "position": "LAT",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 99,
+  "fields": {
+    "cartola_id": 115986,
+    "name": "Denilson",
+    "position": "MEI",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 100,
+  "fields": {
+    "cartola_id": 118655,
+    "name": "Saldivia",
+    "position": "ZAG",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 101,
+  "fields": {
+    "cartola_id": 145400,
+    "name": "Cauê",
+    "position": "LAT",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 102,
+  "fields": {
+    "cartola_id": 126182,
+    "name": "Paulinho",
+    "position": "MEI",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 103,
+  "fields": {
+    "cartola_id": 133696,
+    "name": "Wallace Davi",
+    "position": "MEI",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 104,
+  "fields": {
+    "cartola_id": 108713,
+    "name": "Galeano",
+    "position": "ATA",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 105,
+  "fields": {
+    "cartola_id": 81121,
+    "name": "Lucas Mugni",
+    "position": "MEI",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 106,
+  "fields": {
+    "cartola_id": 131516,
+    "name": "JP Chermont",
+    "position": "LAT",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 107,
+  "fields": {
+    "cartola_id": 124758,
+    "name": "Gustavo Henrique",
+    "position": "ZAG",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 108,
+  "fields": {
+    "cartola_id": 107093,
+    "name": "Luciano Juba",
+    "position": "LAT",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 109,
+  "fields": {
+    "cartola_id": 122487,
+    "name": "GB",
+    "position": "ATA",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 110,
+  "fields": {
+    "cartola_id": 130255,
+    "name": "Guilherme Estrella",
+    "position": "MEI",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 111,
+  "fields": {
+    "cartola_id": 130280,
+    "name": "Phillipe Gabriel",
+    "position": "GOL",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 112,
+  "fields": {
+    "cartola_id": 126120,
+    "name": "Marcelinho",
+    "position": "MEI",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 113,
+  "fields": {
+    "cartola_id": 141139,
+    "name": "Mateus Iseppe",
+    "position": "MEI",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 114,
+  "fields": {
+    "cartola_id": 114040,
+    "name": "Minda",
+    "position": "ATA",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 115,
+  "fields": {
+    "cartola_id": 132412,
+    "name": "Román Gómez",
+    "position": "LAT",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 116,
+  "fields": {
+    "cartola_id": 90061,
+    "name": "Bruno Pacheco",
+    "position": "LAT",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 117,
+  "fields": {
+    "cartola_id": 141131,
+    "name": "Vitão",
+    "position": "ZAG",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 118,
+  "fields": {
+    "cartola_id": 147090,
+    "name": "Kauã Pascini",
+    "position": "LAT",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 119,
+  "fields": {
+    "cartola_id": 102909,
+    "name": "Luan Vinícius",
+    "position": "MEI",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 120,
+  "fields": {
+    "cartola_id": 94154,
+    "name": "Maycon",
+    "position": "MEI",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 121,
+  "fields": {
+    "cartola_id": 83433,
+    "name": "Patrick",
+    "position": "MEI",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 122,
+  "fields": {
+    "cartola_id": 70666,
+    "name": "Marllon",
+    "position": "ZAG",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 123,
+  "fields": {
+    "cartola_id": 146894,
+    "name": "João Bom",
+    "position": "ATA",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 124,
+  "fields": {
+    "cartola_id": 103183,
+    "name": "Andrew",
+    "position": "GOL",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 125,
+  "fields": {
+    "cartola_id": 130048,
+    "name": "Noriega",
+    "position": "ZAG",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 126,
+  "fields": {
+    "cartola_id": 91251,
+    "name": "Rodrigues",
+    "position": "ZAG",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 127,
+  "fields": {
+    "cartola_id": 141873,
+    "name": "Jacaré",
+    "position": "LAT",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 128,
+  "fields": {
+    "cartola_id": 93988,
+    "name": "Breno Lopes",
+    "position": "ATA",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 129,
+  "fields": {
+    "cartola_id": 106302,
+    "name": "Preciado",
+    "position": "LAT",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 130,
+  "fields": {
+    "cartola_id": 100342,
+    "name": "Léo Andrade",
+    "position": "ZAG",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 131,
+  "fields": {
+    "cartola_id": 105089,
+    "name": "Tetê",
+    "position": "ATA",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 132,
+  "fields": {
+    "cartola_id": 141614,
+    "name": "Paulinho",
+    "position": "ATA",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 133,
+  "fields": {
+    "cartola_id": 116034,
+    "name": "Victor Hugo",
+    "position": "MEI",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 134,
+  "fields": {
+    "cartola_id": 106708,
+    "name": "Igor Formiga",
+    "position": "LAT",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 135,
+  "fields": {
+    "cartola_id": 132553,
+    "name": "Jemmes",
+    "position": "ZAG",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 136,
+  "fields": {
+    "cartola_id": 89256,
+    "name": "Gerson",
+    "position": "MEI",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 137,
+  "fields": {
+    "cartola_id": 69208,
+    "name": "Gabriel Paulista",
+    "position": "ZAG",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 138,
+  "fields": {
+    "cartola_id": 105157,
+    "name": "Villagra",
+    "position": "MEI",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 139,
+  "fields": {
+    "cartola_id": 68685,
+    "name": "Alan Patrick",
+    "position": "MEI",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 140,
+  "fields": {
+    "cartola_id": 147864,
+    "name": "Rafael Monti",
+    "position": "ATA",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 141,
+  "fields": {
+    "cartola_id": 106593,
+    "name": "Villalba",
+    "position": "ZAG",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 142,
+  "fields": {
+    "cartola_id": 130414,
+    "name": "Robert",
+    "position": "MEI",
+    "real_team": "Chapecoense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 143,
+  "fields": {
+    "cartola_id": 94514,
+    "name": "Lucas Oliveira",
+    "position": "ZAG",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 144,
+  "fields": {
+    "cartola_id": 109573,
+    "name": "Martinelli",
+    "position": "MEI",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 145,
+  "fields": {
+    "cartola_id": 101254,
+    "name": "Alef Manga",
+    "position": "ATA",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 146,
+  "fields": {
+    "cartola_id": 73717,
+    "name": "Juan Carlos Osorio",
+    "position": "TEC",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 147,
+  "fields": {
+    "cartola_id": 92171,
+    "name": "Arthur Cabral",
+    "position": "ATA",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 148,
+  "fields": {
+    "cartola_id": 97810,
+    "name": "Erick",
+    "position": "ATA",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 149,
+  "fields": {
+    "cartola_id": 69012,
+    "name": "Santos",
+    "position": "GOL",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 150,
+  "fields": {
+    "cartola_id": 104502,
+    "name": "Christian",
+    "position": "MEI",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 151,
+  "fields": {
+    "cartola_id": 68899,
+    "name": "Philippe Coutinho",
+    "position": "MEI",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 152,
+  "fields": {
+    "cartola_id": 68928,
+    "name": "Rafael",
+    "position": "GOL",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 153,
+  "fields": {
+    "cartola_id": 105949,
+    "name": "Rochet",
+    "position": "GOL",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 154,
+  "fields": {
+    "cartola_id": 104758,
+    "name": "Enzo Díaz",
+    "position": "LAT",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 155,
+  "fields": {
+    "cartola_id": 63007,
+    "name": "Neymar",
+    "position": "MEI",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 156,
+  "fields": {
+    "cartola_id": 103056,
+    "name": "Gabriel Brazão",
+    "position": "GOL",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 157,
+  "fields": {
+    "cartola_id": 42234,
+    "name": "Cássio",
+    "position": "GOL",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 158,
+  "fields": {
+    "cartola_id": 72294,
+    "name": "Everson",
+    "position": "GOL",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 159,
+  "fields": {
+    "cartola_id": 61987,
+    "name": "Alex Sandro",
+    "position": "LAT",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 160,
+  "fields": {
+    "cartola_id": 96591,
+    "name": "Renan Lodi",
+    "position": "LAT",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 161,
+  "fields": {
+    "cartola_id": 100898,
+    "name": "Vitinho",
+    "position": "LAT",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 162,
+  "fields": {
+    "cartola_id": 87008,
+    "name": "Léo Jardim",
+    "position": "GOL",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 163,
+  "fields": {
+    "cartola_id": 90768,
+    "name": "Fabrício Bruno",
+    "position": "ZAG",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 164,
+  "fields": {
+    "cartola_id": 37656,
+    "name": "Fábio",
+    "position": "GOL",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 165,
+  "fields": {
+    "cartola_id": 105436,
+    "name": "Carrascal",
+    "position": "MEI",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 166,
+  "fields": {
+    "cartola_id": 80196,
+    "name": "Yago Pikachu",
+    "position": "MEI",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 167,
+  "fields": {
+    "cartola_id": 101727,
+    "name": "Matheuzinho",
+    "position": "LAT",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 168,
+  "fields": {
+    "cartola_id": 99274,
+    "name": "Alexander Barboza",
+    "position": "ZAG",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 169,
+  "fields": {
+    "cartola_id": 109401,
+    "name": "Erick Pulga",
+    "position": "ATA",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 170,
+  "fields": {
+    "cartola_id": 72460,
+    "name": "Bernard",
+    "position": "MEI",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 171,
+  "fields": {
+    "cartola_id": 115248,
+    "name": "Jhon Jhon",
+    "position": "MEI",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 172,
+  "fields": {
+    "cartola_id": 91772,
+    "name": "David Duarte",
+    "position": "ZAG",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 173,
+  "fields": {
+    "cartola_id": 80313,
+    "name": "Gilberto",
+    "position": "LAT",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 174,
+  "fields": {
+    "cartola_id": 91101,
+    "name": "Ronaldo",
+    "position": "GOL",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 175,
+  "fields": {
+    "cartola_id": 123717,
+    "name": "Zé Guilherme",
+    "position": "LAT",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 176,
+  "fields": {
+    "cartola_id": 98484,
+    "name": "Kanu",
+    "position": "ZAG",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 177,
+  "fields": {
+    "cartola_id": 97868,
+    "name": "Iago",
+    "position": "LAT",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 178,
+  "fields": {
+    "cartola_id": 68996,
+    "name": "Willian José",
+    "position": "ATA",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 179,
+  "fields": {
+    "cartola_id": 101314,
+    "name": "Ademir",
+    "position": "ATA",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 180,
+  "fields": {
+    "cartola_id": 104783,
+    "name": "Acevedo",
+    "position": "MEI",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 181,
+  "fields": {
+    "cartola_id": 105373,
+    "name": "Gabriel Xavier",
+    "position": "ZAG",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 182,
+  "fields": {
+    "cartola_id": 98022,
+    "name": "Erick",
+    "position": "MEI",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 183,
+  "fields": {
+    "cartola_id": 98517,
+    "name": "Jean Lucas",
+    "position": "MEI",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 184,
+  "fields": {
+    "cartola_id": 113397,
+    "name": "Cristian Olivera",
+    "position": "ATA",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 185,
+  "fields": {
+    "cartola_id": 106323,
+    "name": "Caio Alexandre",
+    "position": "MEI",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 186,
+  "fields": {
+    "cartola_id": 122994,
+    "name": "Victor Nascimento",
+    "position": "GOL",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 187,
+  "fields": {
+    "cartola_id": 123360,
+    "name": "Cauly",
+    "position": "MEI",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 188,
+  "fields": {
+    "cartola_id": 105990,
+    "name": "Santiago Mingo",
+    "position": "ZAG",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 189,
+  "fields": {
+    "cartola_id": 90449,
+    "name": "Rezende",
+    "position": "MEI",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 190,
+  "fields": {
+    "cartola_id": 107173,
+    "name": "Michel Araújo",
+    "position": "MEI",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 191,
+  "fields": {
+    "cartola_id": 111829,
+    "name": "Kayky",
+    "position": "ATA",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 192,
+  "fields": {
+    "cartola_id": 141419,
+    "name": "Fredi Lippert",
+    "position": "ZAG",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 193,
+  "fields": {
+    "cartola_id": 145379,
+    "name": "Kauê Furquim",
+    "position": "ATA",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 194,
+  "fields": {
+    "cartola_id": 106822,
+    "name": "Rodrigo Nestor",
+    "position": "MEI",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 195,
+  "fields": {
+    "cartola_id": 68806,
+    "name": "Neto",
+    "position": "GOL",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 196,
+  "fields": {
+    "cartola_id": 136955,
+    "name": "Sanabria",
+    "position": "ATA",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 197,
+  "fields": {
+    "cartola_id": 97341,
+    "name": "Rogério Ceni",
+    "position": "TEC",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 198,
+  "fields": {
+    "cartola_id": 129663,
+    "name": "Ruan Pablo",
+    "position": "ATA",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 199,
+  "fields": {
+    "cartola_id": 72493,
+    "name": "Alex Telles",
+    "position": "LAT",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 200,
+  "fields": {
+    "cartola_id": 107183,
+    "name": "Léo Linck",
+    "position": "GOL",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 201,
+  "fields": {
+    "cartola_id": 96353,
+    "name": "Joaquín Correa",
+    "position": "ATA",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 202,
+  "fields": {
+    "cartola_id": 111831,
+    "name": "Matheus Martins",
+    "position": "ATA",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 203,
+  "fields": {
+    "cartola_id": 117965,
+    "name": "Martín Anselmi",
+    "position": "TEC",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 204,
+  "fields": {
+    "cartola_id": 126013,
+    "name": "Ythallo",
+    "position": "ZAG",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 205,
+  "fields": {
+    "cartola_id": 97468,
+    "name": "Marçal",
+    "position": "LAT",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 206,
+  "fields": {
+    "cartola_id": 108274,
+    "name": "David Ricardo",
+    "position": "ZAG",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 207,
+  "fields": {
+    "cartola_id": 98280,
+    "name": "Bastos",
+    "position": "ZAG",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 208,
+  "fields": {
+    "cartola_id": 129930,
+    "name": "Cristhian Loor",
+    "position": "GOL",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 209,
+  "fields": {
+    "cartola_id": 104693,
+    "name": "Newton",
+    "position": "MEI",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 210,
+  "fields": {
+    "cartola_id": 124481,
+    "name": "Mateo Ponte",
+    "position": "LAT",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 211,
+  "fields": {
+    "cartola_id": 124757,
+    "name": "Nathan Fernandes",
+    "position": "ATA",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 212,
+  "fields": {
+    "cartola_id": 105214,
+    "name": "Santiago Rodríguez",
+    "position": "MEI",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 213,
+  "fields": {
+    "cartola_id": 104191,
+    "name": "Raul",
+    "position": "GOL",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 214,
+  "fields": {
+    "cartola_id": 69140,
+    "name": "Allan",
+    "position": "MEI",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 215,
+  "fields": {
+    "cartola_id": 107231,
+    "name": "Danilo",
+    "position": "MEI",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 216,
+  "fields": {
+    "cartola_id": 103179,
+    "name": "Chris Ramos",
+    "position": "ATA",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 217,
+  "fields": {
+    "cartola_id": 98672,
+    "name": "Savarino",
+    "position": "MEI",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 218,
+  "fields": {
+    "cartola_id": 91158,
+    "name": "Kaio",
+    "position": "ZAG",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 219,
+  "fields": {
+    "cartola_id": 95799,
+    "name": "Artur",
+    "position": "ATA",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 220,
+  "fields": {
+    "cartola_id": 142890,
+    "name": "Montoro",
+    "position": "MEI",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 221,
+  "fields": {
+    "cartola_id": 146375,
+    "name": "Kadir",
+    "position": "ATA",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 222,
+  "fields": {
+    "cartola_id": 142877,
+    "name": "Villalba",
+    "position": "ATA",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 223,
+  "fields": {
+    "cartola_id": 78605,
+    "name": "Gabriel",
+    "position": "MEI",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 224,
+  "fields": {
+    "cartola_id": 70360,
+    "name": "Eduardo Sasha",
+    "position": "ATA",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 225,
+  "fields": {
+    "cartola_id": 107170,
+    "name": "Jeffinho",
+    "position": "ATA",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 226,
+  "fields": {
+    "cartola_id": 39850,
+    "name": "Vagner Mancini",
+    "position": "TEC",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 227,
+  "fields": {
+    "cartola_id": 143072,
+    "name": "Gabriel Abdias",
+    "position": "LAT",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 228,
+  "fields": {
+    "cartola_id": 100695,
+    "name": "Fernando",
+    "position": "ATA",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 229,
+  "fields": {
+    "cartola_id": 94968,
+    "name": "Juninho Capixaba",
+    "position": "LAT",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 230,
+  "fields": {
+    "cartola_id": 94067,
+    "name": "Matheus Fernandes",
+    "position": "MEI",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 231,
+  "fields": {
+    "cartola_id": 87225,
+    "name": "Pedro Henrique",
+    "position": "ZAG",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 232,
+  "fields": {
+    "cartola_id": 142484,
+    "name": "Barrera",
+    "position": "MEI",
+    "real_team": "Botafogo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 233,
+  "fields": {
+    "cartola_id": 100848,
+    "name": "Luan Cândido",
+    "position": "LAT",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 234,
+  "fields": {
+    "cartola_id": 70800,
+    "name": "Jorge Sampaoli",
+    "position": "TEC",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 235,
+  "fields": {
+    "cartola_id": 106434,
+    "name": "Eduardo Santos",
+    "position": "ZAG",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 236,
+  "fields": {
+    "cartola_id": 110715,
+    "name": "Andrés Hurtado",
+    "position": "LAT",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 237,
+  "fields": {
+    "cartola_id": 103295,
+    "name": "Eric Ramires",
+    "position": "MEI",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 238,
+  "fields": {
+    "cartola_id": 104588,
+    "name": "Fabrício",
+    "position": "GOL",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 239,
+  "fields": {
+    "cartola_id": 105213,
+    "name": "Sant Anna",
+    "position": "LAT",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 240,
+  "fields": {
+    "cartola_id": 106160,
+    "name": "Lucão",
+    "position": "GOL",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 241,
+  "fields": {
+    "cartola_id": 103014,
+    "name": "Laquintana",
+    "position": "ATA",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 242,
+  "fields": {
+    "cartola_id": 107236,
+    "name": "Vanderlan",
+    "position": "LAT",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 243,
+  "fields": {
+    "cartola_id": 108133,
+    "name": "Isidro Pitta",
+    "position": "ATA",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 244,
+  "fields": {
+    "cartola_id": 107744,
+    "name": "Praxedes",
+    "position": "MEI",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 245,
+  "fields": {
+    "cartola_id": 112886,
+    "name": "Lucas Barbosa",
+    "position": "ATA",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 246,
+  "fields": {
+    "cartola_id": 118175,
+    "name": "Nathan Camargo",
+    "position": "MEI",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 247,
+  "fields": {
+    "cartola_id": 111246,
+    "name": "Alix Vinicius",
+    "position": "ZAG",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 248,
+  "fields": {
+    "cartola_id": 110750,
+    "name": "Gustavo Marques",
+    "position": "ZAG",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 249,
+  "fields": {
+    "cartola_id": 113157,
+    "name": "Nathan Mendes",
+    "position": "LAT",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 250,
+  "fields": {
+    "cartola_id": 122394,
+    "name": "Gustavinho",
+    "position": "MEI",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 251,
+  "fields": {
+    "cartola_id": 111760,
+    "name": "Fabinho",
+    "position": "MEI",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 252,
+  "fields": {
+    "cartola_id": 122897,
+    "name": "Guzmán Rodríguez",
+    "position": "ZAG",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 253,
+  "fields": {
+    "cartola_id": 122755,
+    "name": "Lucas Cunha",
+    "position": "ZAG",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 254,
+  "fields": {
+    "cartola_id": 132580,
+    "name": "Vinicinho",
+    "position": "ATA",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 255,
+  "fields": {
+    "cartola_id": 124239,
+    "name": "Henry Mosquera",
+    "position": "ATA",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 256,
+  "fields": {
+    "cartola_id": 138021,
+    "name": "Palacios",
+    "position": "ZAG",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 257,
+  "fields": {
+    "cartola_id": 72605,
+    "name": "Vitor Hugo",
+    "position": "ZAG",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 258,
+  "fields": {
+    "cartola_id": 140906,
+    "name": "Davi Gomes",
+    "position": "ATA",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 259,
+  "fields": {
+    "cartola_id": 132274,
+    "name": "Ignacio Sosa",
+    "position": "MEI",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 260,
+  "fields": {
+    "cartola_id": 39656,
+    "name": "Alan Franco",
+    "position": "MEI",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 261,
+  "fields": {
+    "cartola_id": 98909,
+    "name": "Cuello",
+    "position": "ATA",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 262,
+  "fields": {
+    "cartola_id": 42135,
+    "name": "Willian",
+    "position": "MEI",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 263,
+  "fields": {
+    "cartola_id": 91607,
+    "name": "Rony",
+    "position": "ATA",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 264,
+  "fields": {
+    "cartola_id": 68920,
+    "name": "Dudu",
+    "position": "ATA",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 265,
+  "fields": {
+    "cartola_id": 87999,
+    "name": "Gustavo Scarpa",
+    "position": "MEI",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 266,
+  "fields": {
+    "cartola_id": 101002,
+    "name": "Júnior Santos",
+    "position": "ATA",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 267,
+  "fields": {
+    "cartola_id": 88312,
+    "name": "Junior Alonso",
+    "position": "ZAG",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 268,
+  "fields": {
+    "cartola_id": 100084,
+    "name": "Igor Gomes",
+    "position": "MEI",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 269,
+  "fields": {
+    "cartola_id": 92087,
+    "name": "Lyanco",
+    "position": "ZAG",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 270,
+  "fields": {
+    "cartola_id": 110760,
+    "name": "Biel",
+    "position": "ATA",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 271,
+  "fields": {
+    "cartola_id": 118774,
+    "name": "Alexsander",
+    "position": "MEI",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 272,
+  "fields": {
+    "cartola_id": 85425,
+    "name": "João Paulo",
+    "position": "GOL",
+    "real_team": "Bahia"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 273,
+  "fields": {
+    "cartola_id": 107554,
+    "name": "Natanael",
+    "position": "LAT",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 274,
+  "fields": {
+    "cartola_id": 100842,
+    "name": "Ruan",
+    "position": "ZAG",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 275,
+  "fields": {
+    "cartola_id": 115674,
+    "name": "Gabriel Delfim",
+    "position": "GOL",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 276,
+  "fields": {
+    "cartola_id": 93882,
+    "name": "Cleiton",
+    "position": "GOL",
+    "real_team": "Bragantino"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 277,
+  "fields": {
+    "cartola_id": 105068,
+    "name": "Reinier",
+    "position": "MEI",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 278,
+  "fields": {
+    "cartola_id": 77485,
+    "name": "Carrillo",
+    "position": "MEI",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 279,
+  "fields": {
+    "cartola_id": 78248,
+    "name": "Gustavo Henrique",
+    "position": "ZAG",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 280,
+  "fields": {
+    "cartola_id": 103767,
+    "name": "Gabriel Menino",
+    "position": "MEI",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 281,
+  "fields": {
+    "cartola_id": 122990,
+    "name": "Patrick",
+    "position": "MEI",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 282,
+  "fields": {
+    "cartola_id": 85048,
+    "name": "Memphis Depay",
+    "position": "ATA",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 283,
+  "fields": {
+    "cartola_id": 40990,
+    "name": "Dorival Júnior",
+    "position": "TEC",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 284,
+  "fields": {
+    "cartola_id": 78435,
+    "name": "Vitinho",
+    "position": "ATA",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 285,
+  "fields": {
+    "cartola_id": 98720,
+    "name": "Angileri",
+    "position": "LAT",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 286,
+  "fields": {
+    "cartola_id": 124661,
+    "name": "Iván Román",
+    "position": "ZAG",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 287,
+  "fields": {
+    "cartola_id": 123359,
+    "name": "Cadu",
+    "position": "ATA",
+    "real_team": "Atlético-MG"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 288,
+  "fields": {
+    "cartola_id": 96342,
+    "name": "Charles",
+    "position": "MEI",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 289,
+  "fields": {
+    "cartola_id": 98225,
+    "name": "Pedro Raul",
+    "position": "ATA",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 290,
+  "fields": {
+    "cartola_id": 105531,
+    "name": "Matheus Bidu",
+    "position": "LAT",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 291,
+  "fields": {
+    "cartola_id": 117910,
+    "name": "Breno Bidon",
+    "position": "MEI",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 292,
+  "fields": {
+    "cartola_id": 107908,
+    "name": "Hugo",
+    "position": "LAT",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 293,
+  "fields": {
+    "cartola_id": 102340,
+    "name": "Cacá",
+    "position": "ZAG",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 294,
+  "fields": {
+    "cartola_id": 101574,
+    "name": "Hugo Souza",
+    "position": "GOL",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 295,
+  "fields": {
+    "cartola_id": 71709,
+    "name": "Cuéllar",
+    "position": "MEI",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 296,
+  "fields": {
+    "cartola_id": 97642,
+    "name": "Félix Torres",
+    "position": "ZAG",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 297,
+  "fields": {
+    "cartola_id": 92440,
+    "name": "André Ramalho",
+    "position": "ZAG",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 298,
+  "fields": {
+    "cartola_id": 121824,
+    "name": "Kayke",
+    "position": "ATA",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 299,
+  "fields": {
+    "cartola_id": 117632,
+    "name": "Garro",
+    "position": "MEI",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 300,
+  "fields": {
+    "cartola_id": 110311,
+    "name": "José Martínez",
+    "position": "MEI",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 301,
+  "fields": {
+    "cartola_id": 107179,
+    "name": "Matheus Donelli",
+    "position": "GOL",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 302,
+  "fields": {
+    "cartola_id": 127242,
+    "name": "Bahia",
+    "position": "MEI",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 303,
+  "fields": {
+    "cartola_id": 84558,
+    "name": "Lucas Romero",
+    "position": "MEI",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 304,
+  "fields": {
+    "cartola_id": 145744,
+    "name": "André",
+    "position": "MEI",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 305,
+  "fields": {
+    "cartola_id": 89275,
+    "name": "William",
+    "position": "LAT",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 306,
+  "fields": {
+    "cartola_id": 125488,
+    "name": "João Pedro",
+    "position": "ZAG",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 307,
+  "fields": {
+    "cartola_id": 122396,
+    "name": "Ryan",
+    "position": "MEI",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 308,
+  "fields": {
+    "cartola_id": 133543,
+    "name": "Gui Negão",
+    "position": "ATA",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 309,
+  "fields": {
+    "cartola_id": 131753,
+    "name": "Felipe Longo",
+    "position": "GOL",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 310,
+  "fields": {
+    "cartola_id": 45125,
+    "name": "Tite",
+    "position": "TEC",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 311,
+  "fields": {
+    "cartola_id": 79701,
+    "name": "Lucas Silva",
+    "position": "MEI",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 312,
+  "fields": {
+    "cartola_id": 141995,
+    "name": "Dieguinho",
+    "position": "MEI",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 313,
+  "fields": {
+    "cartola_id": 88479,
+    "name": "Walace",
+    "position": "MEI",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 314,
+  "fields": {
+    "cartola_id": 42500,
+    "name": "Fagner",
+    "position": "LAT",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 315,
+  "fields": {
+    "cartola_id": 114405,
+    "name": "Sinisterra",
+    "position": "ATA",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 316,
+  "fields": {
+    "cartola_id": 96610,
+    "name": "Matheus Pereira",
+    "position": "MEI",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 317,
+  "fields": {
+    "cartola_id": 124912,
+    "name": "Jonathan Jesus",
+    "position": "ZAG",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 318,
+  "fields": {
+    "cartola_id": 111690,
+    "name": "Matheus Cunha",
+    "position": "GOL",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 319,
+  "fields": {
+    "cartola_id": 100742,
+    "name": "Matheus Henrique",
+    "position": "MEI",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 320,
+  "fields": {
+    "cartola_id": 93478,
+    "name": "Wanderson",
+    "position": "ATA",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 321,
+  "fields": {
+    "cartola_id": 139345,
+    "name": "Kauã Prates",
+    "position": "LAT",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 322,
+  "fields": {
+    "cartola_id": 132264,
+    "name": "Arroyo",
+    "position": "ATA",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 323,
+  "fields": {
+    "cartola_id": 113158,
+    "name": "Marquinhos",
+    "position": "ATA",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 324,
+  "fields": {
+    "cartola_id": 105047,
+    "name": "João Marcelo",
+    "position": "ZAG",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 325,
+  "fields": {
+    "cartola_id": 143600,
+    "name": "Kauã Moraes",
+    "position": "LAT",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 326,
+  "fields": {
+    "cartola_id": 131967,
+    "name": "Villarreal",
+    "position": "ATA",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 327,
+  "fields": {
+    "cartola_id": 146807,
+    "name": "Rayan Lelis",
+    "position": "ATA",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 328,
+  "fields": {
+    "cartola_id": 92854,
+    "name": "Borré",
+    "position": "ATA",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 329,
+  "fields": {
+    "cartola_id": 137542,
+    "name": "Kaique Kenji",
+    "position": "ATA",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 330,
+  "fields": {
+    "cartola_id": 143350,
+    "name": "Murilo Rhikman",
+    "position": "MEI",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 331,
+  "fields": {
+    "cartola_id": 111757,
+    "name": "Ryan Guilherme",
+    "position": "MEI",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 332,
+  "fields": {
+    "cartola_id": 69783,
+    "name": "Danilo",
+    "position": "ZAG",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 333,
+  "fields": {
+    "cartola_id": 122660,
+    "name": "Japa",
+    "position": "MEI",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 334,
+  "fields": {
+    "cartola_id": 137543,
+    "name": "Tevis",
+    "position": "ATA",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 335,
+  "fields": {
+    "cartola_id": 83528,
+    "name": "Léo Pereira",
+    "position": "ZAG",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 336,
+  "fields": {
+    "cartola_id": 117404,
+    "name": "Otávio",
+    "position": "GOL",
+    "real_team": "Cruzeiro"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 337,
+  "fields": {
+    "cartola_id": 84816,
+    "name": "Varela",
+    "position": "LAT",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 338,
+  "fields": {
+    "cartola_id": 86757,
+    "name": "Everton",
+    "position": "ATA",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 339,
+  "fields": {
+    "cartola_id": 87863,
+    "name": "Arrascaeta",
+    "position": "MEI",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 340,
+  "fields": {
+    "cartola_id": 72018,
+    "name": "Tiago Volpi",
+    "position": "GOL",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 341,
+  "fields": {
+    "cartola_id": 90285,
+    "name": "Bruno Henrique",
+    "position": "ATA",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 342,
+  "fields": {
+    "cartola_id": 80061,
+    "name": "Saúl",
+    "position": "MEI",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 343,
+  "fields": {
+    "cartola_id": 98873,
+    "name": "Samuel Lino",
+    "position": "ATA",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 344,
+  "fields": {
+    "cartola_id": 82627,
+    "name": "Luiz Araújo",
+    "position": "ATA",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 345,
+  "fields": {
+    "cartola_id": 84735,
+    "name": "Jorginho",
+    "position": "MEI",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 346,
+  "fields": {
+    "cartola_id": 91473,
+    "name": "Erick Pulgar",
+    "position": "MEI",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 347,
+  "fields": {
+    "cartola_id": 96870,
+    "name": "Emerson Royal",
+    "position": "LAT",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 348,
+  "fields": {
+    "cartola_id": 88393,
+    "name": "Ayrton Lucas",
+    "position": "LAT",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 349,
+  "fields": {
+    "cartola_id": 115914,
+    "name": "Evertton Araújo",
+    "position": "MEI",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 350,
+  "fields": {
+    "cartola_id": 99392,
+    "name": "Michael",
+    "position": "ATA",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 351,
+  "fields": {
+    "cartola_id": 96652,
+    "name": "Allan",
+    "position": "MEI",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 352,
+  "fields": {
+    "cartola_id": 99228,
+    "name": "De la Cruz",
+    "position": "MEI",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 353,
+  "fields": {
+    "cartola_id": 109096,
+    "name": "Plata",
+    "position": "ATA",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 354,
+  "fields": {
+    "cartola_id": 118090,
+    "name": "Iago",
+    "position": "ZAG",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 355,
+  "fields": {
+    "cartola_id": 122320,
+    "name": "Daniel Sales",
+    "position": "LAT",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 356,
+  "fields": {
+    "cartola_id": 139076,
+    "name": "Filipe Luís",
+    "position": "TEC",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 357,
+  "fields": {
+    "cartola_id": 130189,
+    "name": "Léo Nannetti",
+    "position": "GOL",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 358,
+  "fields": {
+    "cartola_id": 122318,
+    "name": "Dyogo Alves",
+    "position": "GOL",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 359,
+  "fields": {
+    "cartola_id": 122573,
+    "name": "Wallace Yan",
+    "position": "ATA",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 360,
+  "fields": {
+    "cartola_id": 62977,
+    "name": "Ganso",
+    "position": "MEI",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 361,
+  "fields": {
+    "cartola_id": 140303,
+    "name": "Da Mata",
+    "position": "ZAG",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 362,
+  "fields": {
+    "cartola_id": 145705,
+    "name": "Douglas Telles",
+    "position": "ATA",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 363,
+  "fields": {
+    "cartola_id": 140492,
+    "name": "João Victor",
+    "position": "ZAG",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 364,
+  "fields": {
+    "cartola_id": 78445,
+    "name": "Renê",
+    "position": "LAT",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 365,
+  "fields": {
+    "cartola_id": 143295,
+    "name": "Joshua",
+    "position": "MEI",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 366,
+  "fields": {
+    "cartola_id": 130382,
+    "name": "Guilherme Gomes",
+    "position": "MEI",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 367,
+  "fields": {
+    "cartola_id": 73384,
+    "name": "Samuel Xavier",
+    "position": "LAT",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 368,
+  "fields": {
+    "cartola_id": 78117,
+    "name": "Everaldo",
+    "position": "ATA",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 369,
+  "fields": {
+    "cartola_id": 79631,
+    "name": "Cano",
+    "position": "ATA",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 370,
+  "fields": {
+    "cartola_id": 82463,
+    "name": "Otávio",
+    "position": "MEI",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 371,
+  "fields": {
+    "cartola_id": 87258,
+    "name": "Soteldo",
+    "position": "ATA",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 372,
+  "fields": {
+    "cartola_id": 78855,
+    "name": "Thiago Santos",
+    "position": "ZAG",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 373,
+  "fields": {
+    "cartola_id": 101319,
+    "name": "Guga",
+    "position": "LAT",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 374,
+  "fields": {
+    "cartola_id": 86485,
+    "name": "Keno",
+    "position": "ATA",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 375,
+  "fields": {
+    "cartola_id": 102928,
+    "name": "Canobbio",
+    "position": "ATA",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 376,
+  "fields": {
+    "cartola_id": 89493,
+    "name": "Igor Rabello",
+    "position": "ZAG",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 377,
+  "fields": {
+    "cartola_id": 87228,
+    "name": "Guilherme Arana",
+    "position": "LAT",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 378,
+  "fields": {
+    "cartola_id": 113034,
+    "name": "Freytes",
+    "position": "ZAG",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 379,
+  "fields": {
+    "cartola_id": 96340,
+    "name": "Lima",
+    "position": "MEI",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 380,
+  "fields": {
+    "cartola_id": 100987,
+    "name": "Nonato",
+    "position": "MEI",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 381,
+  "fields": {
+    "cartola_id": 103523,
+    "name": "Ignácio",
+    "position": "ZAG",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 382,
+  "fields": {
+    "cartola_id": 101478,
+    "name": "Marcelo Pitaluga",
+    "position": "GOL",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 383,
+  "fields": {
+    "cartola_id": 103672,
+    "name": "Gabriel Fuentes",
+    "position": "LAT",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 384,
+  "fields": {
+    "cartola_id": 102137,
+    "name": "Vitor Eudes",
+    "position": "GOL",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 385,
+  "fields": {
+    "cartola_id": 110759,
+    "name": "John Kennedy",
+    "position": "ATA",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 386,
+  "fields": {
+    "cartola_id": 99366,
+    "name": "Luis Zubeldía",
+    "position": "TEC",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 387,
+  "fields": {
+    "cartola_id": 108474,
+    "name": "Santi Moreno",
+    "position": "ATA",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 388,
+  "fields": {
+    "cartola_id": 115915,
+    "name": "Lelê",
+    "position": "ATA",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 389,
+  "fields": {
+    "cartola_id": 116447,
+    "name": "Hércules",
+    "position": "MEI",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 390,
+  "fields": {
+    "cartola_id": 105807,
+    "name": "Luan Freitas",
+    "position": "ZAG",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 391,
+  "fields": {
+    "cartola_id": 123788,
+    "name": "Lezcano",
+    "position": "MEI",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 392,
+  "fields": {
+    "cartola_id": 140484,
+    "name": "Riquelme Felipe",
+    "position": "ATA",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 393,
+  "fields": {
+    "cartola_id": 104075,
+    "name": "Sabino",
+    "position": "ZAG",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 394,
+  "fields": {
+    "cartola_id": 63013,
+    "name": "Marcos Rocha",
+    "position": "LAT",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 395,
+  "fields": {
+    "cartola_id": 127932,
+    "name": "Julio Fidélis",
+    "position": "LAT",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 396,
+  "fields": {
+    "cartola_id": 95556,
+    "name": "Raniele",
+    "position": "MEI",
+    "real_team": "Corinthians"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 397,
+  "fields": {
+    "cartola_id": 132071,
+    "name": "Serna",
+    "position": "ATA",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 398,
+  "fields": {
+    "cartola_id": 130650,
+    "name": "Bernal",
+    "position": "MEI",
+    "real_team": "Fluminense"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 399,
+  "fields": {
+    "cartola_id": 87342,
+    "name": "Kannemann",
+    "position": "ZAG",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 400,
+  "fields": {
+    "cartola_id": 63289,
+    "name": "Edenílson",
+    "position": "MEI",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 401,
+  "fields": {
+    "cartola_id": 87887,
+    "name": "Balbuena",
+    "position": "ZAG",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 402,
+  "fields": {
+    "cartola_id": 89846,
+    "name": "Cristaldo",
+    "position": "MEI",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 403,
+  "fields": {
+    "cartola_id": 88037,
+    "name": "Luís Castro",
+    "position": "TEC",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 404,
+  "fields": {
+    "cartola_id": 97867,
+    "name": "Léo Ortiz",
+    "position": "ZAG",
+    "real_team": "Flamengo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 405,
+  "fields": {
+    "cartola_id": 91706,
+    "name": "Marlon",
+    "position": "LAT",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 406,
+  "fields": {
+    "cartola_id": 89273,
+    "name": "João Pedro",
+    "position": "LAT",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 407,
+  "fields": {
+    "cartola_id": 90532,
+    "name": "Arthur Melo",
+    "position": "MEI",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 408,
+  "fields": {
+    "cartola_id": 107873,
+    "name": "Bobadilla",
+    "position": "MEI",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 409,
+  "fields": {
+    "cartola_id": 100846,
+    "name": "Lucas Esteves",
+    "position": "LAT",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 410,
+  "fields": {
+    "cartola_id": 91908,
+    "name": "Pavón",
+    "position": "ATA",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 411,
+  "fields": {
+    "cartola_id": 102318,
+    "name": "Caio Paulista",
+    "position": "LAT",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 412,
+  "fields": {
+    "cartola_id": 111309,
+    "name": "Gustavo Martins",
+    "position": "ZAG",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 413,
+  "fields": {
+    "cartola_id": 92237,
+    "name": "Rodrigo Ely",
+    "position": "ZAG",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 414,
+  "fields": {
+    "cartola_id": 105563,
+    "name": "Carlos Vinícius",
+    "position": "ATA",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 415,
+  "fields": {
+    "cartola_id": 97145,
+    "name": "Villasanti",
+    "position": "MEI",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 416,
+  "fields": {
+    "cartola_id": 121792,
+    "name": "André",
+    "position": "ATA",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 417,
+  "fields": {
+    "cartola_id": 109966,
+    "name": "Monsalve",
+    "position": "MEI",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 418,
+  "fields": {
+    "cartola_id": 70944,
+    "name": "Bruno Henrique",
+    "position": "MEI",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 419,
+  "fields": {
+    "cartola_id": 142004,
+    "name": "Amuzu",
+    "position": "ATA",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 420,
+  "fields": {
+    "cartola_id": 112616,
+    "name": "Gabriel Grando",
+    "position": "GOL",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 421,
+  "fields": {
+    "cartola_id": 104994,
+    "name": "Wagner Leonardo",
+    "position": "ZAG",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 422,
+  "fields": {
+    "cartola_id": 108548,
+    "name": "Aravena",
+    "position": "ATA",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 423,
+  "fields": {
+    "cartola_id": 130889,
+    "name": "Riquelme",
+    "position": "MEI",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 424,
+  "fields": {
+    "cartola_id": 118238,
+    "name": "Ronald",
+    "position": "MEI",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 425,
+  "fields": {
+    "cartola_id": 116067,
+    "name": "Thiago Beltrame",
+    "position": "GOL",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 426,
+  "fields": {
+    "cartola_id": 92182,
+    "name": "Juninho",
+    "position": "ZAG",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 427,
+  "fields": {
+    "cartola_id": 107989,
+    "name": "Carbonero",
+    "position": "ATA",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 428,
+  "fields": {
+    "cartola_id": 92981,
+    "name": "Ronaldo",
+    "position": "MEI",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 429,
+  "fields": {
+    "cartola_id": 125467,
+    "name": "Viery",
+    "position": "ZAG",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 430,
+  "fields": {
+    "cartola_id": 88136,
+    "name": "Ivan",
+    "position": "GOL",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 431,
+  "fields": {
+    "cartola_id": 83251,
+    "name": "Alan Benítez",
+    "position": "LAT",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 432,
+  "fields": {
+    "cartola_id": 72951,
+    "name": "Mercado",
+    "position": "ZAG",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 433,
+  "fields": {
+    "cartola_id": 110510,
+    "name": "Aguirre",
+    "position": "LAT",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 434,
+  "fields": {
+    "cartola_id": 89637,
+    "name": "Thiago Maia",
+    "position": "MEI",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 435,
+  "fields": {
+    "cartola_id": 107174,
+    "name": "Bruno Tabata",
+    "position": "MEI",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 436,
+  "fields": {
+    "cartola_id": 111466,
+    "name": "Victor Gabriel",
+    "position": "ZAG",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 437,
+  "fields": {
+    "cartola_id": 115479,
+    "name": "Paulo Pezzolano",
+    "position": "TEC",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 438,
+  "fields": {
+    "cartola_id": 101960,
+    "name": "Vitinho",
+    "position": "ATA",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 439,
+  "fields": {
+    "cartola_id": 86711,
+    "name": "Richard",
+    "position": "MEI",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 440,
+  "fields": {
+    "cartola_id": 124271,
+    "name": "Gustavo Prado",
+    "position": "MEI",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 441,
+  "fields": {
+    "cartola_id": 106202,
+    "name": "Bruno Gomes",
+    "position": "MEI",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 442,
+  "fields": {
+    "cartola_id": 111683,
+    "name": "Anthoni",
+    "position": "GOL",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 443,
+  "fields": {
+    "cartola_id": 137618,
+    "name": "Clayton Sampaio",
+    "position": "ZAG",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 444,
+  "fields": {
+    "cartola_id": 123744,
+    "name": "Alan Rodríguez",
+    "position": "MEI",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 445,
+  "fields": {
+    "cartola_id": 93790,
+    "name": "Marlon Freitas",
+    "position": "MEI",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 446,
+  "fields": {
+    "cartola_id": 71684,
+    "name": "Gustavo Gómez",
+    "position": "ZAG",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 447,
+  "fields": {
+    "cartola_id": 143488,
+    "name": "Raykkonen",
+    "position": "ATA",
+    "real_team": "Internacional"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 448,
+  "fields": {
+    "cartola_id": 68872,
+    "name": "Marcelo Lomba",
+    "position": "GOL",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 449,
+  "fields": {
+    "cartola_id": 94509,
+    "name": "Raphael Veiga",
+    "position": "MEI",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 450,
+  "fields": {
+    "cartola_id": 70592,
+    "name": "Felipe Anderson",
+    "position": "MEI",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 451,
+  "fields": {
+    "cartola_id": 84674,
+    "name": "Lucas Evangelista",
+    "position": "MEI",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 452,
+  "fields": {
+    "cartola_id": 102130,
+    "name": "Piquerez",
+    "position": "LAT",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 453,
+  "fields": {
+    "cartola_id": 102950,
+    "name": "Facundo Torres",
+    "position": "MEI",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 454,
+  "fields": {
+    "cartola_id": 71631,
+    "name": "Weverton",
+    "position": "GOL",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 455,
+  "fields": {
+    "cartola_id": 105647,
+    "name": "Maurício",
+    "position": "MEI",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 456,
+  "fields": {
+    "cartola_id": 104085,
+    "name": "Bruno Fuchs",
+    "position": "ZAG",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 457,
+  "fields": {
+    "cartola_id": 99818,
+    "name": "Paulinho",
+    "position": "ATA",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 458,
+  "fields": {
+    "cartola_id": 92811,
+    "name": "Bruno Rodrigues",
+    "position": "ATA",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 459,
+  "fields": {
+    "cartola_id": 97653,
+    "name": "Murilo",
+    "position": "ZAG",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 460,
+  "fields": {
+    "cartola_id": 112863,
+    "name": "Ramón Sosa",
+    "position": "ATA",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 461,
+  "fields": {
+    "cartola_id": 108683,
+    "name": "Emiliano Martínez",
+    "position": "MEI",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 462,
+  "fields": {
+    "cartola_id": 110506,
+    "name": "Abel Ferreira",
+    "position": "TEC",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 463,
+  "fields": {
+    "cartola_id": 130612,
+    "name": "Luighi",
+    "position": "ATA",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 464,
+  "fields": {
+    "cartola_id": 111832,
+    "name": "Jefté",
+    "position": "LAT",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 465,
+  "fields": {
+    "cartola_id": 108588,
+    "name": "Tapia",
+    "position": "ATA",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 466,
+  "fields": {
+    "cartola_id": 73318,
+    "name": "Daniel Borges",
+    "position": "LAT",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 467,
+  "fields": {
+    "cartola_id": 104084,
+    "name": "Carlos Miguel",
+    "position": "GOL",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 468,
+  "fields": {
+    "cartola_id": 105175,
+    "name": "Khellven",
+    "position": "LAT",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 469,
+  "fields": {
+    "cartola_id": 124526,
+    "name": "Giay",
+    "position": "LAT",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 470,
+  "fields": {
+    "cartola_id": 81005,
+    "name": "André Luis",
+    "position": "ATA",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 471,
+  "fields": {
+    "cartola_id": 133679,
+    "name": "Benedetti",
+    "position": "ZAG",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 472,
+  "fields": {
+    "cartola_id": 141451,
+    "name": "Allan",
+    "position": "MEI",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 473,
+  "fields": {
+    "cartola_id": 72279,
+    "name": "Thomazella",
+    "position": "GOL",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 474,
+  "fields": {
+    "cartola_id": 136156,
+    "name": "Larson",
+    "position": "MEI",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 475,
+  "fields": {
+    "cartola_id": 79066,
+    "name": "Alex Muralha",
+    "position": "GOL",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 476,
+  "fields": {
+    "cartola_id": 97460,
+    "name": "João Victor",
+    "position": "ZAG",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 477,
+  "fields": {
+    "cartola_id": 87742,
+    "name": "Neto Moura",
+    "position": "MEI",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 478,
+  "fields": {
+    "cartola_id": 97321,
+    "name": "Alesson",
+    "position": "ATA",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 479,
+  "fields": {
+    "cartola_id": 90917,
+    "name": "Carlos Eduardo",
+    "position": "ATA",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 480,
+  "fields": {
+    "cartola_id": 86863,
+    "name": "Luiz Otávio",
+    "position": "ZAG",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 481,
+  "fields": {
+    "cartola_id": 82775,
+    "name": "Lucas Ramon",
+    "position": "LAT",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 482,
+  "fields": {
+    "cartola_id": 83263,
+    "name": "Yuri Lara",
+    "position": "MEI",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 483,
+  "fields": {
+    "cartola_id": 97520,
+    "name": "Shaylon",
+    "position": "MEI",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 484,
+  "fields": {
+    "cartola_id": 102667,
+    "name": "Nathan Fogaça",
+    "position": "ATA",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 485,
+  "fields": {
+    "cartola_id": 83257,
+    "name": "Gabriel",
+    "position": "ATA",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 486,
+  "fields": {
+    "cartola_id": 98384,
+    "name": "Negueba",
+    "position": "ATA",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 487,
+  "fields": {
+    "cartola_id": 104204,
+    "name": "Edson Carioca",
+    "position": "ATA",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 488,
+  "fields": {
+    "cartola_id": 101708,
+    "name": "Felipe Jonatan",
+    "position": "LAT",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 489,
+  "fields": {
+    "cartola_id": 104027,
+    "name": "Rafael Guanaes",
+    "position": "TEC",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 490,
+  "fields": {
+    "cartola_id": 117403,
+    "name": "Renato Marques",
+    "position": "ATA",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 491,
+  "fields": {
+    "cartola_id": 74187,
+    "name": "Rincón",
+    "position": "MEI",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 492,
+  "fields": {
+    "cartola_id": 82455,
+    "name": "Zé Rafael",
+    "position": "MEI",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 493,
+  "fields": {
+    "cartola_id": 77777,
+    "name": "João Schmidt",
+    "position": "MEI",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 494,
+  "fields": {
+    "cartola_id": 105903,
+    "name": "José Aldo",
+    "position": "MEI",
+    "real_team": "Mirassol"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 495,
+  "fields": {
+    "cartola_id": 81150,
+    "name": "Mayke",
+    "position": "LAT",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 496,
+  "fields": {
+    "cartola_id": 93372,
+    "name": "João Basso",
+    "position": "ZAG",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 497,
+  "fields": {
+    "cartola_id": 78478,
+    "name": "Willian Arão",
+    "position": "MEI",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 498,
+  "fields": {
+    "cartola_id": 84042,
+    "name": "Tiquinho Soares",
+    "position": "ATA",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 499,
+  "fields": {
+    "cartola_id": 91866,
+    "name": "Zé Ivaldo",
+    "position": "ZAG",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 500,
+  "fields": {
+    "cartola_id": 95466,
+    "name": "Igor Vinícius",
+    "position": "LAT",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 501,
+  "fields": {
+    "cartola_id": 102975,
+    "name": "Escobar",
+    "position": "LAT",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 502,
+  "fields": {
+    "cartola_id": 84847,
+    "name": "Luan Peres",
+    "position": "ZAG",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 503,
+  "fields": {
+    "cartola_id": 104754,
+    "name": "Juan Vojvoda",
+    "position": "TEC",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 504,
+  "fields": {
+    "cartola_id": 130811,
+    "name": "Souza",
+    "position": "LAT",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 505,
+  "fields": {
+    "cartola_id": 87470,
+    "name": "Thaciano",
+    "position": "MEI",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 506,
+  "fields": {
+    "cartola_id": 141754,
+    "name": "Gabriel Bontempo",
+    "position": "MEI",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 507,
+  "fields": {
+    "cartola_id": 105114,
+    "name": "Alexis Duarte",
+    "position": "ZAG",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 508,
+  "fields": {
+    "cartola_id": 102256,
+    "name": "Rollheiser",
+    "position": "MEI",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 509,
+  "fields": {
+    "cartola_id": 118775,
+    "name": "Lautaro Díaz",
+    "position": "ATA",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 510,
+  "fields": {
+    "cartola_id": 113690,
+    "name": "Diógenes",
+    "position": "GOL",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 511,
+  "fields": {
+    "cartola_id": 108469,
+    "name": "Adonis Frías",
+    "position": "ZAG",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 512,
+  "fields": {
+    "cartola_id": 63008,
+    "name": "Rafael Tolói",
+    "position": "ZAG",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 513,
+  "fields": {
+    "cartola_id": 142867,
+    "name": "Robinho Jr.",
+    "position": "ATA",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 514,
+  "fields": {
+    "cartola_id": 70164,
+    "name": "Lucas Moura",
+    "position": "MEI",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 515,
+  "fields": {
+    "cartola_id": 89840,
+    "name": "Calleri",
+    "position": "ATA",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 516,
+  "fields": {
+    "cartola_id": 81845,
+    "name": "Alisson",
+    "position": "MEI",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 517,
+  "fields": {
+    "cartola_id": 99889,
+    "name": "Alan Franco",
+    "position": "ZAG",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 518,
+  "fields": {
+    "cartola_id": 85403,
+    "name": "Danielzinho",
+    "position": "MEI",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 519,
+  "fields": {
+    "cartola_id": 77656,
+    "name": "Cédric Soares",
+    "position": "LAT",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 520,
+  "fields": {
+    "cartola_id": 141868,
+    "name": "Vinicius Lira",
+    "position": "LAT",
+    "real_team": "Santos"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 521,
+  "fields": {
+    "cartola_id": 80570,
+    "name": "Wendell",
+    "position": "LAT",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 522,
+  "fields": {
+    "cartola_id": 91573,
+    "name": "Arboleda",
+    "position": "ZAG",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 523,
+  "fields": {
+    "cartola_id": 106294,
+    "name": "Marcos Antônio",
+    "position": "MEI",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 524,
+  "fields": {
+    "cartola_id": 113103,
+    "name": "Flaco López",
+    "position": "ATA",
+    "real_team": "Palmeiras"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 525,
+  "fields": {
+    "cartola_id": 106028,
+    "name": "Coronel",
+    "position": "GOL",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 526,
+  "fields": {
+    "cartola_id": 101290,
+    "name": "Ferreira",
+    "position": "ATA",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 527,
+  "fields": {
+    "cartola_id": 90846,
+    "name": "Klaus",
+    "position": "ZAG",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 528,
+  "fields": {
+    "cartola_id": 103912,
+    "name": "Hernán Crespo",
+    "position": "TEC",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 529,
+  "fields": {
+    "cartola_id": 89883,
+    "name": "Dodi",
+    "position": "MEI",
+    "real_team": "Grêmio"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 530,
+  "fields": {
+    "cartola_id": 113359,
+    "name": "Pablo Maia",
+    "position": "MEI",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 531,
+  "fields": {
+    "cartola_id": 131617,
+    "name": "André Silva",
+    "position": "ATA",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 532,
+  "fields": {
+    "cartola_id": 117818,
+    "name": "Young",
+    "position": "GOL",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 533,
+  "fields": {
+    "cartola_id": 105300,
+    "name": "Ferraresi",
+    "position": "ZAG",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 534,
+  "fields": {
+    "cartola_id": 118563,
+    "name": "Rodriguinho",
+    "position": "MEI",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 535,
+  "fields": {
+    "cartola_id": 141611,
+    "name": "Maik",
+    "position": "LAT",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 536,
+  "fields": {
+    "cartola_id": 140542,
+    "name": "Ryan Francisco",
+    "position": "ATA",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 537,
+  "fields": {
+    "cartola_id": 81091,
+    "name": "Jair",
+    "position": "MEI",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 538,
+  "fields": {
+    "cartola_id": 72391,
+    "name": "Fernando Diniz",
+    "position": "TEC",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 539,
+  "fields": {
+    "cartola_id": 71123,
+    "name": "Thiago Mendes",
+    "position": "MEI",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 540,
+  "fields": {
+    "cartola_id": 141609,
+    "name": "Lucca",
+    "position": "ATA",
+    "real_team": "São Paulo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 541,
+  "fields": {
+    "cartola_id": 90309,
+    "name": "David",
+    "position": "ATA",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 542,
+  "fields": {
+    "cartola_id": 99213,
+    "name": "Puma Rodríguez",
+    "position": "LAT",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 543,
+  "fields": {
+    "cartola_id": 93716,
+    "name": "Paulo Henrique",
+    "position": "LAT",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 544,
+  "fields": {
+    "cartola_id": 86410,
+    "name": "Victor Luis",
+    "position": "LAT",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 545,
+  "fields": {
+    "cartola_id": 86686,
+    "name": "Tchê Tchê",
+    "position": "MEI",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 546,
+  "fields": {
+    "cartola_id": 97095,
+    "name": "Carlos Cuesta",
+    "position": "ZAG",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 547,
+  "fields": {
+    "cartola_id": 116706,
+    "name": "Andrés Gómez",
+    "position": "ATA",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 548,
+  "fields": {
+    "cartola_id": 117330,
+    "name": "Robert Renan",
+    "position": "ZAG",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 549,
+  "fields": {
+    "cartola_id": 95936,
+    "name": "Daniel Fuzato",
+    "position": "GOL",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 550,
+  "fields": {
+    "cartola_id": 99198,
+    "name": "Vegetti",
+    "position": "ATA",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 551,
+  "fields": {
+    "cartola_id": 115141,
+    "name": "Lucas Freitas",
+    "position": "ZAG",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 552,
+  "fields": {
+    "cartola_id": 105584,
+    "name": "Lucas Piton",
+    "position": "LAT",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 553,
+  "fields": {
+    "cartola_id": 111682,
+    "name": "Adson",
+    "position": "MEI",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 554,
+  "fields": {
+    "cartola_id": 122485,
+    "name": "Barros",
+    "position": "MEI",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 555,
+  "fields": {
+    "cartola_id": 101594,
+    "name": "Hugo Moura",
+    "position": "MEI",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 556,
+  "fields": {
+    "cartola_id": 108671,
+    "name": "Garré",
+    "position": "MEI",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 557,
+  "fields": {
+    "cartola_id": 92180,
+    "name": "Jair Ventura",
+    "position": "TEC",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 558,
+  "fields": {
+    "cartola_id": 118752,
+    "name": "Mateus Carvalho",
+    "position": "MEI",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 559,
+  "fields": {
+    "cartola_id": 142279,
+    "name": "Nuno Moreira",
+    "position": "MEI",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 560,
+  "fields": {
+    "cartola_id": 90588,
+    "name": "Caíque",
+    "position": "MEI",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 561,
+  "fields": {
+    "cartola_id": 92696,
+    "name": "Renato Kayzer",
+    "position": "ATA",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 562,
+  "fields": {
+    "cartola_id": 122486,
+    "name": "Rayan",
+    "position": "ATA",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 563,
+  "fields": {
+    "cartola_id": 115100,
+    "name": "Matheus França",
+    "position": "MEI",
+    "real_team": "Vasco"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 564,
+  "fields": {
+    "cartola_id": 83786,
+    "name": "Neris",
+    "position": "ZAG",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 565,
+  "fields": {
+    "cartola_id": 93411,
+    "name": "Cantalapiedra",
+    "position": "MEI",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 566,
+  "fields": {
+    "cartola_id": 96793,
+    "name": "Camutanga",
+    "position": "ZAG",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 567,
+  "fields": {
+    "cartola_id": 90943,
+    "name": "Zé Marcos",
+    "position": "ZAG",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 568,
+  "fields": {
+    "cartola_id": 42222,
+    "name": "Osvaldo",
+    "position": "ATA",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 569,
+  "fields": {
+    "cartola_id": 101597,
+    "name": "Ramon",
+    "position": "LAT",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 570,
+  "fields": {
+    "cartola_id": 101752,
+    "name": "Claudinho",
+    "position": "LAT",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 571,
+  "fields": {
+    "cartola_id": 90703,
+    "name": "Matheuzinho",
+    "position": "MEI",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 572,
+  "fields": {
+    "cartola_id": 104118,
+    "name": "Lucas Arcanjo",
+    "position": "GOL",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 573,
+  "fields": {
+    "cartola_id": 99440,
+    "name": "Baralhas",
+    "position": "MEI",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 574,
+  "fields": {
+    "cartola_id": 109138,
+    "name": "Kike Saverio",
+    "position": "ATA",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 575,
+  "fields": {
+    "cartola_id": 116461,
+    "name": "Jamerson",
+    "position": "LAT",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 576,
+  "fields": {
+    "cartola_id": 111879,
+    "name": "Matheus Silva",
+    "position": "LAT",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 577,
+  "fields": {
+    "cartola_id": 104330,
+    "name": "Dudu",
+    "position": "MEI",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 578,
+  "fields": {
+    "cartola_id": 97645,
+    "name": "Thiago Couto",
+    "position": "GOL",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 579,
+  "fields": {
+    "cartola_id": 100969,
+    "name": "Ronald Lopes",
+    "position": "MEI",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 580,
+  "fields": {
+    "cartola_id": 130620,
+    "name": "Edenílson",
+    "position": "MEI",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 581,
+  "fields": {
+    "cartola_id": 145099,
+    "name": "Rúben Rodrigues",
+    "position": "MEI",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 582,
+  "fields": {
+    "cartola_id": 111951,
+    "name": "Renzo López",
+    "position": "ATA",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 583,
+  "fields": {
+    "cartola_id": 90031,
+    "name": "Mendoza",
+    "position": "ATA",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 584,
+  "fields": {
+    "cartola_id": 145387,
+    "name": "Rúben Ismael",
+    "position": "MEI",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 585,
+  "fields": {
+    "cartola_id": 51548,
+    "name": "Giuliano",
+    "position": "MEI",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 586,
+  "fields": {
+    "cartola_id": 145510,
+    "name": "Paulo Roberto",
+    "position": "LAT",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 587,
+  "fields": {
+    "cartola_id": 129317,
+    "name": "Felipe Cardoso",
+    "position": "MEI",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 588,
+  "fields": {
+    "cartola_id": 102561,
+    "name": "Mastriani",
+    "position": "ATA",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 589,
+  "fields": {
+    "cartola_id": 85626,
+    "name": "Léo",
+    "position": "ZAG",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 590,
+  "fields": {
+    "cartola_id": 78077,
+    "name": "Madson",
+    "position": "LAT",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 591,
+  "fields": {
+    "cartola_id": 102796,
+    "name": "Julimar",
+    "position": "ATA",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 592,
+  "fields": {
+    "cartola_id": 105844,
+    "name": "Belezi",
+    "position": "ZAG",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 593,
+  "fields": {
+    "cartola_id": 80129,
+    "name": "Jadson",
+    "position": "MEI",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 594,
+  "fields": {
+    "cartola_id": 90715,
+    "name": "Luiz Fernando",
+    "position": "ATA",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 595,
+  "fields": {
+    "cartola_id": 120433,
+    "name": "Léo Derik",
+    "position": "LAT",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 596,
+  "fields": {
+    "cartola_id": 92273,
+    "name": "Odair Hellmann",
+    "position": "TEC",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 597,
+  "fields": {
+    "cartola_id": 105518,
+    "name": "Renan Peixoto",
+    "position": "ATA",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 598,
+  "fields": {
+    "cartola_id": 113113,
+    "name": "Benavídez",
+    "position": "LAT",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 599,
+  "fields": {
+    "cartola_id": 110668,
+    "name": "Esquivel",
+    "position": "LAT",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 600,
+  "fields": {
+    "cartola_id": 112017,
+    "name": "Felipinho",
+    "position": "MEI",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 601,
+  "fields": {
+    "cartola_id": 107985,
+    "name": "Terán",
+    "position": "ZAG",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 602,
+  "fields": {
+    "cartola_id": 92496,
+    "name": "Raul",
+    "position": "MEI",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 603,
+  "fields": {
+    "cartola_id": 115266,
+    "name": "Renan Viana",
+    "position": "ATA",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 604,
+  "fields": {
+    "cartola_id": 110698,
+    "name": "Mycael",
+    "position": "GOL",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 605,
+  "fields": {
+    "cartola_id": 115270,
+    "name": "Habraão",
+    "position": "ZAG",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 606,
+  "fields": {
+    "cartola_id": 125926,
+    "name": "Zapelli",
+    "position": "MEI",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 607,
+  "fields": {
+    "cartola_id": 125746,
+    "name": "Dudu",
+    "position": "MEI",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 608,
+  "fields": {
+    "cartola_id": 123869,
+    "name": "Aguirre",
+    "position": "ZAG",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 609,
+  "fields": {
+    "cartola_id": 122439,
+    "name": "Isaac",
+    "position": "ATA",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 610,
+  "fields": {
+    "cartola_id": 143193,
+    "name": "Viveros",
+    "position": "ATA",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 611,
+  "fields": {
+    "cartola_id": 122316,
+    "name": "Batata",
+    "position": "LAT",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 612,
+  "fields": {
+    "cartola_id": 128431,
+    "name": "João Cruz",
+    "position": "MEI",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 613,
+  "fields": {
+    "cartola_id": 127970,
+    "name": "Felipe Chiqueti",
+    "position": "MEI",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 614,
+  "fields": {
+    "cartola_id": 123101,
+    "name": "Leozinho",
+    "position": "ATA",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 615,
+  "fields": {
+    "cartola_id": 131832,
+    "name": "Portilla",
+    "position": "MEI",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 616,
+  "fields": {
+    "cartola_id": 63354,
+    "name": "Rodrigo Moledo",
+    "position": "ZAG",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 617,
+  "fields": {
+    "cartola_id": 128429,
+    "name": "Marcão",
+    "position": "ZAG",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 618,
+  "fields": {
+    "cartola_id": 130842,
+    "name": "Matheus Soares",
+    "position": "GOL",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 619,
+  "fields": {
+    "cartola_id": 50742,
+    "name": "Gabriel Leite",
+    "position": "GOL",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 620,
+  "fields": {
+    "cartola_id": 84339,
+    "name": "Bruno Melo",
+    "position": "LAT",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 621,
+  "fields": {
+    "cartola_id": 143532,
+    "name": "Carlos Eduardo",
+    "position": "GOL",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 622,
+  "fields": {
+    "cartola_id": 128427,
+    "name": "Alejandro García",
+    "position": "MEI",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 623,
+  "fields": {
+    "cartola_id": 145609,
+    "name": "Élan Ricardo",
+    "position": "MEI",
+    "real_team": "Athlético-PR"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 624,
+  "fields": {
+    "cartola_id": 81952,
+    "name": "Willian Oliveira",
+    "position": "MEI",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 625,
+  "fields": {
+    "cartola_id": 84626,
+    "name": "Josué",
+    "position": "MEI",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 626,
+  "fields": {
+    "cartola_id": 90302,
+    "name": "Pedro Rocha",
+    "position": "ATA",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 627,
+  "fields": {
+    "cartola_id": 71227,
+    "name": "Maicon",
+    "position": "ZAG",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 628,
+  "fields": {
+    "cartola_id": 126977,
+    "name": "Fernando Seabra",
+    "position": "TEC",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 629,
+  "fields": {
+    "cartola_id": 104811,
+    "name": "Sebastián Gómez",
+    "position": "MEI",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 630,
+  "fields": {
+    "cartola_id": 101405,
+    "name": "Wallisson",
+    "position": "MEI",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 631,
+  "fields": {
+    "cartola_id": 82628,
+    "name": "Tinga",
+    "position": "LAT",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 632,
+  "fields": {
+    "cartola_id": 97878,
+    "name": "Jacy",
+    "position": "ZAG",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 633,
+  "fields": {
+    "cartola_id": 84428,
+    "name": "Fernando Sobral",
+    "position": "MEI",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 634,
+  "fields": {
+    "cartola_id": 110708,
+    "name": "Pedro Rangel",
+    "position": "GOL",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 635,
+  "fields": {
+    "cartola_id": 117930,
+    "name": "Lavega",
+    "position": "ATA",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 636,
+  "fields": {
+    "cartola_id": 125803,
+    "name": "Pedro Morisco",
+    "position": "GOL",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 637,
+  "fields": {
+    "cartola_id": 112576,
+    "name": "Vini Paulista",
+    "position": "MEI",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 638,
+  "fields": {
+    "cartola_id": 123648,
+    "name": "Lucas Ronier",
+    "position": "ATA",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 639,
+  "fields": {
+    "cartola_id": 133460,
+    "name": "Felipe Guimarães",
+    "position": "LAT",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 640,
+  "fields": {
+    "cartola_id": 124834,
+    "name": "Ruan Assis",
+    "position": "ATA",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 641,
+  "fields": {
+    "cartola_id": 124358,
+    "name": "João Almeida",
+    "position": "LAT",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 642,
+  "fields": {
+    "cartola_id": 109127,
+    "name": "Tiago Cóser",
+    "position": "ZAG",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 643,
+  "fields": {
+    "cartola_id": 115840,
+    "name": "Benassi",
+    "position": "GOL",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 644,
+  "fields": {
+    "cartola_id": 141337,
+    "name": "Lucas Taverna",
+    "position": "LAT",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 645,
+  "fields": {
+    "cartola_id": 131279,
+    "name": "Thiago Azaf",
+    "position": "ATA",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 646,
+  "fields": {
+    "cartola_id": 125551,
+    "name": "Jean Gabriel",
+    "position": "MEI",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 647,
+  "fields": {
+    "cartola_id": 82730,
+    "name": "Marcelo Rangel",
+    "position": "GOL",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 648,
+  "fields": {
+    "cartola_id": 84708,
+    "name": "Panagiotis Tachtsidis",
+    "position": "MEI",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 649,
+  "fields": {
+    "cartola_id": 130283,
+    "name": "Matheus Dias",
+    "position": "MEI",
+    "real_team": "Coritiba"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 650,
+  "fields": {
+    "cartola_id": 84927,
+    "name": "Dodô",
+    "position": "MEI",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 651,
+  "fields": {
+    "cartola_id": 88065,
+    "name": "Jorge",
+    "position": "LAT",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 652,
+  "fields": {
+    "cartola_id": 83074,
+    "name": "Ygor Vinhas",
+    "position": "GOL",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 653,
+  "fields": {
+    "cartola_id": 70449,
+    "name": "Gabriel",
+    "position": "GOL",
+    "real_team": "Vitória"
+  }
+},
+{
+  "model": "league.player",
+  "pk": 654,
+  "fields": {
+    "cartola_id": 85315,
+    "name": "Cantillo",
+    "position": "MEI",
+    "real_team": "Remo"
+  }
+},
+{
+  "model": "league.roster",
+  "pk": 2,
+  "fields": {
+    "team": 2,
+    "player": 2,
+    "active": true
+  }
+},
+{
+  "model": "league.roster",
+  "pk": 3,
+  "fields": {
+    "team": 1,
+    "player": 1,
+    "active": true
+  }
+},
+{
+  "model": "league.roster",
+  "pk": 4,
+  "fields": {
+    "team": 1,
+    "player": 3,
+    "active": true
+  }
+},
+{
+  "model": "league.roster",
+  "pk": 5,
+  "fields": {
+    "team": 3,
+    "player": 4,
+    "active": true
+  }
+},
+{
+  "model": "league.roster",
+  "pk": 6,
+  "fields": {
+    "team": 4,
+    "player": 462,
+    "active": true
+  }
+},
+{
+  "model": "league.roster",
+  "pk": 7,
+  "fields": {
+    "team": 5,
+    "player": 35,
+    "active": true
+  }
+},
+{
+  "model": "league.roster",
+  "pk": 8,
+  "fields": {
+    "team": 6,
+    "player": 210,
+    "active": true
+  }
+},
+{
+  "model": "league.roster",
+  "pk": 9,
+  "fields": {
+    "team": 7,
+    "player": 137,
+    "active": true
+  }
+},
+{
+  "model": "league.roster",
+  "pk": 10,
+  "fields": {
+    "team": 8,
+    "player": 407,
+    "active": true
+  }
+},
+{
+  "model": "league.roster",
+  "pk": 11,
+  "fields": {
+    "team": 9,
+    "player": 391,
+    "active": true
+  }
+},
+{
+  "model": "league.roster",
+  "pk": 12,
+  "fields": {
+    "team": 10,
+    "player": 622,
+    "active": true
+  }
+},
+{
+  "model": "league.roster",
+  "pk": 13,
+  "fields": {
+    "team": 10,
+    "player": 431,
+    "active": true
+  }
+},
+{
+  "model": "league.roster",
+  "pk": 14,
+  "fields": {
+    "team": 9,
+    "player": 234,
+    "active": true
+  }
+},
+{
+  "model": "league.draft",
+  "pk": 1,
+  "fields": {
+    "league": 1,
+    "draft_type": "snake",
+    "rounds": 20,
+    "created_at": "2026-01-21T03:23:19.669Z"
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 1,
+  "fields": {
+    "draft": 1,
+    "round_number": 1,
+    "pick_number": 1,
+    "overall_number": 1,
+    "team": 1,
+    "player": 1,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 2,
+  "fields": {
+    "draft": 1,
+    "round_number": 1,
+    "pick_number": 2,
+    "overall_number": 2,
+    "team": 2,
+    "player": 2,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 3,
+  "fields": {
+    "draft": 1,
+    "round_number": 1,
+    "pick_number": 3,
+    "overall_number": 3,
+    "team": 3,
+    "player": 4,
+    "made_at": "2026-01-21T18:29:02.345Z",
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 4,
+  "fields": {
+    "draft": 1,
+    "round_number": 1,
+    "pick_number": 4,
+    "overall_number": 4,
+    "team": 4,
+    "player": 462,
+    "made_at": "2026-01-21T19:18:53.523Z",
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 5,
+  "fields": {
+    "draft": 1,
+    "round_number": 1,
+    "pick_number": 5,
+    "overall_number": 5,
+    "team": 5,
+    "player": 35,
+    "made_at": "2026-01-21T19:19:25.677Z",
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 6,
+  "fields": {
+    "draft": 1,
+    "round_number": 1,
+    "pick_number": 6,
+    "overall_number": 6,
+    "team": 6,
+    "player": 210,
+    "made_at": "2026-01-21T19:19:47.528Z",
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 7,
+  "fields": {
+    "draft": 1,
+    "round_number": 1,
+    "pick_number": 7,
+    "overall_number": 7,
+    "team": 7,
+    "player": 137,
+    "made_at": "2026-01-21T19:41:49.485Z",
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 8,
+  "fields": {
+    "draft": 1,
+    "round_number": 1,
+    "pick_number": 8,
+    "overall_number": 8,
+    "team": 8,
+    "player": 407,
+    "made_at": "2026-01-21T19:46:00.495Z",
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 9,
+  "fields": {
+    "draft": 1,
+    "round_number": 1,
+    "pick_number": 9,
+    "overall_number": 9,
+    "team": 9,
+    "player": 391,
+    "made_at": "2026-01-21T21:02:46.500Z",
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 10,
+  "fields": {
+    "draft": 1,
+    "round_number": 1,
+    "pick_number": 10,
+    "overall_number": 10,
+    "team": 10,
+    "player": 622,
+    "made_at": "2026-01-21T21:03:09.247Z",
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 11,
+  "fields": {
+    "draft": 1,
+    "round_number": 2,
+    "pick_number": 1,
+    "overall_number": 11,
+    "team": 10,
+    "player": 431,
+    "made_at": "2026-01-21T21:03:22.931Z",
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 12,
+  "fields": {
+    "draft": 1,
+    "round_number": 2,
+    "pick_number": 2,
+    "overall_number": 12,
+    "team": 9,
+    "player": 234,
+    "made_at": "2026-01-21T22:14:55.752Z",
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 13,
+  "fields": {
+    "draft": 1,
+    "round_number": 2,
+    "pick_number": 3,
+    "overall_number": 13,
+    "team": 8,
+    "player": null,
+    "made_at": null,
+    "is_current": true
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 14,
+  "fields": {
+    "draft": 1,
+    "round_number": 2,
+    "pick_number": 4,
+    "overall_number": 14,
+    "team": 7,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 15,
+  "fields": {
+    "draft": 1,
+    "round_number": 2,
+    "pick_number": 5,
+    "overall_number": 15,
+    "team": 6,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 16,
+  "fields": {
+    "draft": 1,
+    "round_number": 2,
+    "pick_number": 6,
+    "overall_number": 16,
+    "team": 5,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 17,
+  "fields": {
+    "draft": 1,
+    "round_number": 2,
+    "pick_number": 7,
+    "overall_number": 17,
+    "team": 4,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 18,
+  "fields": {
+    "draft": 1,
+    "round_number": 2,
+    "pick_number": 8,
+    "overall_number": 18,
+    "team": 3,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 19,
+  "fields": {
+    "draft": 1,
+    "round_number": 2,
+    "pick_number": 9,
+    "overall_number": 19,
+    "team": 2,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 20,
+  "fields": {
+    "draft": 1,
+    "round_number": 2,
+    "pick_number": 10,
+    "overall_number": 20,
+    "team": 1,
+    "player": 3,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 21,
+  "fields": {
+    "draft": 1,
+    "round_number": 3,
+    "pick_number": 1,
+    "overall_number": 21,
+    "team": 1,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 22,
+  "fields": {
+    "draft": 1,
+    "round_number": 3,
+    "pick_number": 2,
+    "overall_number": 22,
+    "team": 2,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 23,
+  "fields": {
+    "draft": 1,
+    "round_number": 3,
+    "pick_number": 3,
+    "overall_number": 23,
+    "team": 3,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 24,
+  "fields": {
+    "draft": 1,
+    "round_number": 3,
+    "pick_number": 4,
+    "overall_number": 24,
+    "team": 4,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 25,
+  "fields": {
+    "draft": 1,
+    "round_number": 3,
+    "pick_number": 5,
+    "overall_number": 25,
+    "team": 5,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 26,
+  "fields": {
+    "draft": 1,
+    "round_number": 3,
+    "pick_number": 6,
+    "overall_number": 26,
+    "team": 6,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 27,
+  "fields": {
+    "draft": 1,
+    "round_number": 3,
+    "pick_number": 7,
+    "overall_number": 27,
+    "team": 7,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 28,
+  "fields": {
+    "draft": 1,
+    "round_number": 3,
+    "pick_number": 8,
+    "overall_number": 28,
+    "team": 8,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 29,
+  "fields": {
+    "draft": 1,
+    "round_number": 3,
+    "pick_number": 9,
+    "overall_number": 29,
+    "team": 9,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 30,
+  "fields": {
+    "draft": 1,
+    "round_number": 3,
+    "pick_number": 10,
+    "overall_number": 30,
+    "team": 10,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 31,
+  "fields": {
+    "draft": 1,
+    "round_number": 4,
+    "pick_number": 1,
+    "overall_number": 31,
+    "team": 10,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 32,
+  "fields": {
+    "draft": 1,
+    "round_number": 4,
+    "pick_number": 2,
+    "overall_number": 32,
+    "team": 9,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 33,
+  "fields": {
+    "draft": 1,
+    "round_number": 4,
+    "pick_number": 3,
+    "overall_number": 33,
+    "team": 8,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 34,
+  "fields": {
+    "draft": 1,
+    "round_number": 4,
+    "pick_number": 4,
+    "overall_number": 34,
+    "team": 7,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 35,
+  "fields": {
+    "draft": 1,
+    "round_number": 4,
+    "pick_number": 5,
+    "overall_number": 35,
+    "team": 6,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 36,
+  "fields": {
+    "draft": 1,
+    "round_number": 4,
+    "pick_number": 6,
+    "overall_number": 36,
+    "team": 5,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 37,
+  "fields": {
+    "draft": 1,
+    "round_number": 4,
+    "pick_number": 7,
+    "overall_number": 37,
+    "team": 4,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 38,
+  "fields": {
+    "draft": 1,
+    "round_number": 4,
+    "pick_number": 8,
+    "overall_number": 38,
+    "team": 3,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 39,
+  "fields": {
+    "draft": 1,
+    "round_number": 4,
+    "pick_number": 9,
+    "overall_number": 39,
+    "team": 2,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 40,
+  "fields": {
+    "draft": 1,
+    "round_number": 4,
+    "pick_number": 10,
+    "overall_number": 40,
+    "team": 1,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 41,
+  "fields": {
+    "draft": 1,
+    "round_number": 5,
+    "pick_number": 1,
+    "overall_number": 41,
+    "team": 1,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 42,
+  "fields": {
+    "draft": 1,
+    "round_number": 5,
+    "pick_number": 2,
+    "overall_number": 42,
+    "team": 2,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 43,
+  "fields": {
+    "draft": 1,
+    "round_number": 5,
+    "pick_number": 3,
+    "overall_number": 43,
+    "team": 3,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 44,
+  "fields": {
+    "draft": 1,
+    "round_number": 5,
+    "pick_number": 4,
+    "overall_number": 44,
+    "team": 4,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 45,
+  "fields": {
+    "draft": 1,
+    "round_number": 5,
+    "pick_number": 5,
+    "overall_number": 45,
+    "team": 5,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 46,
+  "fields": {
+    "draft": 1,
+    "round_number": 5,
+    "pick_number": 6,
+    "overall_number": 46,
+    "team": 6,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 47,
+  "fields": {
+    "draft": 1,
+    "round_number": 5,
+    "pick_number": 7,
+    "overall_number": 47,
+    "team": 7,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 48,
+  "fields": {
+    "draft": 1,
+    "round_number": 5,
+    "pick_number": 8,
+    "overall_number": 48,
+    "team": 8,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 49,
+  "fields": {
+    "draft": 1,
+    "round_number": 5,
+    "pick_number": 9,
+    "overall_number": 49,
+    "team": 9,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 50,
+  "fields": {
+    "draft": 1,
+    "round_number": 5,
+    "pick_number": 10,
+    "overall_number": 50,
+    "team": 10,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 51,
+  "fields": {
+    "draft": 1,
+    "round_number": 6,
+    "pick_number": 1,
+    "overall_number": 51,
+    "team": 10,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 52,
+  "fields": {
+    "draft": 1,
+    "round_number": 6,
+    "pick_number": 2,
+    "overall_number": 52,
+    "team": 9,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 53,
+  "fields": {
+    "draft": 1,
+    "round_number": 6,
+    "pick_number": 3,
+    "overall_number": 53,
+    "team": 8,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 54,
+  "fields": {
+    "draft": 1,
+    "round_number": 6,
+    "pick_number": 4,
+    "overall_number": 54,
+    "team": 7,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 55,
+  "fields": {
+    "draft": 1,
+    "round_number": 6,
+    "pick_number": 5,
+    "overall_number": 55,
+    "team": 6,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 56,
+  "fields": {
+    "draft": 1,
+    "round_number": 6,
+    "pick_number": 6,
+    "overall_number": 56,
+    "team": 5,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 57,
+  "fields": {
+    "draft": 1,
+    "round_number": 6,
+    "pick_number": 7,
+    "overall_number": 57,
+    "team": 4,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 58,
+  "fields": {
+    "draft": 1,
+    "round_number": 6,
+    "pick_number": 8,
+    "overall_number": 58,
+    "team": 3,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 59,
+  "fields": {
+    "draft": 1,
+    "round_number": 6,
+    "pick_number": 9,
+    "overall_number": 59,
+    "team": 2,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 60,
+  "fields": {
+    "draft": 1,
+    "round_number": 6,
+    "pick_number": 10,
+    "overall_number": 60,
+    "team": 1,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 61,
+  "fields": {
+    "draft": 1,
+    "round_number": 7,
+    "pick_number": 1,
+    "overall_number": 61,
+    "team": 1,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 62,
+  "fields": {
+    "draft": 1,
+    "round_number": 7,
+    "pick_number": 2,
+    "overall_number": 62,
+    "team": 2,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 63,
+  "fields": {
+    "draft": 1,
+    "round_number": 7,
+    "pick_number": 3,
+    "overall_number": 63,
+    "team": 3,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 64,
+  "fields": {
+    "draft": 1,
+    "round_number": 7,
+    "pick_number": 4,
+    "overall_number": 64,
+    "team": 4,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 65,
+  "fields": {
+    "draft": 1,
+    "round_number": 7,
+    "pick_number": 5,
+    "overall_number": 65,
+    "team": 5,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 66,
+  "fields": {
+    "draft": 1,
+    "round_number": 7,
+    "pick_number": 6,
+    "overall_number": 66,
+    "team": 6,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 67,
+  "fields": {
+    "draft": 1,
+    "round_number": 7,
+    "pick_number": 7,
+    "overall_number": 67,
+    "team": 7,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 68,
+  "fields": {
+    "draft": 1,
+    "round_number": 7,
+    "pick_number": 8,
+    "overall_number": 68,
+    "team": 8,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 69,
+  "fields": {
+    "draft": 1,
+    "round_number": 7,
+    "pick_number": 9,
+    "overall_number": 69,
+    "team": 9,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 70,
+  "fields": {
+    "draft": 1,
+    "round_number": 7,
+    "pick_number": 10,
+    "overall_number": 70,
+    "team": 10,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 71,
+  "fields": {
+    "draft": 1,
+    "round_number": 8,
+    "pick_number": 1,
+    "overall_number": 71,
+    "team": 10,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 72,
+  "fields": {
+    "draft": 1,
+    "round_number": 8,
+    "pick_number": 2,
+    "overall_number": 72,
+    "team": 9,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 73,
+  "fields": {
+    "draft": 1,
+    "round_number": 8,
+    "pick_number": 3,
+    "overall_number": 73,
+    "team": 8,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 74,
+  "fields": {
+    "draft": 1,
+    "round_number": 8,
+    "pick_number": 4,
+    "overall_number": 74,
+    "team": 7,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 75,
+  "fields": {
+    "draft": 1,
+    "round_number": 8,
+    "pick_number": 5,
+    "overall_number": 75,
+    "team": 6,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 76,
+  "fields": {
+    "draft": 1,
+    "round_number": 8,
+    "pick_number": 6,
+    "overall_number": 76,
+    "team": 5,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 77,
+  "fields": {
+    "draft": 1,
+    "round_number": 8,
+    "pick_number": 7,
+    "overall_number": 77,
+    "team": 4,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 78,
+  "fields": {
+    "draft": 1,
+    "round_number": 8,
+    "pick_number": 8,
+    "overall_number": 78,
+    "team": 3,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 79,
+  "fields": {
+    "draft": 1,
+    "round_number": 8,
+    "pick_number": 9,
+    "overall_number": 79,
+    "team": 2,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 80,
+  "fields": {
+    "draft": 1,
+    "round_number": 8,
+    "pick_number": 10,
+    "overall_number": 80,
+    "team": 1,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 81,
+  "fields": {
+    "draft": 1,
+    "round_number": 9,
+    "pick_number": 1,
+    "overall_number": 81,
+    "team": 1,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 82,
+  "fields": {
+    "draft": 1,
+    "round_number": 9,
+    "pick_number": 2,
+    "overall_number": 82,
+    "team": 2,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 83,
+  "fields": {
+    "draft": 1,
+    "round_number": 9,
+    "pick_number": 3,
+    "overall_number": 83,
+    "team": 3,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 84,
+  "fields": {
+    "draft": 1,
+    "round_number": 9,
+    "pick_number": 4,
+    "overall_number": 84,
+    "team": 4,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 85,
+  "fields": {
+    "draft": 1,
+    "round_number": 9,
+    "pick_number": 5,
+    "overall_number": 85,
+    "team": 5,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 86,
+  "fields": {
+    "draft": 1,
+    "round_number": 9,
+    "pick_number": 6,
+    "overall_number": 86,
+    "team": 6,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 87,
+  "fields": {
+    "draft": 1,
+    "round_number": 9,
+    "pick_number": 7,
+    "overall_number": 87,
+    "team": 7,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 88,
+  "fields": {
+    "draft": 1,
+    "round_number": 9,
+    "pick_number": 8,
+    "overall_number": 88,
+    "team": 8,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 89,
+  "fields": {
+    "draft": 1,
+    "round_number": 9,
+    "pick_number": 9,
+    "overall_number": 89,
+    "team": 9,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 90,
+  "fields": {
+    "draft": 1,
+    "round_number": 9,
+    "pick_number": 10,
+    "overall_number": 90,
+    "team": 10,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 91,
+  "fields": {
+    "draft": 1,
+    "round_number": 10,
+    "pick_number": 1,
+    "overall_number": 91,
+    "team": 10,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 92,
+  "fields": {
+    "draft": 1,
+    "round_number": 10,
+    "pick_number": 2,
+    "overall_number": 92,
+    "team": 9,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 93,
+  "fields": {
+    "draft": 1,
+    "round_number": 10,
+    "pick_number": 3,
+    "overall_number": 93,
+    "team": 8,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 94,
+  "fields": {
+    "draft": 1,
+    "round_number": 10,
+    "pick_number": 4,
+    "overall_number": 94,
+    "team": 7,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 95,
+  "fields": {
+    "draft": 1,
+    "round_number": 10,
+    "pick_number": 5,
+    "overall_number": 95,
+    "team": 6,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 96,
+  "fields": {
+    "draft": 1,
+    "round_number": 10,
+    "pick_number": 6,
+    "overall_number": 96,
+    "team": 5,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 97,
+  "fields": {
+    "draft": 1,
+    "round_number": 10,
+    "pick_number": 7,
+    "overall_number": 97,
+    "team": 4,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 98,
+  "fields": {
+    "draft": 1,
+    "round_number": 10,
+    "pick_number": 8,
+    "overall_number": 98,
+    "team": 3,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 99,
+  "fields": {
+    "draft": 1,
+    "round_number": 10,
+    "pick_number": 9,
+    "overall_number": 99,
+    "team": 2,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 100,
+  "fields": {
+    "draft": 1,
+    "round_number": 10,
+    "pick_number": 10,
+    "overall_number": 100,
+    "team": 1,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 101,
+  "fields": {
+    "draft": 1,
+    "round_number": 11,
+    "pick_number": 1,
+    "overall_number": 101,
+    "team": 1,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 102,
+  "fields": {
+    "draft": 1,
+    "round_number": 11,
+    "pick_number": 2,
+    "overall_number": 102,
+    "team": 2,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 103,
+  "fields": {
+    "draft": 1,
+    "round_number": 11,
+    "pick_number": 3,
+    "overall_number": 103,
+    "team": 3,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 104,
+  "fields": {
+    "draft": 1,
+    "round_number": 11,
+    "pick_number": 4,
+    "overall_number": 104,
+    "team": 4,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 105,
+  "fields": {
+    "draft": 1,
+    "round_number": 11,
+    "pick_number": 5,
+    "overall_number": 105,
+    "team": 5,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 106,
+  "fields": {
+    "draft": 1,
+    "round_number": 11,
+    "pick_number": 6,
+    "overall_number": 106,
+    "team": 6,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 107,
+  "fields": {
+    "draft": 1,
+    "round_number": 11,
+    "pick_number": 7,
+    "overall_number": 107,
+    "team": 7,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 108,
+  "fields": {
+    "draft": 1,
+    "round_number": 11,
+    "pick_number": 8,
+    "overall_number": 108,
+    "team": 8,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 109,
+  "fields": {
+    "draft": 1,
+    "round_number": 11,
+    "pick_number": 9,
+    "overall_number": 109,
+    "team": 9,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 110,
+  "fields": {
+    "draft": 1,
+    "round_number": 11,
+    "pick_number": 10,
+    "overall_number": 110,
+    "team": 10,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 111,
+  "fields": {
+    "draft": 1,
+    "round_number": 12,
+    "pick_number": 1,
+    "overall_number": 111,
+    "team": 10,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 112,
+  "fields": {
+    "draft": 1,
+    "round_number": 12,
+    "pick_number": 2,
+    "overall_number": 112,
+    "team": 9,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 113,
+  "fields": {
+    "draft": 1,
+    "round_number": 12,
+    "pick_number": 3,
+    "overall_number": 113,
+    "team": 8,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 114,
+  "fields": {
+    "draft": 1,
+    "round_number": 12,
+    "pick_number": 4,
+    "overall_number": 114,
+    "team": 7,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 115,
+  "fields": {
+    "draft": 1,
+    "round_number": 12,
+    "pick_number": 5,
+    "overall_number": 115,
+    "team": 6,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 116,
+  "fields": {
+    "draft": 1,
+    "round_number": 12,
+    "pick_number": 6,
+    "overall_number": 116,
+    "team": 5,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 117,
+  "fields": {
+    "draft": 1,
+    "round_number": 12,
+    "pick_number": 7,
+    "overall_number": 117,
+    "team": 4,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 118,
+  "fields": {
+    "draft": 1,
+    "round_number": 12,
+    "pick_number": 8,
+    "overall_number": 118,
+    "team": 3,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 119,
+  "fields": {
+    "draft": 1,
+    "round_number": 12,
+    "pick_number": 9,
+    "overall_number": 119,
+    "team": 2,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 120,
+  "fields": {
+    "draft": 1,
+    "round_number": 12,
+    "pick_number": 10,
+    "overall_number": 120,
+    "team": 1,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 121,
+  "fields": {
+    "draft": 1,
+    "round_number": 13,
+    "pick_number": 1,
+    "overall_number": 121,
+    "team": 1,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 122,
+  "fields": {
+    "draft": 1,
+    "round_number": 13,
+    "pick_number": 2,
+    "overall_number": 122,
+    "team": 2,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 123,
+  "fields": {
+    "draft": 1,
+    "round_number": 13,
+    "pick_number": 3,
+    "overall_number": 123,
+    "team": 3,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 124,
+  "fields": {
+    "draft": 1,
+    "round_number": 13,
+    "pick_number": 4,
+    "overall_number": 124,
+    "team": 4,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 125,
+  "fields": {
+    "draft": 1,
+    "round_number": 13,
+    "pick_number": 5,
+    "overall_number": 125,
+    "team": 5,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 126,
+  "fields": {
+    "draft": 1,
+    "round_number": 13,
+    "pick_number": 6,
+    "overall_number": 126,
+    "team": 6,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 127,
+  "fields": {
+    "draft": 1,
+    "round_number": 13,
+    "pick_number": 7,
+    "overall_number": 127,
+    "team": 7,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 128,
+  "fields": {
+    "draft": 1,
+    "round_number": 13,
+    "pick_number": 8,
+    "overall_number": 128,
+    "team": 8,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 129,
+  "fields": {
+    "draft": 1,
+    "round_number": 13,
+    "pick_number": 9,
+    "overall_number": 129,
+    "team": 9,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 130,
+  "fields": {
+    "draft": 1,
+    "round_number": 13,
+    "pick_number": 10,
+    "overall_number": 130,
+    "team": 10,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 131,
+  "fields": {
+    "draft": 1,
+    "round_number": 14,
+    "pick_number": 1,
+    "overall_number": 131,
+    "team": 10,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 132,
+  "fields": {
+    "draft": 1,
+    "round_number": 14,
+    "pick_number": 2,
+    "overall_number": 132,
+    "team": 9,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 133,
+  "fields": {
+    "draft": 1,
+    "round_number": 14,
+    "pick_number": 3,
+    "overall_number": 133,
+    "team": 8,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 134,
+  "fields": {
+    "draft": 1,
+    "round_number": 14,
+    "pick_number": 4,
+    "overall_number": 134,
+    "team": 7,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 135,
+  "fields": {
+    "draft": 1,
+    "round_number": 14,
+    "pick_number": 5,
+    "overall_number": 135,
+    "team": 6,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 136,
+  "fields": {
+    "draft": 1,
+    "round_number": 14,
+    "pick_number": 6,
+    "overall_number": 136,
+    "team": 5,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 137,
+  "fields": {
+    "draft": 1,
+    "round_number": 14,
+    "pick_number": 7,
+    "overall_number": 137,
+    "team": 4,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 138,
+  "fields": {
+    "draft": 1,
+    "round_number": 14,
+    "pick_number": 8,
+    "overall_number": 138,
+    "team": 3,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 139,
+  "fields": {
+    "draft": 1,
+    "round_number": 14,
+    "pick_number": 9,
+    "overall_number": 139,
+    "team": 2,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 140,
+  "fields": {
+    "draft": 1,
+    "round_number": 14,
+    "pick_number": 10,
+    "overall_number": 140,
+    "team": 1,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 141,
+  "fields": {
+    "draft": 1,
+    "round_number": 15,
+    "pick_number": 1,
+    "overall_number": 141,
+    "team": 1,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 142,
+  "fields": {
+    "draft": 1,
+    "round_number": 15,
+    "pick_number": 2,
+    "overall_number": 142,
+    "team": 2,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 143,
+  "fields": {
+    "draft": 1,
+    "round_number": 15,
+    "pick_number": 3,
+    "overall_number": 143,
+    "team": 3,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 144,
+  "fields": {
+    "draft": 1,
+    "round_number": 15,
+    "pick_number": 4,
+    "overall_number": 144,
+    "team": 4,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 145,
+  "fields": {
+    "draft": 1,
+    "round_number": 15,
+    "pick_number": 5,
+    "overall_number": 145,
+    "team": 5,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 146,
+  "fields": {
+    "draft": 1,
+    "round_number": 15,
+    "pick_number": 6,
+    "overall_number": 146,
+    "team": 6,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 147,
+  "fields": {
+    "draft": 1,
+    "round_number": 15,
+    "pick_number": 7,
+    "overall_number": 147,
+    "team": 7,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 148,
+  "fields": {
+    "draft": 1,
+    "round_number": 15,
+    "pick_number": 8,
+    "overall_number": 148,
+    "team": 8,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 149,
+  "fields": {
+    "draft": 1,
+    "round_number": 15,
+    "pick_number": 9,
+    "overall_number": 149,
+    "team": 9,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 150,
+  "fields": {
+    "draft": 1,
+    "round_number": 15,
+    "pick_number": 10,
+    "overall_number": 150,
+    "team": 10,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 151,
+  "fields": {
+    "draft": 1,
+    "round_number": 16,
+    "pick_number": 1,
+    "overall_number": 151,
+    "team": 10,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 152,
+  "fields": {
+    "draft": 1,
+    "round_number": 16,
+    "pick_number": 2,
+    "overall_number": 152,
+    "team": 9,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 153,
+  "fields": {
+    "draft": 1,
+    "round_number": 16,
+    "pick_number": 3,
+    "overall_number": 153,
+    "team": 8,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 154,
+  "fields": {
+    "draft": 1,
+    "round_number": 16,
+    "pick_number": 4,
+    "overall_number": 154,
+    "team": 7,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 155,
+  "fields": {
+    "draft": 1,
+    "round_number": 16,
+    "pick_number": 5,
+    "overall_number": 155,
+    "team": 6,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 156,
+  "fields": {
+    "draft": 1,
+    "round_number": 16,
+    "pick_number": 6,
+    "overall_number": 156,
+    "team": 5,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 157,
+  "fields": {
+    "draft": 1,
+    "round_number": 16,
+    "pick_number": 7,
+    "overall_number": 157,
+    "team": 4,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 158,
+  "fields": {
+    "draft": 1,
+    "round_number": 16,
+    "pick_number": 8,
+    "overall_number": 158,
+    "team": 3,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 159,
+  "fields": {
+    "draft": 1,
+    "round_number": 16,
+    "pick_number": 9,
+    "overall_number": 159,
+    "team": 2,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 160,
+  "fields": {
+    "draft": 1,
+    "round_number": 16,
+    "pick_number": 10,
+    "overall_number": 160,
+    "team": 1,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 161,
+  "fields": {
+    "draft": 1,
+    "round_number": 17,
+    "pick_number": 1,
+    "overall_number": 161,
+    "team": 1,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 162,
+  "fields": {
+    "draft": 1,
+    "round_number": 17,
+    "pick_number": 2,
+    "overall_number": 162,
+    "team": 2,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 163,
+  "fields": {
+    "draft": 1,
+    "round_number": 17,
+    "pick_number": 3,
+    "overall_number": 163,
+    "team": 3,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 164,
+  "fields": {
+    "draft": 1,
+    "round_number": 17,
+    "pick_number": 4,
+    "overall_number": 164,
+    "team": 4,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 165,
+  "fields": {
+    "draft": 1,
+    "round_number": 17,
+    "pick_number": 5,
+    "overall_number": 165,
+    "team": 5,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 166,
+  "fields": {
+    "draft": 1,
+    "round_number": 17,
+    "pick_number": 6,
+    "overall_number": 166,
+    "team": 6,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 167,
+  "fields": {
+    "draft": 1,
+    "round_number": 17,
+    "pick_number": 7,
+    "overall_number": 167,
+    "team": 7,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 168,
+  "fields": {
+    "draft": 1,
+    "round_number": 17,
+    "pick_number": 8,
+    "overall_number": 168,
+    "team": 8,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 169,
+  "fields": {
+    "draft": 1,
+    "round_number": 17,
+    "pick_number": 9,
+    "overall_number": 169,
+    "team": 9,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 170,
+  "fields": {
+    "draft": 1,
+    "round_number": 17,
+    "pick_number": 10,
+    "overall_number": 170,
+    "team": 10,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 171,
+  "fields": {
+    "draft": 1,
+    "round_number": 18,
+    "pick_number": 1,
+    "overall_number": 171,
+    "team": 10,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 172,
+  "fields": {
+    "draft": 1,
+    "round_number": 18,
+    "pick_number": 2,
+    "overall_number": 172,
+    "team": 9,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 173,
+  "fields": {
+    "draft": 1,
+    "round_number": 18,
+    "pick_number": 3,
+    "overall_number": 173,
+    "team": 8,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 174,
+  "fields": {
+    "draft": 1,
+    "round_number": 18,
+    "pick_number": 4,
+    "overall_number": 174,
+    "team": 7,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 175,
+  "fields": {
+    "draft": 1,
+    "round_number": 18,
+    "pick_number": 5,
+    "overall_number": 175,
+    "team": 6,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 176,
+  "fields": {
+    "draft": 1,
+    "round_number": 18,
+    "pick_number": 6,
+    "overall_number": 176,
+    "team": 5,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 177,
+  "fields": {
+    "draft": 1,
+    "round_number": 18,
+    "pick_number": 7,
+    "overall_number": 177,
+    "team": 4,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 178,
+  "fields": {
+    "draft": 1,
+    "round_number": 18,
+    "pick_number": 8,
+    "overall_number": 178,
+    "team": 3,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 179,
+  "fields": {
+    "draft": 1,
+    "round_number": 18,
+    "pick_number": 9,
+    "overall_number": 179,
+    "team": 2,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 180,
+  "fields": {
+    "draft": 1,
+    "round_number": 18,
+    "pick_number": 10,
+    "overall_number": 180,
+    "team": 1,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 181,
+  "fields": {
+    "draft": 1,
+    "round_number": 19,
+    "pick_number": 1,
+    "overall_number": 181,
+    "team": 1,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 182,
+  "fields": {
+    "draft": 1,
+    "round_number": 19,
+    "pick_number": 2,
+    "overall_number": 182,
+    "team": 2,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 183,
+  "fields": {
+    "draft": 1,
+    "round_number": 19,
+    "pick_number": 3,
+    "overall_number": 183,
+    "team": 3,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 184,
+  "fields": {
+    "draft": 1,
+    "round_number": 19,
+    "pick_number": 4,
+    "overall_number": 184,
+    "team": 4,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 185,
+  "fields": {
+    "draft": 1,
+    "round_number": 19,
+    "pick_number": 5,
+    "overall_number": 185,
+    "team": 5,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 186,
+  "fields": {
+    "draft": 1,
+    "round_number": 19,
+    "pick_number": 6,
+    "overall_number": 186,
+    "team": 6,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 187,
+  "fields": {
+    "draft": 1,
+    "round_number": 19,
+    "pick_number": 7,
+    "overall_number": 187,
+    "team": 7,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 188,
+  "fields": {
+    "draft": 1,
+    "round_number": 19,
+    "pick_number": 8,
+    "overall_number": 188,
+    "team": 8,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 189,
+  "fields": {
+    "draft": 1,
+    "round_number": 19,
+    "pick_number": 9,
+    "overall_number": 189,
+    "team": 9,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 190,
+  "fields": {
+    "draft": 1,
+    "round_number": 19,
+    "pick_number": 10,
+    "overall_number": 190,
+    "team": 10,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 191,
+  "fields": {
+    "draft": 1,
+    "round_number": 20,
+    "pick_number": 1,
+    "overall_number": 191,
+    "team": 10,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 192,
+  "fields": {
+    "draft": 1,
+    "round_number": 20,
+    "pick_number": 2,
+    "overall_number": 192,
+    "team": 9,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 193,
+  "fields": {
+    "draft": 1,
+    "round_number": 20,
+    "pick_number": 3,
+    "overall_number": 193,
+    "team": 8,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 194,
+  "fields": {
+    "draft": 1,
+    "round_number": 20,
+    "pick_number": 4,
+    "overall_number": 194,
+    "team": 7,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 195,
+  "fields": {
+    "draft": 1,
+    "round_number": 20,
+    "pick_number": 5,
+    "overall_number": 195,
+    "team": 6,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 196,
+  "fields": {
+    "draft": 1,
+    "round_number": 20,
+    "pick_number": 6,
+    "overall_number": 196,
+    "team": 5,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 197,
+  "fields": {
+    "draft": 1,
+    "round_number": 20,
+    "pick_number": 7,
+    "overall_number": 197,
+    "team": 4,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 198,
+  "fields": {
+    "draft": 1,
+    "round_number": 20,
+    "pick_number": 8,
+    "overall_number": 198,
+    "team": 3,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 199,
+  "fields": {
+    "draft": 1,
+    "round_number": 20,
+    "pick_number": 9,
+    "overall_number": 199,
+    "team": 2,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.draftpick",
+  "pk": 200,
+  "fields": {
+    "draft": 1,
+    "round_number": 20,
+    "pick_number": 10,
+    "overall_number": 200,
+    "team": 1,
+    "player": null,
+    "made_at": null,
+    "is_current": false
+  }
+},
+{
+  "model": "league.rosterspot",
+  "pk": 1,
+  "fields": {
+    "draft": 1,
+    "team": 1,
+    "player": 1,
+    "acquired_via": "DRAFT",
+    "acquired_at": "2026-01-21T20:59:04.602Z"
+  }
+},
+{
+  "model": "league.rosterspot",
+  "pk": 2,
+  "fields": {
+    "draft": 1,
+    "team": 2,
+    "player": 2,
+    "acquired_via": "DRAFT",
+    "acquired_at": "2026-01-21T20:59:04.604Z"
+  }
+},
+{
+  "model": "league.rosterspot",
+  "pk": 3,
+  "fields": {
+    "draft": 1,
+    "team": 3,
+    "player": 4,
+    "acquired_via": "DRAFT",
+    "acquired_at": "2026-01-21T20:59:04.605Z"
+  }
+},
+{
+  "model": "league.rosterspot",
+  "pk": 4,
+  "fields": {
+    "draft": 1,
+    "team": 4,
+    "player": 462,
+    "acquired_via": "DRAFT",
+    "acquired_at": "2026-01-21T20:59:04.605Z"
+  }
+},
+{
+  "model": "league.rosterspot",
+  "pk": 5,
+  "fields": {
+    "draft": 1,
+    "team": 5,
+    "player": 35,
+    "acquired_via": "DRAFT",
+    "acquired_at": "2026-01-21T20:59:04.606Z"
+  }
+},
+{
+  "model": "league.rosterspot",
+  "pk": 6,
+  "fields": {
+    "draft": 1,
+    "team": 6,
+    "player": 210,
+    "acquired_via": "DRAFT",
+    "acquired_at": "2026-01-21T20:59:04.607Z"
+  }
+},
+{
+  "model": "league.rosterspot",
+  "pk": 7,
+  "fields": {
+    "draft": 1,
+    "team": 7,
+    "player": 137,
+    "acquired_via": "DRAFT",
+    "acquired_at": "2026-01-21T20:59:04.607Z"
+  }
+},
+{
+  "model": "league.rosterspot",
+  "pk": 8,
+  "fields": {
+    "draft": 1,
+    "team": 8,
+    "player": 407,
+    "acquired_via": "DRAFT",
+    "acquired_at": "2026-01-21T20:59:04.608Z"
+  }
+},
+{
+  "model": "league.rosterspot",
+  "pk": 9,
+  "fields": {
+    "draft": 1,
+    "team": 1,
+    "player": 3,
+    "acquired_via": "DRAFT",
+    "acquired_at": "2026-01-21T20:59:04.609Z"
+  }
+}
+]
