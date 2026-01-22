@@ -22,10 +22,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # -----------------------------
 # Core settings (Render-ready)
 # -----------------------------
-# IMPORTANT:
-# - In production (Render), set SECRET_KEY env var
-# - DEBUG should be "0" in production
-# - ALLOWED_HOSTS should include your Render hostname, e.g. "myapp.onrender.com"
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-me")
 DEBUG = os.environ.get("DEBUG", "0") == "1"
 
@@ -33,7 +29,7 @@ DEBUG = os.environ.get("DEBUG", "0") == "1"
 _allowed_hosts_raw = os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost")
 ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts_raw.split(",") if h.strip()]
 
-# CSRF trusted origins (optional but helpful on Render/custom domains)
+# CSRF trusted origins (optional but recommended for Render/custom domains)
 # Example: "https://myapp.onrender.com,https://draft.meudominio.com"
 _csrf_trusted_raw = os.environ.get("CSRF_TRUSTED_ORIGINS", "")
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in _csrf_trusted_raw.split(",") if o.strip()]
@@ -49,7 +45,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     "league.apps.LeagueConfig",
 ]
 
@@ -88,15 +83,25 @@ WSGI_APPLICATION = "backend.wsgi.application"
 # -----------------------------
 # Database
 # -----------------------------
-# Render Postgres will provide DATABASE_URL automatically (if you create a Render PostgreSQL).
-# Local: falls back to sqlite.
-DATABASES = {
-    "default": dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600,
-        ssl_require=not DEBUG,
-    )
-}
+# Render Postgres provides DATABASE_URL. Local dev can fall back to sqlite.
+# IMPORTANT: Only require SSL when DATABASE_URL is present (Postgres). SQLite breaks with sslmode.
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+if DATABASE_URL:
+    DATABASES = {
+        "default": dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=not DEBUG,
+        )
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 # -----------------------------
@@ -156,8 +161,8 @@ SECURE_SSL_REDIRECT = not DEBUG
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 
-# HSTS: eu deixei "desligado" por padrão porque configurar errado pode te travar.
-# Se quiser ligar depois:
+# HSTS: deixo desligado por padrão pra evitar travar domínio por engano.
+# Quando estiver tudo OK e estável, você pode ligar:
 # SECURE_HSTS_SECONDS = 31536000
 # SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 # SECURE_HSTS_PRELOAD = True
