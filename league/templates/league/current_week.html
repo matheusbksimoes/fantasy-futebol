@@ -1,0 +1,59 @@
+{% extends "league/base.html" %}
+
+{% block title %}Rodada atual{% endblock %}
+
+{% block head %}
+  <style>
+    .meta { color:#666; margin-bottom: 12px; }
+    .error { color:#b00020; margin: 12px 0; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ddd; padding: 8px; }
+    th { background: #f5f5f5; }
+    .tag { padding: 2px 8px; border-radius: 999px; font-size: 12px; border:1px solid #ddd; }
+    .tag-warn { border-color:#b00020; color:#b00020; background:#ffe5e5; }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <h1>Rodada atual</h1>
+
+  <div class="meta">
+    <a href="{% url 'draft_board' draft.id %}">← Voltar para a board</a>
+  </div>
+
+  {% if error %}
+    <div class="error">{{ error }}</div>
+  {% endif %}
+
+  {% if current_week %}
+    <p>
+      <b>Week {{ current_week.number }}</b>
+      {% if current_week.is_postponed %}
+        <span class="tag tag-warn">ADIADA</span>
+      {% endif %}
+    </p>
+
+    {% if matchups %}
+      <table>
+        <thead>
+          <tr>
+            <th>Mandante</th>
+            <th>Visitante</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for m in matchups %}
+            <tr>
+              <td>{{ m.home_team.name }}</td>
+              <td>{{ m.away_team.name }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>Não há confrontos cadastrados para esta rodada.</p>
+    {% endif %}
+  {% else %}
+    <p>Nenhuma rodada atual definida.</p>
+  {% endif %}
+{% endblock %}

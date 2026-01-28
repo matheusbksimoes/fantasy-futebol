@@ -1,0 +1,114 @@
+{% extends "league/base.html" %}
+
+{% block title %}Escalação{% endblock %}
+
+{% block head %}
+  <style>
+    select, button { padding: 8px; font-size: 14px; }
+    .row { display:flex; gap:12px; flex-wrap:wrap; }
+    .box { border:1px solid #ddd; border-radius:10px; padding:12px; margin:12px 0; }
+    label { font-weight:600; display:block; margin-bottom:6px; }
+    small { color:#666; display:block; margin-top:6px; }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <h1>Escalação — {{ team.name }}</h1>
+
+  <p>
+    Draft {{ draft.id }} • Week {{ week.number }}
+  </p>
+
+  <form method="post" class="box">
+    {% csrf_token %}
+
+    <!-- Formação -->
+    <div class="row" style="align-items:flex-end;">
+      <div style="min-width: 260px;">
+        <label>Formação</label>
+        <select name="formation">
+          {% for value,label in formation_choices %}
+            <option value="{{ value }}" {% if lineup.formation == value %}selected{% endif %}>
+              {{ label }}
+            </option>
+          {% endfor %}
+        </select>
+        <small>A formação ajusta automaticamente quantos ZAG/LAT/MEI/ATA existem.</small>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- Slots (GOL, ZAG, LAT, MEI, ATA, TEC) -->
+    <div class="row">
+      {% for s in slots %}
+        <div style="min-width: 260px;">
+          <label>{{ s.get_slot_type_display }} {{ s.slot_index }}</label>
+
+          {% if s.player and s.player.id in locked_player_ids %}
+            <select name="slot_{{ s.slot_type }}_{{ s.slot_index }}" disabled>
+          {% else %}
+            <select name="slot_{{ s.slot_type }}_{{ s.slot_index }}">
+          {% endif %}
+              <option value="">-- escolher --</option>
+
+              {% if s.slot_type == "GOL" %}
+                {% for p in gols %}
+                  <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>
+                    {{ p.name }} ({{ p.position }})
+                  </option>
+                {% endfor %}
+
+              {% elif s.slot_type == "ZAG" %}
+                {% for p in zags %}
+                  <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>
+                    {{ p.name }} ({{ p.position }})
+                  </option>
+                {% endfor %}
+
+              {% elif s.slot_type == "LAT" %}
+                {% for p in lats %}
+                  <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>
+                    {{ p.name }} ({{ p.position }})
+                  </option>
+                {% endfor %}
+
+              {% elif s.slot_type == "MEI" %}
+                {% for p in meis %}
+                  <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>
+                    {{ p.name }} ({{ p.position }})
+                  </option>
+                {% endfor %}
+
+              {% elif s.slot_type == "ATA" %}
+                {% for p in atas %}
+                  <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>
+                    {{ p.name }} ({{ p.position }})
+                  </option>
+                {% endfor %}
+
+              {% elif s.slot_type == "TEC" %}
+                {% for p in tecs %}
+                  <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>
+                    {{ p.name }} ({{ p.position }})
+                  </option>
+                {% endfor %}
+              {% endif %}
+            </select>
+
+          {% if s.player and s.player.id in locked_player_ids %}
+            <!-- disabled não envia POST, então preservamos -->
+            <input type="hidden"
+                   name="slot_{{ s.slot_type }}_{{ s.slot_index }}"
+                   value="{{ s.player.id }}">
+            <small>Travado (jogo em andamento)</small>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+
+    <div style="margin-top:12px;">
+      <button type="submit">Salvar escalação</button>
+    </div>
+  </form>
+{% endblock %}

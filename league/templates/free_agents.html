@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <title>Free Agents</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 16px; }
+    h1 { margin: 0 0 6px 0; }
+    .meta { color: #666; margin-bottom: 10px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ddd; padding: 8px; }
+    th { background: #f5f5f5; }
+    .actions { white-space: nowrap; }
+    .btn {
+      border: 1px solid #ccc; background: #fff; padding: 6px 10px;
+      cursor: pointer; border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Free Agents — {{ team.name }}</h1>
+
+  {% if draft %}
+    <div class="meta">
+      Draft: <b>{{ draft.id }}</b> • Liga: <b>{{ draft.league }}</b>
+    </div>
+    <p><a href="{% url 'team_roster' draft.id team.id %}">Voltar ao roster</a></p>
+  {% else %}
+    <p>{{ error }}</p>
+  {% endif %}
+
+  {% if free_agents %}
+    <table>
+      <thead>
+        <tr>
+          <th>Posição</th>
+          <th>Jogador</th>
+          <th>Time real</th>
+          <th class="actions">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in free_agents %}
+          <tr>
+            <td>{{ p.get_position_display }}</td>
+            <td><b>{{ p.name }}</b></td>
+            <td>{{ p.real_team }}</td>
+            <td class="actions">
+              <form method="post" action="{% url 'add_free_agent' team.id p.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button class="btn" type="submit">Add</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>Nenhum free agent disponível.</p>
+  {% endif %}
+</body>
+</html>

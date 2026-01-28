@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}Sleeper do Cartola{% endblock %}</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 16px; max-width: 1100px; }
+    a { color:#0b57d0; text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .topbar { display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin-bottom: 12px; }
+    .topbar .brand { font-weight: 800; font-size: 18px; margin-right: 8px; }
+    .pill { padding:6px 10px; border:1px solid #ddd; border-radius:999px; background:#fafafa; }
+    .pill.active { background:#0b57d0; color:white; border-color:#0b57d0; }
+    .pill.active a { color:white; }
+    .muted { color:#666; }
+    .box { border:1px solid #ddd; border-radius:10px; padding:12px; margin:12px 0; }
+  </style>
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand">⚽ Sleeper do Cartola</div>
+
+    <div class="pill {% if active_tab == 'board' %}active{% endif %}">
+      <a href="{% url 'draft_board' draft.id %}">Draft</a>
+    </div>
+
+    <div class="pill {% if active_tab == 'week' %}active{% endif %}">
+      <a href="{% url 'current_week' draft.id %}">Rodada atual</a>
+    </div>
+
+    <div class="pill {% if active_tab == 'schedule' %}active{% endif %}">
+      <a href="{% url 'current_week_matchups' draft.id %}">Schedule</a>
+    </div>
+
+    <div class="pill {% if active_tab == 'transactions' %}active{% endif %}">
+      <a href="{% url 'transactions_list' draft.id %}">Transações</a>
+    </div>
+
+    {% if team %}
+      <div class="pill {% if active_tab == 'roster' %}active{% endif %}">
+        <a href="{% url 'team_roster' draft.id team.id %}">Meu roster</a>
+      </div>
+
+      <div class="pill {% if active_tab == 'lineup' %}active{% endif %}">
+        <a href="{% url 'set_lineup' draft.id team.id %}">Escalação</a>
+      </div>
+
+      <div class="pill {% if active_tab == 'fa' %}active{% endif %}">
+        <a href="{% url 'free_agents_list' team.id %}">Free Agents</a>
+      </div>
+    {% endif %}
+
+    <span class="muted" style="margin-left:auto;">
+      {% if draft %}Draft #{{ draft.id }}{% endif %}
+      {% if week %} • Week {{ week.number }}{% endif %}
+    </span>
+  </div>
+
+  {% if messages %}
+    <div class="box">
+      {% for m in messages %}
+        <div class="muted">{{ m }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+
+</body>
+</html>

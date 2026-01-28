@@ -141,9 +141,15 @@ class DraftPick(models.Model):
             )
 from django.utils import timezone
 
+from django.db import models
+from django.db.models import Q
+from django.utils import timezone
+
+
 class RosterSpot(models.Model):
     ACQUIRED_CHOICES = [
         ("DRAFT", "Draft"),
+        ("WAIVER", "Waiver"),
         ("FA", "Free Agency"),
         ("TRADE", "Trade"),
     ]
@@ -155,12 +161,230 @@ class RosterSpot(models.Model):
     acquired_via = models.CharField(max_length=10, choices=ACQUIRED_CHOICES, default="DRAFT")
     acquired_at = models.DateTimeField(default=timezone.now)
 
+    # ✅ NOVO: marca que o jogador foi dropado
+    dropped_at = models.DateTimeField(null=True, blank=True)
+
     class Meta:
         constraints = [
-            # impede o mesmo jogador estar em 2 times no MESMO draft
+            # ✅ NOVO: impede jogador estar ativo em 2 times ao mesmo tempo
+            models.UniqueConstraint(
+                fields=["player"],
+                condition=Q(dropped_at__isnull=True),
+                name="uniq_active_player_global",
+            ),
+            # mantém sua regra original
             models.UniqueConstraint(fields=["draft", "player"], name="uniq_player_per_draft_roster"),
         ]
 
     def __str__(self):
-        return f"{self.team.name}: {self.player.name} ({self.acquired_via})"
+        status = "ACTIVE" if self.dropped_at is None else "DROPPED"
+        return f"{self.team.name}: {self.player.name} ({self.acquired_via}) - {status}"
+
+class Transaction(models.Model):
+    TYPE_CHOICES = [
+        ("DRAFT", "Draft"),
+        ("ADD", "Add (FA)"),
+        ("DROP", "Drop"),
+        ("TRADE", "Trade"),
+    ]
+
+    draft = models.ForeignKey("Draft", on_delete=models.CASCADE)
+    team = models.ForeignKey("Team", on_delete=models.CASCADE)
+    player = models.ForeignKey("Player", on_delete=models.CASCADE)
+
+    type = models.CharField(max_length=10, choices=TYPE_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+    notes = models.CharField(max_length=255, blank=True)
+
+    def __str__(self):
+        return f"{self.created_at:%d/%m %H:%M} - {self.team} - {self.type} - {self.player}"
+
+class Week(models.Model):
+    draft = models.ForeignKey(
+        "Draft",
+        on_delete=models.CASCADE,
+        related_name="weeks"
+    )
+
+    number = models.PositiveIntegerField()  # 1, 2, 3...
+
+    # Datas reais (opcional, mas útil)
+    starts_at = models.DateTimeField(null=True, blank=True)
+    ends_at = models.DateTimeField(null=True, blank=True)
+
+    # Controle de estado
+    is_current = models.BooleanField(default=False)
+
+    # 🔹 NOVOS CAMPOS (C4.8)
+    is_playoff = models.BooleanField(default=False)
+    is_final = models.BooleanField(default=False)
+
+    is_locked = models.BooleanField(default=False)
+    is_postponed = models.BooleanField(default=False)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["draft", "number"],
+                name="uniq_week_per_draft"
+            ),
+        ]
+        ordering = ["draft_id", "number"]
+
+    def __str__(self):
+        label = f"Draft {self.draft_id} — Week {self.number}"
+
+        if self.is_final:
+            label += " (Final)"
+        elif self.is_playoff:
+            label += " (Playoffs)"
+
+        if self.is_postponed:
+            label += " [ADIADA]"
+
+        return label
+
+class LineupSpot(models.Model):
+    SLOT_CHOICES = [
+        ("GOL", "Goleiro"),
+        ("LAT", "Lateral"),
+        ("ZAG", "Zagueiro"),
+        ("MEI", "Meia"),
+        ("ATA", "Atacante"),
+        ("TEC", "Técnico"),
+        ("BENCH", "Banco"),
+    ]
+
+    week = models.ForeignKey("Week", on_delete=models.CASCADE, related_name="lineup_spots")
+    team = models.ForeignKey("Team", on_delete=models.CASCADE, related_name="lineup_spots")
+    player = models.ForeignKey("Player", on_delete=models.CASCADE, related_name="lineup_spots")
+
+    slot = models.CharField(max_length=10, choices=SLOT_CHOICES)
+    set_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            # jogador não pode estar em 2 times na mesma semana
+            models.UniqueConstraint(fields=["week", "player"], name="uniq_player_per_week"),
+            # jogador não pode ser escalado 2x no mesmo time na mesma semana (redundante mas ajuda)
+            models.UniqueConstraint(fields=["week", "team", "player"], name="uniq_player_team_week"),
+        ]
+
+    def __str__(self):
+        return f"Week {self.week.number} — {self.team.name}: {self.player.name} ({self.slot})"
+
+from django.db import models
+from django.utils import timezone
+
+class PlayerWeekScore(models.Model):
+    week = models.ForeignKey("Week", on_delete=models.CASCADE, related_name="player_scores")
+    player = models.ForeignKey("Player", on_delete=models.CASCADE, related_name="week_scores")
+
+    points = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    scouts = models.JSONField(default=dict, blank=True)
+
+    source = models.CharField(max_length=20, default="CARTOLA")
+    fetched_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["week", "player"], name="uniq_player_score_per_week"),
+        ]
+
+    def __str__(self):
+        return f"Week {self.week.number} — {self.player.name}: {self.points}"
+
+class Matchup(models.Model):
+    week = models.ForeignKey("Week", on_delete=models.CASCADE, related_name="matchups")
+
+    home_team = models.ForeignKey(
+        "Team",
+        on_delete=models.CASCADE,
+        related_name="home_matchups",
+    )
+    away_team = models.ForeignKey(
+        "Team",
+        on_delete=models.CASCADE,
+        related_name="away_matchups",
+    )
+
+    home_score = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    away_score = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+
+    is_final = models.BooleanField(default=False)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["week", "home_team", "away_team"],
+                name="uniq_matchup_per_week",
+            ),
+        ]
+
+    def __str__(self):
+        return f"Week {self.week.number}: {self.home_team.name} x {self.away_team.name}"
+
+# league/models.py
+from django.db import models
+from django.core.exceptions import ValidationError
+from django.db.models import UniqueConstraint
+
+FORMATIONS = [
+    ("343", "3-4-3"),
+    ("352", "3-5-2"),
+    ("451", "4-5-1"),
+    ("442", "4-4-2"),
+    ("433", "4-3-3"),
+    ("532", "5-3-2"),
+    ("541", "5-4-1"),
+]
+
+SLOT_TYPES = [
+    ("GOL", "Goleiro"),
+    ("ZAG", "Zagueiro"),
+    ("LAT", "Lateral"),
+    ("MEI", "Meia"),
+    ("ATA", "Atacante"),
+    ("TEC", "Técnico"),
+]
+
+FORMATION_MAP = {
+    "343": {"ZAG": 3, "LAT": 0, "MEI": 4, "ATA": 3},
+    "352": {"ZAG": 3, "LAT": 0, "MEI": 5, "ATA": 2},
+    "451": {"ZAG": 2, "LAT": 2, "MEI": 5, "ATA": 1},
+    "442": {"ZAG": 2, "LAT": 2, "MEI": 4, "ATA": 2},
+    "433": {"ZAG": 2, "LAT": 2, "MEI": 3, "ATA": 3},
+    "532": {"ZAG": 3, "LAT": 2, "MEI": 3, "ATA": 2},
+    "541": {"ZAG": 3, "LAT": 2, "MEI": 4, "ATA": 1},
+}
+
+class Lineup(models.Model):
+    fantasy_team = models.ForeignKey("league.Team", on_delete=models.CASCADE)
+    round_number = models.PositiveIntegerField()
+    formation = models.CharField(max_length=3, choices=FORMATIONS, default="433")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(fields=["fantasy_team", "round_number"], name="uniq_lineup_team_round")
+        ]
+
+    def clean(self):
+        if self.formation not in FORMATION_MAP:
+            raise ValidationError("Formação inválida.")
+
+class LineupSlot(models.Model):
+    lineup = models.ForeignKey(Lineup, on_delete=models.CASCADE, related_name="slots")
+    slot_type = models.CharField(max_length=3, choices=SLOT_TYPES)
+    slot_index = models.PositiveIntegerField()  # 1..N dentro do tipo (DEF1, DEF2...)
+    player = models.ForeignKey("league.Player", on_delete=models.SET_NULL, null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(fields=["lineup", "slot_type", "slot_index"], name="uniq_lineup_slot")
+        ]
+
+    def __str__(self):
+        return f"{self.lineup.fantasy_team} R{self.lineup.round_number} {self.slot_type}{self.slot_index}"
 

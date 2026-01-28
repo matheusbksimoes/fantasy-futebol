@@ -1,11 +1,9 @@
-<!doctype html>
-<html lang="pt-br">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Draft Board</title>
+{% extends "league/base.html" %}
+
+{% block title %}Draft Board{% endblock %}
+
+{% block head %}
   <style>
-    body { font-family: Arial, sans-serif; margin: 16px; }
     h1 { margin: 0 0 6px 0; }
     .meta { color: #666; margin-bottom: 10px; }
 
@@ -35,9 +33,23 @@
     .pick { font-size: 14px; }
     .empty { color: #aaa; }
     .small { font-size: 12px; color: #777; margin-top: 4px; }
+
+    /* botão admin (adiar) */
+    .btn-admin {
+      display: inline-block;
+      margin-left: 10px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 1px solid #b00020;
+      background: #ffe5e5;
+      color: #b00020;
+    }
+    .btn-admin:hover { filter: brightness(0.98); }
   </style>
-</head>
-<body>
+{% endblock %}
+
+{% block content %}
   <h1>Draft Board</h1>
 
   <div class="meta">
@@ -46,13 +58,29 @@
 
   {% if current_pick %}
     <div class="current">
+      <b>Rodada atual:</b>
+      {% if current_week and current_week.is_postponed %}
+        <span style="color:#b00020;">(ADIADA)</span>
+      {% endif %}
+      <br>
+
       <b>Pick atual:</b> #{{ current_pick.overall_number }} — {{ current_pick.team.name }}
-<a href="/team/{{ current_pick.team.id }}/roster/">Ver roster</a>
+
+      <a href="{% url 'team_roster' draft.id current_pick.team.id %}">Ver roster</a>
 
       {% if can_draft %}
-        <a href="/draft/{{ draft.id }}/pick/">Draftar</a>
+        <a href="{% url 'make_pick' draft.id %}">Draftar</a>
       {% else %}
         <span style="margin-left:10px; color:#777;">(aguardando o dono do time)</span>
+      {% endif %}
+
+      {% if request.user.is_superuser %}
+        <form method="post"
+              action="{% url 'postpone_current_week' draft.id %}"
+              style="display:inline;">
+          {% csrf_token %}
+          <button class="btn-admin" type="submit">Adiar rodada</button>
+        </form>
       {% endif %}
     </div>
   {% endif %}
@@ -62,8 +90,9 @@
       <tr>
         <th class="round">Round</th>
         {% for t in teams %}
-          <th><a href="/team/{{ t.id }}/roster/">{{ t.name }}</a></th>
-
+          <th>
+            <a href="{% url 'team_roster' draft.id t.id %}">{{ t.name }}</a>
+          </th>
         {% endfor %}
       </tr>
     </thead>
@@ -71,10 +100,8 @@
     <tbody>
       {% for row in board_rows %}
         <tr>
-          <!-- round = contador do loop -->
           <td class="round">{{ forloop.counter }}</td>
 
-          <!-- row é uma lista de picks -->
           {% for p in row %}
             <td>
               {% if p and p.player %}
@@ -92,5 +119,4 @@
       {% endfor %}
     </tbody>
   </table>
-</body>
-</html>
+{% endblock %}

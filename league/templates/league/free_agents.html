@@ -1,6 +1,6 @@
 {% extends "league/base.html" %}
 
-{% block title %}Roster{% endblock %}
+{% block title %}Free Agents{% endblock %}
 
 {% block head %}
   <style>
@@ -14,25 +14,31 @@
       border: 1px solid #ccc; background: #fff; padding: 6px 10px;
       cursor: pointer; border-radius: 4px;
     }
-    .btn-danger { border-color: #d33; color: #d33; }
     .top-links a { margin-right: 12px; }
   </style>
 {% endblock %}
 
 {% block content %}
-  <h1>Roster — {{ team.name }}</h1>
+  <h1>Free Agents — {{ team.name }}</h1>
 
   <div class="meta">
-    Draft: <b>{{ draft.id }}</b> • Liga: <b>{{ draft.league }}</b>
+    {% if draft %}
+      Draft: <b>{{ draft.id }}</b> • Liga: <b>{{ draft.league }}</b>
+    {% else %}
+      Nenhum draft encontrado.
+    {% endif %}
   </div>
 
   <p class="top-links">
-    <a href="{% url 'draft_board' draft.id %}">Voltar para a board</a>
-    <a href="{% url 'free_agents_list' team.id %}">Ver Free Agents</a>
-    <a href="{% url 'set_lineup' draft.id team.id %}">Escalar time</a>
+    {% if draft %}
+      <a href="{% url 'team_roster' draft.id team.id %}">Voltar para o roster</a>
+      <a href="{% url 'set_lineup' draft.id team.id %}">Escalação</a>
+    {% else %}
+      <a href="javascript:history.back()">Voltar</a>
+    {% endif %}
   </p>
 
-  {% if roster_spots %}
+  {% if free_agents %}
     <table>
       <thead>
         <tr>
@@ -43,17 +49,15 @@
         </tr>
       </thead>
       <tbody>
-        {% for spot in roster_spots %}
+        {% for p in free_agents %}
           <tr>
-            <td>{{ spot.player.get_position_display }}</td>
-            <td><b>{{ spot.player.name }}</b></td>
-            <td>{{ spot.player.real_team }}</td>
+            <td>{{ p.get_position_display }}</td>
+            <td><b>{{ p.name }}</b></td>
+            <td>{{ p.real_team }}</td>
             <td class="actions">
-              <form method="post"
-                    action="{% url 'drop_player' team.id spot.player.id %}"
-                    style="display:inline;">
+              <form method="post" action="{% url 'add_free_agent' team.id p.id %}" style="display:inline;">
                 {% csrf_token %}
-                <button class="btn btn-danger" type="submit">Drop</button>
+                <button class="btn" type="submit">Add</button>
               </form>
             </td>
           </tr>
@@ -61,6 +65,6 @@
       </tbody>
     </table>
   {% else %}
-    <p>Nenhum jogador no roster ativo desse time.</p>
+    <p>Nenhum free agent disponível.</p>
   {% endif %}
 {% endblock %}

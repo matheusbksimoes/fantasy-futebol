@@ -76,7 +76,6 @@ TEMPLATES = [
         },
     },
 ]
-
 WSGI_APPLICATION = "backend.wsgi.application"
 
 
@@ -84,17 +83,20 @@ WSGI_APPLICATION = "backend.wsgi.application"
 # Database
 # -----------------------------
 # Render Postgres provides DATABASE_URL. Local dev can fall back to sqlite.
-# IMPORTANT: Only require SSL when DATABASE_URL is present (Postgres). SQLite breaks with sslmode.
-DATABASE_URL = os.environ.get("DATABASE_URL")
+DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
 
 if DATABASE_URL:
+    # Render: normalmente usa SSL. Local pode não usar.
+    ssl_require = os.environ.get("DB_SSL_REQUIRE", "1") == "1"
+
     DATABASES = {
         "default": dj_database_url.parse(
             DATABASE_URL,
             conn_max_age=600,
-            ssl_require=not DEBUG,
+            ssl_require=ssl_require,
         )
     }
+
 else:
     DATABASES = {
         "default": {
@@ -103,9 +105,6 @@ else:
         }
     }
 
-
-# -----------------------------
-# Password validation
 # -----------------------------
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -155,14 +154,25 @@ LOGOUT_REDIRECT_URL = "/accounts/login/"
 # -----------------------------
 # Render sits behind a proxy; this makes Django understand https correctly.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
 
 # Keep it strict in production, relaxed in DEBUG
 SECURE_SSL_REDIRECT = not DEBUG
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 
-# HSTS: deixo desligado por padrão pra evitar travar domínio por engano.
-# Quando estiver tudo OK e estável, você pode ligar:
-# SECURE_HSTS_SECONDS = 31536000
-# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-# SECURE_HSTS_PRELOAD = True
+# ✅ Local dev override: runserver não suporta HTTPS
+# Use: set DJANGO_LOCAL=1 (cmd)  |  $env:DJANGO_LOCAL="1" (PowerShell)
+# ==============================
+# 🔧 LOCAL DEVELOPMENT OVERRIDE
+# ==============================
+if os.environ.get("DJANGO_LOCAL") == "1":
+    DEBUG = True
+
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+
+    SECURE_PROXY_SSL_HEADER = None
+    USE_X_FORWARDED_HOST = False
+
