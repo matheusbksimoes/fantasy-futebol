@@ -2,71 +2,63 @@
 <html lang="pt-br">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Sleeper do Cartola{% endblock %}</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 16px; max-width: 1100px; }
+    body { font-family: Arial, sans-serif; margin: 16px; }
+    h1 { margin: 0 0 6px 0; }
     a { color:#0b57d0; text-decoration:none; }
     a:hover { text-decoration:underline; }
-    .topbar { display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin-bottom: 12px; }
-    .topbar .brand { font-weight: 800; font-size: 18px; margin-right: 8px; }
-    .pill { padding:6px 10px; border:1px solid #ddd; border-radius:999px; background:#fafafa; }
-    .pill.active { background:#0b57d0; color:white; border-color:#0b57d0; }
-    .pill.active a { color:white; }
-    .muted { color:#666; }
-    .box { border:1px solid #ddd; border-radius:10px; padding:12px; margin:12px 0; }
+
+    .nav {
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+      margin-bottom: 16px;
+    }
+    .brand { font-weight:700; margin-right: 10px; display:flex; align-items:center; gap:8px; }
+    .pill {
+      padding:6px 10px; border:1px solid #ddd; border-radius:999px;
+      text-decoration:none; color:#0b57d0; background:#fff;
+    }
+    .pill:hover { background:#fafafa; }
+    .pill-active { background:#0b57d0; color:#fff; border-color:#0b57d0; }
+    .muted { color:#666; margin-left:auto; }
+    .divider { width:1px; height:22px; background:#e5e5e5; margin: 0 4px; }
   </style>
-  {% block head %}{% endblock %}
+  {% block extra_head %}{% endblock %}
 </head>
 <body>
 
-  <div class="topbar">
-    <div class="brand">⚽ Sleeper do Cartola</div>
-
-    <div class="pill {% if active_tab == 'board' %}active{% endif %}">
-      <a href="{% url 'draft_board' draft.id %}">Draft</a>
+  <div class="nav">
+    <div class="brand">
+      <span>🌐</span>
+      <span>Sleeper do Cartola</span>
     </div>
 
-    <div class="pill {% if active_tab == 'week' %}active{% endif %}">
-      <a href="{% url 'current_week' draft.id %}">Rodada atual</a>
-    </div>
+    {% if draft %}
+      <a class="pill {% if active_tab == 'draft' %}pill-active{% endif %}" href="{% url 'draft_board' draft.id %}">Draft</a>
+      <a class="pill {% if active_tab == 'current_week' %}pill-active{% endif %}" href="{% url 'current_week_matchups' draft.id %}">Rodada atual</a>
 
-    <div class="pill {% if active_tab == 'schedule' %}active{% endif %}">
-      <a href="{% url 'current_week_matchups' draft.id %}">Schedule</a>
-    </div>
+      {# Se você criar uma página de schedule depois, deixe isso pronto #}
+      {% if schedule_url %}
+        <a class="pill {% if active_tab == 'schedule' %}pill-active{% endif %}" href="{{ schedule_url }}">Schedule</a>
+      {% endif %}
 
-    <div class="pill {% if active_tab == 'transactions' %}active{% endif %}">
-      <a href="{% url 'transactions_list' draft.id %}">Transações</a>
-    </div>
-
-    {% if team %}
-      <div class="pill {% if active_tab == 'roster' %}active{% endif %}">
-        <a href="{% url 'team_roster' draft.id team.id %}">Meu roster</a>
-      </div>
-
-      <div class="pill {% if active_tab == 'lineup' %}active{% endif %}">
-        <a href="{% url 'set_lineup' draft.id team.id %}">Escalação</a>
-      </div>
-
-      <div class="pill {% if active_tab == 'fa' %}active{% endif %}">
-        <a href="{% url 'free_agents_list' team.id %}">Free Agents</a>
-      </div>
+      <a class="pill {% if active_tab == 'transactions' %}pill-active{% endif %}" href="{% url 'transactions_list' draft.id %}">Transações</a>
     {% endif %}
 
-    <span class="muted" style="margin-left:auto;">
+    {% if draft and team %}
+      <span class="divider"></span>
+      <a class="pill {% if active_tab == 'roster' %}pill-active{% endif %}" href="{% url 'team_roster' draft.id team.id %}">Meu roster</a>
+      <a class="pill {% if active_tab == 'lineup' %}pill-active{% endif %}" href="{% url 'set_lineup' draft.id team.id %}">Escalação</a>
+      <a class="pill {% if active_tab == 'free_agents' %}pill-active{% endif %}" href="{% url 'free_agents_list' team.id %}">Free Agents</a>
+    {% endif %}
+
+    <div class="muted">
       {% if draft %}Draft #{{ draft.id }}{% endif %}
       {% if week %} • Week {{ week.number }}{% endif %}
-    </span>
+    </div>
   </div>
 
-  {% if messages %}
-    <div class="box">
-      {% for m in messages %}
-        <div class="muted">{{ m }}</div>
-      {% endfor %}
-    </div>
-  {% endif %}
-
   {% block content %}{% endblock %}
-
 </body>
 </html>

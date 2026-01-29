@@ -48,7 +48,6 @@ def draft_board(request, draft_id: int):
     rounds = draft.rounds
     board_rows = []
     picks = list(picks_qs)
-
     pick_map = {(p.round_number, p.team_id): p for p in picks}
 
     for r in range(1, rounds + 1):
@@ -57,10 +56,7 @@ def draft_board(request, draft_id: int):
             row.append(pick_map.get((r, t.id)))
         board_rows.append(row)
 
-    # week atual (pra mostrar se está adiada)
     current_week = Week.objects.filter(draft=draft, is_current=True).first()
-    week = Week.objects.filter(draft=draft, is_current=True).first()
-    my_team = Team.objects.filter(league=draft.league, user_id=request.user.id).first()
 
     return render(request, "league/draft_board.html", {
         "draft": draft,
@@ -69,11 +65,11 @@ def draft_board(request, draft_id: int):
         "current_pick": current_pick,
         "can_draft": can_draft,
         "current_week": current_week,
-        "active_tab": "board",
-        "week": week,
-        "team": my_team,
-        
+        "week": current_week,          # ✅ pro base.html
+        "team": None,                  # ✅ base.html não quebra
+        "active_tab": "draft",
     })
+
 
 
 @login_required
@@ -251,6 +247,7 @@ def make_pick(request, draft_id: int):
 def team_roster(request, draft_id: int, team_id: int):
     draft = get_object_or_404(Draft, id=draft_id)
     team = get_object_or_404(Team, id=team_id)
+    week = Week.objects.filter(draft=draft, is_current=True).first()
 
     roster_spots = (
         RosterSpot.objects
@@ -263,9 +260,10 @@ def team_roster(request, draft_id: int, team_id: int):
         "team": team,
         "draft": draft,
         "week": week,
-        "active_tab": "roster",
         "roster_spots": roster_spots,
+        "active_tab": "roster",
     })
+
 
 
 @login_required
@@ -299,12 +297,10 @@ def free_agents_list(request, team_id: int):
             "team": team,
             "draft": None,
             "week": None,
-            "active_tab": "fa",
             "free_agents": [],
-            "error": "Nenhum draft encontrado.",
+            "active_tab": "free_agents",
         })
 
-    # week atual (para o menu)
     week = Week.objects.filter(draft=draft, is_current=True).first()
 
     active_player_ids = (
@@ -312,16 +308,16 @@ def free_agents_list(request, team_id: int):
         .filter(dropped_at__isnull=True)
         .values_list("player_id", flat=True)
     )
-
     free_agents = Player.objects.exclude(id__in=active_player_ids).order_by("name")
 
     return render(request, "league/free_agents.html", {
         "team": team,
         "draft": draft,
         "week": week,
-        "active_tab": "fa",
         "free_agents": free_agents,
+        "active_tab": "free_agents",
     })
+
 
 
 @login_required
@@ -376,6 +372,7 @@ def team_roster_legacy(request, team_id: int):
 @login_required
 def transactions_list(request, draft_id: int):
     draft = get_object_or_404(Draft, id=draft_id)
+    week = Week.objects.filter(draft=draft, is_current=True).first()
 
     transactions = (
         Transaction.objects
@@ -384,16 +381,14 @@ def transactions_list(request, draft_id: int):
         .order_by("-created_at")[:200]
     )
 
-    week = Week.objects.filter(draft=draft, is_current=True).first()
-    my_team = Team.objects.filter(league=draft.league, user_id=request.user.id).first()
-
     return render(request, "league/transactions.html", {
         "draft": draft,
-        "transactions": transactions,
         "week": week,
-        "team": my_team,
+        "team": None,
+        "transactions": transactions,
         "active_tab": "transactions",
     })
+
 
 
 
@@ -564,22 +559,25 @@ def current_week_matchups(request, draft_id: int):
         return render(request, "league/current_week.html", {
             "draft": draft,
             "week": None,
+            "current_week": None,
             "matchups": [],
-            "team": my_team,
-            "week": week,
-            "active_tab": "schedule",
+            "team": None,
+            "active_tab": "current_week",
+            "error": "Nenhuma Week marcada como atual (is_current=True).",
         })
 
-    matchups = Matchup.objects.filter(week=week).select_related(
-        "home_team",
-        "away_team",
-    )
+    matchups = Matchup.objects.filter(week=week).select_related("home_team", "away_team")
 
     return render(request, "league/current_week.html", {
         "draft": draft,
         "week": week,
+        "current_week": week,
         "matchups": matchups,
+        "team": None,
+        "active_tab": "current_week",
+        "error": None,
     })
+
 
 
 @login_required

@@ -1,63 +1,15 @@
 {% extends "league/base.html" %}
-
 {% block title %}Draft Board{% endblock %}
-
-{% block head %}
-  <style>
-    h1 { margin: 0 0 6px 0; }
-    .meta { color: #666; margin-bottom: 10px; }
-
-    .current {
-      background: #fff7cc;
-      border: 1px solid #f0e29a;
-      padding: 10px;
-      border-radius: 8px;
-      margin: 10px 0 16px 0;
-    }
-    .current a {
-      display: inline-block;
-      margin-left: 10px;
-      padding: 6px 10px;
-      border: 1px solid #333;
-      border-radius: 6px;
-      text-decoration: none;
-      color: #111;
-      background: #fff;
-    }
-    .current a:hover { background: #f3f3f3; }
-
-    table { border-collapse: collapse; width: 100%; }
-    th, td { border: 1px solid #ddd; padding: 8px; vertical-align: top; }
-    th { background: #f5f5f5; position: sticky; top: 0; z-index: 2; }
-    .round { font-weight: bold; background: #fafafa; width: 80px; position: sticky; left: 0; z-index: 1; }
-    .pick { font-size: 14px; }
-    .empty { color: #aaa; }
-    .small { font-size: 12px; color: #777; margin-top: 4px; }
-
-    /* botão admin (adiar) */
-    .btn-admin {
-      display: inline-block;
-      margin-left: 10px;
-      padding: 6px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      border: 1px solid #b00020;
-      background: #ffe5e5;
-      color: #b00020;
-    }
-    .btn-admin:hover { filter: brightness(0.98); }
-  </style>
-{% endblock %}
 
 {% block content %}
   <h1>Draft Board</h1>
 
-  <div class="meta">
+  <div style="color:#666; margin-bottom:10px;">
     Liga: <b>{{ draft.league }}</b> • Tipo: <b>{{ draft.draft_type }}</b> • Rounds: <b>{{ draft.rounds }}</b>
   </div>
 
   {% if current_pick %}
-    <div class="current">
+    <div style="background:#fff7cc; border:1px solid #f0e29a; padding:10px; border-radius:8px; margin: 10px 0 16px 0;">
       <b>Rodada atual:</b>
       {% if current_week and current_week.is_postponed %}
         <span style="color:#b00020;">(ADIADA)</span>
@@ -66,24 +18,34 @@
 
       <b>Pick atual:</b> #{{ current_pick.overall_number }} — {{ current_pick.team.name }}
 
-      <a href="{% url 'team_roster' draft.id current_pick.team.id %}">Ver roster</a>
+      <a class="pill" style="margin-left:10px;" href="{% url 'team_roster' draft.id current_pick.team.id %}">Ver roster</a>
 
       {% if can_draft %}
-        <a href="{% url 'make_pick' draft.id %}">Draftar</a>
+        <a class="pill" href="{% url 'make_pick' draft.id %}">Draftar</a>
       {% else %}
         <span style="margin-left:10px; color:#777;">(aguardando o dono do time)</span>
       {% endif %}
 
       {% if request.user.is_superuser %}
-        <form method="post"
-              action="{% url 'postpone_current_week' draft.id %}"
-              style="display:inline;">
+        <form method="post" action="{% url 'postpone_current_week' draft.id %}" style="display:inline;">
           {% csrf_token %}
-          <button class="btn-admin" type="submit">Adiar rodada</button>
+          <button type="submit" style="margin-left:10px; padding:6px 10px; border-radius:6px; cursor:pointer; border:1px solid #b00020; background:#ffe5e5; color:#b00020;">
+            Adiar rodada
+          </button>
         </form>
       {% endif %}
     </div>
   {% endif %}
+
+  <style>
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ddd; padding: 8px; vertical-align: top; }
+    th { background: #f5f5f5; position: sticky; top: 0; z-index: 2; }
+    .round { font-weight: bold; background: #fafafa; width: 80px; position: sticky; left: 0; z-index: 1; }
+    .pick { font-size: 14px; }
+    .empty { color: #aaa; }
+    .small { font-size: 12px; color: #777; margin-top: 4px; }
+  </style>
 
   <table>
     <thead>
