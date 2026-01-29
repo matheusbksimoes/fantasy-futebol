@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
-
 import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -23,13 +22,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Core settings (Render-ready)
 # -----------------------------
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-me")
-DEBUG = os.environ.get("DEBUG", "0") == "1"
+
+# Aceita tanto DJANGO_DEBUG=1 quanto DEBUG=1
+DEBUG = (os.environ.get("DJANGO_DEBUG") == "1") or (os.environ.get("DEBUG") == "1")
 
 # Accept comma-separated list: "127.0.0.1,localhost,myapp.onrender.com"
-_allowed_hosts_raw = os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost")
+_allowed_hosts_raw = os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost,.onrender.com")
 ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts_raw.split(",") if h.strip()]
 
-# CSRF trusted origins (optional but recommended for Render/custom domains)
+# CSRF trusted origins (recommended for Render/custom domains)
 # Example: "https://myapp.onrender.com,https://draft.meudominio.com"
 _csrf_trusted_raw = os.environ.get("CSRF_TRUSTED_ORIGINS", "")
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in _csrf_trusted_raw.split(",") if o.strip()]
@@ -76,6 +77,7 @@ TEMPLATES = [
         },
     },
 ]
+
 WSGI_APPLICATION = "backend.wsgi.application"
 
 
@@ -96,7 +98,6 @@ if DATABASE_URL:
             ssl_require=ssl_require,
         )
     }
-
 else:
     DATABASES = {
         "default": {
@@ -105,6 +106,9 @@ else:
         }
     }
 
+
+# -----------------------------
+# Password validation
 # -----------------------------
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -117,12 +121,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # -----------------------------
 # Internationalization
 # -----------------------------
-LANGUAGE_CODE = "en-us"
-
-# Recomendo São Paulo por estar alinhado com seu uso (-03:00).
-# Se você preferir manter UTC, troque para "UTC".
+LANGUAGE_CODE = "pt-br"
 TIME_ZONE = os.environ.get("TIME_ZONE", "America/Sao_Paulo")
-
 USE_I18N = True
 USE_TZ = True
 
@@ -133,7 +133,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# WhiteNoise storage (ótimo pra Render sem S3/CDN)
+# WhiteNoise storage (Render sem S3/CDN)
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -156,16 +156,16 @@ LOGOUT_REDIRECT_URL = "/accounts/login/"
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 USE_X_FORWARDED_HOST = True
 
-# Keep it strict in production, relaxed in DEBUG
+# Em produção: força https e cookies seguros.
+# Em DEBUG: relaxa tudo para facilitar debug/teste.
 SECURE_SSL_REDIRECT = not DEBUG
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 
-# ✅ Local dev override: runserver não suporta HTTPS
-# Use: set DJANGO_LOCAL=1 (cmd)  |  $env:DJANGO_LOCAL="1" (PowerShell)
-# ==============================
-# 🔧 LOCAL DEVELOPMENT OVERRIDE
-# ==============================
+# -----------------------------
+# Local development override
+# -----------------------------
+# Use: DJANGO_LOCAL=1
 if os.environ.get("DJANGO_LOCAL") == "1":
     DEBUG = True
 
@@ -175,4 +175,3 @@ if os.environ.get("DJANGO_LOCAL") == "1":
 
     SECURE_PROXY_SSL_HEADER = None
     USE_X_FORWARDED_HOST = False
-
