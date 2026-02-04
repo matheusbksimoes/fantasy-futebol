@@ -144,12 +144,17 @@ class Command(BaseCommand):
 
         # Criar Weeks 2..27 se não existirem
         weeks_by_number = {w.number: w for w in Week.objects.filter(draft=draft, number__in=range(1, 28))}
-        created_weeks = 0
-        for num in range(1, 28):
-            if num not in weeks_by_number:
-                if not dry_run:
-                    weeks_by_number[num] = Week.objects.create(draft=draft, number=num, is_current=False)
-                created_weeks += 1
+created_weeks = 0
+
+for num in range(1, 28):
+    if num not in weeks_by_number:
+        created_weeks += 1
+        if not dry_run:
+            weeks_by_number[num] = Week.objects.create(draft=draft, number=num, is_current=False)
+        else:
+            # Placeholder em memória para o dry-run não quebrar no acesso weeks_by_number[num]
+            weeks_by_number[num] = Week(draft=draft, number=num, is_current=False)
+
 
         # Setar Week 2 como atual (e desligar as outras)
         if not dry_run:
