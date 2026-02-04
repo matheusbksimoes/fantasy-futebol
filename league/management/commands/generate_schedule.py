@@ -23,7 +23,6 @@ def circle_method_rounds(teams):
     """
     n = len(teams)
     assert n % 2 == 0, "Número de times precisa ser par para esta implementação."
-    # método do círculo: fixa o primeiro, rotaciona o resto
     fixed = teams[0]
     rot = teams[1:]
 
@@ -36,15 +35,12 @@ def circle_method_rounds(teams):
         for i in range(n // 2):
             a = left[i]
             b = right[i]
-            # Alterna mando para dar uma “balanceada”
             if (r + i) % 2 == 0:
                 pairs.append((a, b))
             else:
                 pairs.append((b, a))
 
         rounds.append(pairs)
-
-        # rotaciona
         rot = [rot[-1]] + rot[:-1]
 
     return rounds
@@ -56,10 +52,6 @@ def swap_home_away(rounds):
 
 def build_27_rounds(teams):
     base9 = circle_method_rounds(teams)
-    # 27 rounds = 3 turnos
-    # Ciclo 1: base
-    # Ciclo 2: inverte mando (opcional, mas ajuda)
-    # Ciclo 3: base novamente
     return base9 + swap_home_away(base9) + base9
 
 
@@ -78,7 +70,6 @@ def find_schedule_matching_week1(teams, week1_pairset, max_shuffles=4000):
 
         schedule27 = build_27_rounds(teams)
 
-        # achar em qual round do schedule os pares batem com week1
         idx = None
         for i, rnd in enumerate(schedule27):
             if round_pairs_key(rnd) == week1_pairset:
@@ -86,9 +77,7 @@ def find_schedule_matching_week1(teams, week1_pairset, max_shuffles=4000):
                 break
 
         if idx is not None:
-            # rotaciona para que week1 seja o round 1
-            rotated = schedule27[idx:] + schedule27[:idx]
-            return rotated
+            return schedule27[idx:] + schedule27[:idx]
 
     return None
 
@@ -99,7 +88,12 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--draft-id", type=int, default=None, help="ID do Draft. Se omitido, usa o último.")
         parser.add_argument("--dry-run", action="store_true", help="Não grava no banco; só valida e mostra resumo.")
-        parser.add_argument("--max-shuffles", type=int, default=4000, help="Tentativas de embaralhar times para encaixar Week 1.")
+        parser.add_argument(
+            "--max-shuffles",
+            type=int,
+            default=4000,
+            help="Tentativas de embaralhar times para encaixar Week 1.",
+        )
 
     @transaction.atomic
     def handle(self, *args, **opts):
@@ -125,7 +119,6 @@ class Command(BaseCommand):
         if len(week1_matchups) != 5:
             raise Exception(f"Week 1 deveria ter 5 matchups. Encontrei {len(week1_matchups)}.")
 
-        # ✅ AJUSTE PARA SEU MODEL: Matchup.home_team / Matchup.away_team
         week1_pairset = frozenset(
             pair_key(m.home_team_id, m.away_team_id)
             for m in week1_matchups
@@ -138,23 +131,20 @@ class Command(BaseCommand):
                 "Solução: ou recriar Week 1 via script, ou aumentar --max-shuffles, ou usar um gerador com backtracking."
             )
 
-        # Garantias rápidas
         if round_pairs_key(schedule27[0]) != week1_pairset:
             raise Exception("Bug interno: schedule[0] não bate Week 1 após rotação.")
 
-        # Criar Weeks 2..27 se não existirem
+        # Criar Weeks 1..27 se não existirem (em dry-run cria placeholder em memória)
         weeks_by_number = {w.number: w for w in Week.objects.filter(draft=draft, number__in=range(1, 28))}
-created_weeks = 0
+        created_weeks = 0
 
-for num in range(1, 28):
-    if num not in weeks_by_number:
-        created_weeks += 1
-        if not dry_run:
-            weeks_by_number[num] = Week.objects.create(draft=draft, number=num, is_current=False)
-        else:
-            # Placeholder em memória para o dry-run não quebrar no acesso weeks_by_number[num]
-            weeks_by_number[num] = Week(draft=draft, number=num, is_current=False)
-
+        for num in range(1, 28):
+            if num not in weeks_by_number:
+                created_weeks += 1
+                if not dry_run:
+                    weeks_by_number[num] = Week.objects.create(draft=draft, number=num, is_current=False)
+                else:
+                    weeks_by_number[num] = Week(draft=draft, number=num, is_current=False)
 
         # Setar Week 2 como atual (e desligar as outras)
         if not dry_run:
@@ -178,8 +168,11 @@ for num in range(1, 28):
                 used.add(b.id)
 
             for home, away in rnd:
-                # evita duplicar se já existe matchup nessa week com esse par (qualquer ordem)
-                # ✅ AJUSTE PARA SEU MODEL: home_team / away_team
+                if dry_run:
+                    # Em dry-run, pode haver Week placeholder (sem id). Então só contabiliza.
+                    created_matchups += 1
+                    continue
+
                 exists = Matchup.objects.filter(week=week).filter(
                     (Q(home_team=home) & Q(away_team=away)) |
                     (Q(home_team=away) & Q(away_team=home))
@@ -189,12 +182,11 @@ for num in range(1, 28):
                     skipped_existing += 1
                     continue
 
-                if not dry_run:
-                    Matchup.objects.create(
-                        week=week,
-                        home_team=home,
-                        away_team=away,
-                    )
+                Matchup.objects.create(
+                    week=week,
+                    home_team=home,
+                    away_team=away,
+                )
                 created_matchups += 1
 
         msg = (
@@ -206,5 +198,4 @@ for num in range(1, 28):
         self.stdout.write(self.style.SUCCESS(msg))
 
         if dry_run:
-            # força rollback do atomic
             raise Exception("DRY-RUN finalizado (rollback intencional).")
