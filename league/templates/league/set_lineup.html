@@ -4,26 +4,37 @@
 {% block content %}
   <h1>Escalação — {{ team.name }}</h1>
 
-  <form method="post" style="border:1px solid #ddd; border-radius:10px; padding:12px; margin:12px 0;">
-    {% csrf_token %}
 
+  <form method="get" style="border:1px solid #ddd; border-radius:10px; padding:12px; margin:12px 0;">
     <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;">
       <div style="min-width:260px;">
         <label style="font-weight:600; display:block; margin-bottom:6px;">Formação</label>
-        <select name="formation" style="padding:8px; font-size:14px;">
+
+        <select
+          name="formation"
+          style="padding:8px; font-size:14px;"
+          onchange="this.form.submit()"
+        >
           {% for value,label in formation_choices %}
-            <option value="{{ value }}" {% if lineup.formation == value %}selected{% endif %}>
+            <option value="{{ value }}" {% if selected_formation == value %}selected{% endif %}>
               {{ label }}
             </option>
           {% endfor %}
         </select>
+
         <small style="color:#666; display:block; margin-top:6px;">
-          A formação ajusta automaticamente quantos ZAG/LAT/MEI/ATA existem.
+          A formação controla quantos slots existem (anti-fraude).
         </small>
       </div>
     </div>
+  </form>
 
-    <hr>
+ 
+  <form method="post" style="border:1px solid #ddd; border-radius:10px; padding:12px; margin:12px 0;">
+    {% csrf_token %}
+
+    {# ✅ Formação que será salva ao clicar em "Salvar escalação" #}
+    <input type="hidden" name="formation" value="{{ selected_formation }}">
 
     <div style="display:flex; gap:12px; flex-wrap:wrap;">
       {% for s in slots %}
@@ -41,39 +52,27 @@
 
               {% if s.slot_type == "GOL" %}
                 {% for p in gols %}
-                  <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>
-                    {{ p.name }} ({{ p.position }})
-                  </option>
+                  <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>{{ p.name }} ({{ p.position }})</option>
                 {% endfor %}
               {% elif s.slot_type == "ZAG" %}
                 {% for p in zags %}
-                  <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>
-                    {{ p.name }} ({{ p.position }})
-                  </option>
+                  <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>{{ p.name }} ({{ p.position }})</option>
                 {% endfor %}
               {% elif s.slot_type == "LAT" %}
                 {% for p in lats %}
-                  <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>
-                    {{ p.name }} ({{ p.position }})
-                  </option>
+                  <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>{{ p.name }} ({{ p.position }})</option>
                 {% endfor %}
               {% elif s.slot_type == "MEI" %}
                 {% for p in meis %}
-                  <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>
-                    {{ p.name }} ({{ p.position }})
-                  </option>
+                  <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>{{ p.name }} ({{ p.position }})</option>
                 {% endfor %}
               {% elif s.slot_type == "ATA" %}
                 {% for p in atas %}
-                  <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>
-                    {{ p.name }} ({{ p.position }})
-                  </option>
+                  <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>{{ p.name }} ({{ p.position }})</option>
                 {% endfor %}
               {% elif s.slot_type == "TEC" %}
                 {% for p in tecs %}
-                  <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>
-                    {{ p.name }} ({{ p.position }})
-                  </option>
+                  <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>{{ p.name }} ({{ p.position }})</option>
                 {% endfor %}
               {% endif %}
             </select>

@@ -1,23 +1,54 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
-from django.utils import timezone
-from django.db import transaction
 from django.contrib import messages
-from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
+from django.db import transaction
+from django.http import HttpResponseForbidden
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+from django.views.decorators.http import require_POST
 
 from .models import (
-    Draft, DraftPick, Team, Player, RosterSpot, Transaction,
-    Week, LineupSpot, Matchup
+    Draft,
+    DraftPick,
+    Team,
+    Player,
+    RosterSpot,
+    Transaction,
+    Week,
+    Matchup,
+    Lineup,          # ✅ novo
+    LineupSpot,      # ✅ novo (lineup/slot_type/slot_index/player)
+    PlayerWeekScore,
+    FORMATION_MAP,   # ✅ novo
 )
 
-# Lineup V2 (formação + slots)
-from league.models import Lineup  # se Lineup estiver em .models, troque para: from .models import Lineup
-from league.services.lineup_service import ensure_slots_for_formation
 from league.services.lock_service import player_locked
 
 
+# ============================================================
+# 🔒 Permissões: só dono do time (ou admin) pode mexer no time
+# ============================================================
+def forbid_if_not_team_owner(request, team: Team):
+    """
+    Admin pode tudo.
+    Usuário normal só pode mexer no próprio time.
+    Se o time não está vinculado a um usuário, bloqueia (exceto admin).
+    """
+    if request.user.is_superuser:
+        return None
+
+    if team.user_id is None:
+        return HttpResponseForbidden("Este time ainda não está vinculado a um usuário.")
+
+    if team.user_id != request.user.id:
+        return HttpResponseForbidden("Você não tem permissão para mexer neste time.")
+
+    return None
+
+
+# ============================================================
+# Draft board
+# ============================================================
 @login_required
 def draft_board(request, draft_id: int):
     draft = get_object_or_404(Draft, id=draft_id)
@@ -65,11 +96,10 @@ def draft_board(request, draft_id: int):
         "current_pick": current_pick,
         "can_draft": can_draft,
         "current_week": current_week,
-        "week": current_week,          # ✅ pro base.html
-        "team": None,                  # ✅ base.html não quebra
+        "week": current_week,          # pro base.html
+        "team": None,                  # base.html não quebra
         "active_tab": "draft",
     })
-
 
 
 @login_required
@@ -120,7 +150,7 @@ def make_pick(request, draft_id: int):
             "team": "",
         })
 
-    # Permissão
+    # Permissão: só admin ou dono do time da vez
     if not request.user.is_superuser:
         if current_pick.team.user_id is None or current_pick.team.user_id != request.user.id:
             return HttpResponseForbidden(
@@ -243,10 +273,18 @@ def make_pick(request, draft_id: int):
     })
 
 
+# ============================================================
+# Roster / Free agents / Transactions
+# ============================================================
 @login_required
 def team_roster(request, draft_id: int, team_id: int):
     draft = get_object_or_404(Draft, id=draft_id)
     team = get_object_or_404(Team, id=team_id)
+
+    forbidden = forbid_if_not_team_owner(request, team)
+    if forbidden:
+        return forbidden
+
     week = Week.objects.filter(draft=draft, is_current=True).first()
 
     roster_spots = (
@@ -265,11 +303,15 @@ def team_roster(request, draft_id: int, team_id: int):
     })
 
 
-
 @login_required
 @require_POST
 def drop_player(request, team_id: int, player_id: int):
     team = get_object_or_404(Team, id=team_id)
+
+    forbidden = forbid_if_not_team_owner(request, team)
+    if forbidden:
+        return forbidden
+
     player = get_object_or_404(Player, id=player_id)
 
     spot = get_object_or_404(
@@ -290,6 +332,10 @@ def drop_player(request, team_id: int, player_id: int):
 @login_required
 def free_agents_list(request, team_id: int):
     team = get_object_or_404(Team, id=team_id)
+
+    forbidden = forbid_if_not_team_owner(request, team)
+    if forbidden:
+        return forbidden
 
     draft = Draft.objects.order_by("-id").first()
     if not draft:
@@ -319,11 +365,15 @@ def free_agents_list(request, team_id: int):
     })
 
 
-
 @login_required
 @require_POST
 def add_free_agent(request, team_id: int, player_id: int):
     team = get_object_or_404(Team, id=team_id)
+
+    forbidden = forbid_if_not_team_owner(request, team)
+    if forbidden:
+        return forbidden
+
     player = get_object_or_404(Player, id=player_id)
 
     draft = Draft.objects.order_by("-id").first()
@@ -390,110 +440,118 @@ def transactions_list(request, draft_id: int):
     })
 
 
+# ============================================================
+# ✅ ESCALAÇÃO (Week + Lineup + Formation + LineupSpot indexado)
+# ============================================================
+SLOT_ORDER = {"GOL": 0, "ZAG": 1, "LAT": 2, "MEI": 3, "ATA": 4, "TEC": 5}
 
 
-# ✅ ESCALAÇÃO (ÚNICA) — V2 com Formação + Slots + Lock
+def expected_slots_for_formation(formation: str):
+    """
+    Retorna lista (slot_type, slot_index) na ordem:
+    GOL1, ZAGs, LATs, MEIs, ATAs, TEC1
+    """
+    if formation not in FORMATION_MAP:
+        raise ValidationError("Formação inválida.")
+
+    counts = FORMATION_MAP[formation]
+    out = [("GOL", 1)]
+
+    for t in ["ZAG", "LAT", "MEI", "ATA"]:
+        for i in range(1, counts[t] + 1):
+            out.append((t, i))
+
+    out.append(("TEC", 1))
+    return out
+
+
+def ensure_spots_for_lineup(lineup: Lineup):
+    """
+    Garante que existem exatamente os slots daquela formação.
+    - Cria slots faltantes (player NULL).
+    - Remove slots extras somente se estiverem vazios.
+    """
+    expected = set(expected_slots_for_formation(lineup.formation))
+
+    qs = LineupSpot.objects.filter(lineup=lineup).select_related("player")
+    existing = {(s.slot_type, s.slot_index): s for s in qs}
+
+    # criar faltantes
+    to_create = []
+    for (t, idx) in expected:
+        if (t, idx) not in existing:
+            to_create.append(LineupSpot(lineup=lineup, slot_type=t, slot_index=idx, player=None))
+    if to_create:
+        LineupSpot.objects.bulk_create(to_create)
+
+    # remover extras (só se vazio)
+    for key, spot in existing.items():
+        if key not in expected:
+            if spot.player_id is not None:
+                raise ValidationError(
+                    f"Não dá pra aplicar esta formação: existe jogador em um slot extra ({spot.slot_type}{spot.slot_index})."
+                )
+            spot.delete()
+
+
 @login_required
-def set_lineup(request, draft_id: int, team_id: int):
+def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
     team = get_object_or_404(Team, id=team_id)
+
+    forbidden = forbid_if_not_team_owner(request, team)
+    if forbidden:
+        return forbidden
+
     draft = get_object_or_404(Draft, id=draft_id)
 
-    # week atual
-    week = Week.objects.filter(draft=draft, is_current=True).first()
-    if not week:
+    # week alvo
+    if week_number is not None:
         week, _ = Week.objects.get_or_create(
             draft=draft,
-            number=1,
-            defaults={"is_current": True},
+            number=week_number,
+            defaults={"is_current": False},
         )
+    else:
+        week = Week.objects.filter(draft=draft, is_current=True).first()
+        if not week:
+            week, _ = Week.objects.get_or_create(
+                draft=draft,
+                number=1,
+                defaults={"is_current": True},
+            )
+
+    # Week travada: só admin mexe
+    if week.is_locked and not request.user.is_superuser:
+        return HttpResponseForbidden("Esta Week está travada. Não é possível editar a escalação.")
 
     round_number = week.number
 
+    # 🔹 1) pega formação do PREVIEW (GET) se existir, senão usa a salva no banco
+    preview_formation = request.GET.get("formation")
+
+    # 🔹 2) garante que existe Lineup no banco (sempre com a formação salva)
     lineup, _ = Lineup.objects.get_or_create(
-        fantasy_team=team,
-        round_number=round_number,
+        week=week,
+        team=team,
         defaults={"formation": "433"},
     )
 
-    try:
-        ensure_slots_for_formation(lineup)
-    except ValidationError as e:
-        messages.error(request, str(e))
-        return redirect("set_lineup", draft_id=draft.id, team_id=team.id)
+    # 🔹 3) formação efetiva usada para MONTAR OS SLOTS NA TELA (preview)
+    # ✅ PREVIEW de formação via GET (não salva no banco)
+    preview_formation = request.GET.get("formation")
+    selected_formation = preview_formation or lineup.formation
+    if selected_formation not in FORMATION_MAP:
+        selected_formation = lineup.formation
 
-    # roster ativo do time
+    # Roster disponível do time (ativos)
     roster_spots = (
         RosterSpot.objects
         .filter(draft=draft, team=team, dropped_at__isnull=True)
         .select_related("player")
         .order_by("player__position", "player__name")
     )
-    all_players = Player.objects.filter(id__in=[rs.player_id for rs in roster_spots])
-
-    if request.method == "POST":
-        new_formation = request.POST.get("formation", lineup.formation)
-
-        try:
-            with transaction.atomic():
-                if new_formation != lineup.formation:
-                    lineup.formation = new_formation
-                    lineup.full_clean()
-                    lineup.save()
-                    ensure_slots_for_formation(lineup)
-
-                slots = list(
-                    lineup.slots.select_related("player").order_by("slot_type", "slot_index")
-                )
-
-                chosen_ids = []
-                slot_updates = []
-
-                for s in slots:
-                    field_name = f"slot_{s.slot_type}_{s.slot_index}"
-                    pid = request.POST.get(field_name) or None
-                    pid = int(pid) if pid else None
-
-                    old_player = s.player
-                    new_player = Player.objects.get(id=pid) if pid else None
-
-                    if old_player and old_player != new_player and player_locked(old_player, round_number):
-                        raise ValidationError(
-                            f"Você não pode remover/trocar {old_player.name}: jogo já começou."
-                        )
-
-                    if new_player and old_player != new_player and player_locked(new_player, round_number):
-                        raise ValidationError(
-                            f"Você não pode escalar {new_player.name}: jogo já começou."
-                        )
-
-                    if new_player and new_player.position != s.slot_type:
-                        raise ValidationError(
-                            f"{new_player.name} é {new_player.position} e não pode ser escalado em {s.slot_type}{s.slot_index}."
-                        )
-
-                    if new_player:
-                        chosen_ids.append(new_player.id)
-
-                    slot_updates.append((s, new_player))
-
-                if len(chosen_ids) != len(set(chosen_ids)):
-                    raise ValidationError("Você não pode repetir o mesmo jogador em mais de um slot.")
-
-                for s, p in slot_updates:
-                    if p is None:
-                        raise ValidationError(
-                            "Preencha todos os slots antes de salvar (GOL, ZAG, LAT, MEI, ATA e TEC)."
-                        )
-
-                for s, p in slot_updates:
-                    s.player = p
-                    s.save()
-
-            messages.success(request, "Escalação salva!")
-            return redirect("set_lineup", draft_id=draft.id, team_id=team.id)
-
-        except (ValidationError, Player.DoesNotExist) as e:
-            messages.error(request, str(e))
+    roster_player_ids = [rs.player_id for rs in roster_spots]
+    all_players = Player.objects.filter(id__in=roster_player_ids)
 
     gols = all_players.filter(position="GOL")
     zags = all_players.filter(position="ZAG")
@@ -502,35 +560,146 @@ def set_lineup(request, draft_id: int, team_id: int):
     atas = all_players.filter(position="ATA")
     tecs = all_players.filter(position="TEC")
 
-    slots = lineup.slots.select_related("player").order_by("slot_type", "slot_index")
+    if request.method == "POST":
+        new_formation = request.POST.get("formation", lineup.formation)
+
+        try:
+            with transaction.atomic():
+                # trocando formação: bloqueia se existir jogador travado já escalado
+                if new_formation != lineup.formation:
+                    current_players = (
+                        LineupSpot.objects.filter(lineup=lineup, player__isnull=False)
+                        .select_related("player")
+                    )
+                    for s in current_players:
+                        if s.player and player_locked(s.player, round_number):
+                            raise ValidationError(
+                                "Não é possível mudar a formação: existe jogador travado na escalação (jogo já começou)."
+                            )
+
+                    lineup.formation = new_formation
+                    lineup.full_clean()
+                    lineup.save(update_fields=["formation", "updated_at"])
+
+                # ✅ garante slots REAIS da formação salva (agora sim)
+                ensure_spots_for_lineup(lineup)
+                expected = expected_slots_for_formation(lineup.formation)
+
+                # map de slots atuais
+                spots = {
+                    (s.slot_type, s.slot_index): s
+                    for s in LineupSpot.objects.filter(lineup=lineup).select_related("player")
+                }
+
+                chosen_ids = []
+
+                for (t, idx) in expected:
+                    field = f"slot_{t}_{idx}"
+                    pid = request.POST.get(field) or None
+                    pid = int(pid) if pid else None
+
+                    if not pid:
+                        raise ValidationError("Preencha todos os slots antes de salvar.")
+
+                    player = get_object_or_404(Player, id=pid)
+
+                    if player.id not in roster_player_ids:
+                        raise ValidationError(f"{player.name} não está no roster do seu time.")
+
+                    if player.position != t:
+                        raise ValidationError(
+                            f"{player.name} é {player.position} e não pode ser escalado em {t}{idx}."
+                        )
+
+                    spot = spots[(t, idx)]
+                    old_player = spot.player
+
+                    if old_player and old_player.id != player.id and player_locked(old_player, round_number):
+                        raise ValidationError(f"Você não pode remover/trocar {old_player.name}: jogo já começou.")
+
+                    if (not old_player or old_player.id != player.id) and player_locked(player, round_number):
+                        raise ValidationError(f"Você não pode escalar {player.name}: jogo já começou.")
+
+                    chosen_ids.append(player.id)
+
+                    spot.player = player
+                    spot.full_clean()
+                    spot.save(update_fields=["player", "set_at"])
+
+                if len(chosen_ids) != len(set(chosen_ids)):
+                    raise ValidationError("Você não pode repetir o mesmo jogador em mais de um slot.")
+
+            messages.success(request, "Escalação salva!")
+
+            return redirect(
+                "matchup_view",
+                draft_id=draft.id,
+                week_number=week.number,
+                team_id=team.id,
+            )
+
+            if week_number is not None:
+                return redirect("set_lineup_week", draft_id=draft.id, team_id=team.id, week_number=week_number)
+            return redirect("set_lineup", draft_id=draft.id, team_id=team.id)
+
+        except (ValidationError, Player.DoesNotExist) as e:
+            messages.error(request, str(e))
+
+    # ✅ GET: renderiza slots conforme selected_formation (preview), sem mexer no banco
+    try:
+        expected = expected_slots_for_formation(selected_formation)
+
+        existing_qs = LineupSpot.objects.filter(lineup=lineup).select_related("player")
+        existing = {(s.slot_type, s.slot_index): s for s in existing_qs}
+
+        slots = []
+        for (t, idx) in expected:
+            s = existing.get((t, idx))
+            if s:
+                slots.append(s)
+            else:
+                # objeto "fake" só pra render (sem id)
+                slots.append(LineupSpot(lineup=lineup, slot_type=t, slot_index=idx, player=None))
+
+    except ValidationError as e:
+        messages.error(request, str(e))
+        slots = list(LineupSpot.objects.filter(lineup=lineup).select_related("player"))
+
+    slots.sort(key=lambda s: (SLOT_ORDER.get(s.slot_type, 99), s.slot_index or 999))
 
     locked_player_ids = set()
-    for s in slots:
-        if s.player and player_locked(s.player, round_number):
-            locked_player_ids.add(s.player.id)
+    # ✅ trava deve considerar os slots reais existentes (do banco)
+    for s in LineupSpot.objects.filter(lineup=lineup).select_related("player"):
+        if s.player_id and player_locked(s.player, round_number):
+            locked_player_ids.add(s.player_id)
 
     formation_choices = Lineup._meta.get_field("formation").choices
 
     return render(request, "league/set_lineup.html", {
-    "draft": draft,
-    "team": team,
-    "week": week,
+        "draft": draft,
+        "team": team,
+        "week": week,
+        "active_tab": "lineup",
 
-    "active_tab": "lineup",  # ✅ ADICIONE ISSO
+        "lineup": lineup,
+        "formation_choices": formation_choices,
+        "selected_formation": selected_formation,  # ✅ IMPORTANTE pro template
+        "slots": slots,
+        "locked_player_ids": locked_player_ids,
 
-    "lineup": lineup,
-    "formation_choices": formation_choices,
-    "slots": slots,
-    "gols": gols,
-    "zags": zags,
-    "lats": lats,
-    "meis": meis,
-    "atas": atas,
-    "tecs": tecs,
-    "locked_player_ids": locked_player_ids,
-})
+        "gols": gols,
+        "zags": zags,
+        "lats": lats,
+        "meis": meis,
+        "atas": atas,
+        "tecs": tecs,
+    })
 
 
+
+# ============================================================
+# Week controls
+# ============================================================
 @login_required
 @require_POST
 def postpone_current_week(request, draft_id: int):
@@ -545,13 +714,15 @@ def postpone_current_week(request, draft_id: int):
 
     current_week.is_postponed = True
     current_week.save(update_fields=["is_postponed"])
-    
 
     return redirect("draft_board", draft_id=draft.id)
 
 
+# ============================================================
+# Week view
+# ============================================================
 @login_required
-def current_week_matchups(request, draft_id: int):
+def current_week_view(request, draft_id: int):
     draft = get_object_or_404(Draft, id=draft_id)
 
     week = Week.objects.filter(draft=draft, is_current=True).first()
@@ -566,7 +737,12 @@ def current_week_matchups(request, draft_id: int):
             "error": "Nenhuma Week marcada como atual (is_current=True).",
         })
 
-    matchups = Matchup.objects.filter(week=week).select_related("home_team", "away_team")
+    matchups = (
+        Matchup.objects
+        .filter(week=week)
+        .select_related("home_team", "away_team", "week")
+        .order_by("id")
+    )
 
     return render(request, "league/current_week.html", {
         "draft": draft,
@@ -579,33 +755,120 @@ def current_week_matchups(request, draft_id: int):
     })
 
 
-
+# ============================================================
+# Admin edit matchup scores (manual override)
+# ============================================================
 @login_required
-def current_week_view(request, draft_id: int):
+@transaction.atomic
+def edit_week_scores(request, draft_id: int, week_number: int):
+    if not request.user.is_superuser:
+        return HttpResponseForbidden("Apenas o admin pode editar pontuações.")
+
     draft = get_object_or_404(Draft, id=draft_id)
+    week, _ = Week.objects.get_or_create(draft=draft, number=week_number)
 
-    current_week = Week.objects.filter(draft=draft, is_current=True).first()
-    if not current_week:
-        return render(request, "league/current_week.html", {
-            "draft": draft,
-            "current_week": None,
-            "matchups": [],
-            "error": "Nenhuma Week marcada como atual (is_current=True).",
-            "team": my_team,
-            "week": current_week,   # <- pro menu mostrar Week
-            "active_tab": "week",
-        })
-
-    matchups = (
-        Matchup.objects
-        .filter(week=current_week)
-        .select_related("home_team", "away_team", "week")
-        .order_by("id")
+    matchups = list(
+        Matchup.objects.filter(week=week).select_related("home_team", "away_team").order_by("id")
     )
 
-    return render(request, "league/current_week.html", {
+    if request.method == "POST":
+        for m in matchups:
+            hs = request.POST.get(f"home_score_{m.id}", "").strip()
+            a_s = request.POST.get(f"away_score_{m.id}", "").strip()
+
+            try:
+                m.home_score = float(hs) if hs != "" else 0
+                m.away_score = float(a_s) if a_s != "" else 0
+                m.save(update_fields=["home_score", "away_score"])
+            except ValueError:
+                messages.error(request, "Pontuação inválida. Use números (ex: 62.5).")
+                return redirect("edit_week_scores", draft_id=draft.id, week_number=week_number)
+
+        messages.success(request, f"Pontuações da Week {week_number} salvas!")
+        return redirect("current_week", draft_id=draft.id)
+
+    return render(request, "league/edit_week_scores.html", {
         "draft": draft,
-        "current_week": current_week,
+        "week": week,
         "matchups": matchups,
-        "error": None,
+        "team": None,
+        "active_tab": "current_week",
+    })
+from django.db.models import Q
+
+def lineup_display_data(week, team):
+    """
+    Retorna (lineup, spots_ordenados, total_points, points_map)
+    """
+    lineup, _ = Lineup.objects.get_or_create(week=week, team=team, defaults={"formation": "433"})
+
+    # garante slots reais do banco para formação salva
+    try:
+        ensure_spots_for_lineup(lineup)
+    except ValidationError:
+        pass
+
+    spots = list(LineupSpot.objects.filter(lineup=lineup).select_related("player"))
+    spots.sort(key=lambda s: (SLOT_ORDER.get(s.slot_type, 99), s.slot_index or 999))
+
+    player_ids = [s.player_id for s in spots if s.player_id]
+    score_qs = PlayerWeekScore.objects.filter(week=week, player_id__in=player_ids)
+    points_map = {ps.player_id: ps.points for ps in score_qs}
+
+    total = 0
+    for s in spots:
+        if s.player_id:
+            total += float(points_map.get(s.player_id, 0))
+
+    return lineup, spots, total, points_map
+
+
+@login_required
+def matchup_view(request, draft_id: int, week_number: int, team_id: int):
+    draft = get_object_or_404(Draft, id=draft_id)
+    week = get_object_or_404(Week, draft=draft, number=week_number)
+    team = get_object_or_404(Team, id=team_id)
+
+    forbidden = forbid_if_not_team_owner(request, team)
+    if forbidden:
+        return forbidden
+
+    matchup = (
+        Matchup.objects
+        .filter(week=week)
+        .filter(Q(home_team=team) | Q(away_team=team))
+        .select_related("home_team", "away_team", "week")
+        .first()
+    )
+
+    if not matchup:
+        # se não tiver schedule ainda, volta pra week view
+        messages.error(request, "Nenhum matchup encontrado para este time nesta week.")
+        return redirect("current_week", draft_id=draft.id)
+
+    home_lineup, home_spots, home_total, home_points_map = lineup_display_data(week, matchup.home_team)
+    away_lineup, away_spots, away_total, away_points_map = lineup_display_data(week, matchup.away_team)
+
+    return render(request, "league/matchup.html", {
+        "draft": draft,
+        "week": week,
+        "team": team,  # pro base.html não quebrar (aba Meu roster etc.)
+        "active_tab": "my_matchup",
+
+        "matchup": matchup,
+
+        "home_team": matchup.home_team,
+        "away_team": matchup.away_team,
+
+        "home_lineup": home_lineup,
+        "away_lineup": away_lineup,
+
+        "home_spots": home_spots,
+        "away_spots": away_spots,
+
+        "home_total": home_total,
+        "away_total": away_total,
+
+        "home_points_map": home_points_map,
+        "away_points_map": away_points_map,
     })

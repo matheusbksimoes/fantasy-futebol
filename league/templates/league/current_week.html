@@ -12,7 +12,9 @@
     <p>
       <b>Week {{ current_week.number }}</b>
       {% if current_week.is_postponed %}
-        <span style="padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid #b00020; color:#b00020; background:#ffe5e5;">ADIADA</span>
+        <span style="padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid #b00020; color:#b00020; background:#ffe5e5;">
+          ADIADA
+        </span>
       {% endif %}
     </p>
 
@@ -40,3 +42,4 @@
     <p>Nenhuma rodada atual definida.</p>
   {% endif %}
 {% endblock %}
+

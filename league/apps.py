@@ -2,14 +2,10 @@ from django.apps import AppConfig
 
 
 class LeagueConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'league'
-from django.apps import AppConfig
-
-
-class LeagueConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'league'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "league"
 
     def ready(self):
-        from . import signals  # noqa
+        # Não carregamos mais signals aqui.
+        # A criação do roster já é tratada em DraftPick.save().
+        pass

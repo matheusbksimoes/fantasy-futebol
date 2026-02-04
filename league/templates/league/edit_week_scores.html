@@ -1,0 +1,39 @@
+{% extends "league/base.html" %}
+{% block title %}Editar pontuações{% endblock %}
+
+{% block content %}
+  <h1>Editar pontuações — Week {{ week.number }}</h1>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <table style="border-collapse:collapse; width:100%;">
+      <thead>
+        <tr>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Mandante</th>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Score</th>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Visitante</th>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in matchups %}
+          <tr>
+            <td style="border:1px solid #ddd; padding:8px;">{{ m.home_team.name }}</td>
+            <td style="border:1px solid #ddd; padding:8px;">
+              <input type="text" name="home_score_{{ m.id }}" value="{{ m.home_score }}" style="width:90px;">
+            </td>
+            <td style="border:1px solid #ddd; padding:8px;">{{ m.away_team.name }}</td>
+            <td style="border:1px solid #ddd; padding:8px;">
+              <input type="text" name="away_score_{{ m.id }}" value="{{ m.away_score }}" style="width:90px;">
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div style="margin-top:12px;">
+      <button type="submit">Salvar pontuações</button>
+    </div>
+  </form>
+{% endblock %}

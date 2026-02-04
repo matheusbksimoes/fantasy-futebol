@@ -1,4 +1,4 @@
-<!doctype html>
+<!doctype html> 
 <html lang="pt-br">
 <head>
   <meta charset="utf-8">
@@ -35,22 +35,64 @@
     </div>
 
     {% if draft %}
-      <a class="pill {% if active_tab == 'draft' %}pill-active{% endif %}" href="{% url 'draft_board' draft.id %}">Draft</a>
-      <a class="pill {% if active_tab == 'current_week' %}pill-active{% endif %}" href="{% url 'current_week_matchups' draft.id %}">Rodada atual</a>
+      <a class="pill {% if active_tab == 'draft' %}pill-active{% endif %}"
+         href="{% url 'draft_board' draft.id %}">
+        Draft
+      </a>
+
+      <a class="pill {% if active_tab == 'current_week' %}pill-active{% endif %}"
+         href="{% url 'current_week_matchups' draft.id %}">
+        Rodada atual
+      </a>
 
       {# Se você criar uma página de schedule depois, deixe isso pronto #}
       {% if schedule_url %}
-        <a class="pill {% if active_tab == 'schedule' %}pill-active{% endif %}" href="{{ schedule_url }}">Schedule</a>
+        <a class="pill {% if active_tab == 'schedule' %}pill-active{% endif %}"
+           href="{{ schedule_url }}">
+          Schedule
+        </a>
       {% endif %}
 
-      <a class="pill {% if active_tab == 'transactions' %}pill-active{% endif %}" href="{% url 'transactions_list' draft.id %}">Transações</a>
+      <a class="pill {% if active_tab == 'transactions' %}pill-active{% endif %}"
+         href="{% url 'transactions_list' draft.id %}">
+        Transações
+      </a>
     {% endif %}
 
     {% if draft and team %}
       <span class="divider"></span>
-      <a class="pill {% if active_tab == 'roster' %}pill-active{% endif %}" href="{% url 'team_roster' draft.id team.id %}">Meu roster</a>
-      <a class="pill {% if active_tab == 'lineup' %}pill-active{% endif %}" href="{% url 'set_lineup' draft.id team.id %}">Escalação</a>
-      <a class="pill {% if active_tab == 'free_agents' %}pill-active{% endif %}" href="{% url 'free_agents_list' team.id %}">Free Agents</a>
+
+      <a class="pill {% if active_tab == 'roster' %}pill-active{% endif %}"
+         href="{% url 'team_roster' draft.id team.id %}">
+        Meu roster
+      </a>
+
+      <a class="pill {% if active_tab == 'lineup' %}pill-active{% endif %}"
+         href="{% url 'set_lineup' draft.id team.id %}">
+        Escalação
+      </a>
+
+      <a class="pill {% if active_tab == 'free_agents' %}pill-active{% endif %}"
+         href="{% url 'free_agents_list' team.id %}">
+        Free Agents
+      </a>
+
+      {# ✅ NOVO BOTÃO: MEU MATCHUP #}
+      {% if week %}
+        <a class="pill {% if active_tab == 'my_matchup' %}pill-active{% endif %}"
+           href="{% url 'matchup_view' draft.id week.number team.id %}">
+          Meu matchup
+        </a>
+      {% endif %}
+
+    {% endif %}
+
+    {# ✅ NOVO BOTÃO: TODOS OS MATCHUPS DA RODADA #}
+    {% if draft %}
+      <a class="pill {% if active_tab == 'all_matchups' %}pill-active{% endif %}"
+         href="{% url 'current_week_matchups' draft.id %}">
+        Matchups
+      </a>
     {% endif %}
 
     <div class="muted">

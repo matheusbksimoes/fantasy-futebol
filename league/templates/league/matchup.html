@@ -1,0 +1,63 @@
+{% extends "league/base.html" %}
+{% load league_extras %}
+{% block title %}Matchup{% endblock %}
+
+{% block content %}
+  <h1>Week {{ week.number }} — {{ home_team.name }} x {{ away_team.name }}</h1>
+
+  <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:12px;">
+    <div style="flex:1; min-width:320px; border:1px solid #ddd; border-radius:10px; padding:12px;">
+      <h2 style="margin-top:0;">
+        {{ home_team.name }} — <span style="font-weight:700;">{{ home_total }}</span>
+      </h2>
+      <small style="color:#666;">Formação: {{ home_lineup.get_formation_display }}</small>
+
+      <hr>
+
+      {% for s in home_spots %}
+        <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed #eee;">
+          <div>
+            <strong>{{ s.get_slot_type_display }} {{ s.slot_index }}</strong><br>
+            {% if s.player %}{{ s.player.name }}{% else %}<span style="color:#999;">— vazio —</span>{% endif %}
+          </div>
+          <div style="font-weight:700;">
+            {% if s.player %}
+              {{ home_points_map|get_item:s.player.id|default:"0" }}
+            {% else %}
+              0
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div style="flex:1; min-width:320px; border:1px solid #ddd; border-radius:10px; padding:12px;">
+      <h2 style="margin-top:0;">
+        {{ away_team.name }} — <span style="font-weight:700;">{{ away_total }}</span>
+      </h2>
+      <small style="color:#666;">Formação: {{ away_lineup.get_formation_display }}</small>
+
+      <hr>
+
+      {% for s in away_spots %}
+        <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed #eee;">
+          <div>
+            <strong>{{ s.get_slot_type_display }} {{ s.slot_index }}</strong><br>
+            {% if s.player %}{{ s.player.name }}{% else %}<span style="color:#999;">— vazio —</span>{% endif %}
+          </div>
+          <div style="font-weight:700;">
+            {% if s.player %}
+              {{ away_points_map|get_item:s.player.id|default:"0" }}
+            {% else %}
+              0
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div style="margin-top:16px;">
+    <a href="{% url 'set_lineup_week' draft.id team.id week.number %}">Voltar para editar minha escalação</a>
+  </div>
+{% endblock %}
