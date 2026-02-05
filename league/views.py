@@ -365,6 +365,14 @@ def free_agents_list(request, team_id: int):
     })
 
 
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
+from django.utils import timezone
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+
+from .models import Team, Player, Draft, RosterSpot, WaiverClaim  # garanta WaiverClaim aqui
+
 @login_required
 @require_POST
 def add_free_agent(request, team_id: int, player_id: int):
@@ -381,6 +389,7 @@ def add_free_agent(request, team_id: int, player_id: int):
         messages.error(request, "Nenhum draft encontrado.")
         return redirect("free_agents_list", team_id=team.id)
 
+    # Se já pertence a alguém, não cria claim
     active_spot = RosterSpot.objects.filter(
         draft=draft,
         player=player,
@@ -391,25 +400,50 @@ def add_free_agent(request, team_id: int, player_id: int):
         messages.error(request, f"{player.name} já pertence a um time.")
         return redirect("free_agents_list", team_id=team.id)
 
-    spot = RosterSpot.objects.filter(draft=draft, player=player).first()
+    # Bid e drop (por enquanto o template provavelmente não manda => bid 0, sem drop)
+    try:
+        bid = int(request.POST.get("bid", 0))
+    except ValueError:
+        bid = 0
+    if bid < 0:
+        bid = 0
 
-    if spot:
-        spot.team = team
-        spot.acquired_via = "FA"
-        spot.acquired_at = timezone.now()
-        spot.dropped_at = None
-        spot.save()
-    else:
-        RosterSpot.objects.create(
+    drop_player_id = request.POST.get("drop_player_id") or None
+    drop_player = None
+    if drop_player_id:
+        drop_player = get_object_or_404(Player, id=drop_player_id)
+
+        # valida que o drop está no roster do time (ativo)
+        owns_drop = RosterSpot.objects.filter(
             draft=draft,
             team=team,
-            player=player,
-            acquired_via="FA",
-        )
+            player=drop_player,
+            dropped_at__isnull=True
+        ).exists()
+        if not owns_drop:
+            messages.error(request, "O jogador selecionado para drop não está no seu roster.")
+            return redirect("free_agents_list", team_id=team.id)
 
-    messages.success(request, f"{player.name} foi adicionado ao {team.name} (Free Agency).")
-    return redirect("team_roster", draft_id=draft.id, team_id=team.id)
+    # Evita claims duplicados (mesmo time, mesmo jogador, PENDING)
+    exists = WaiverClaim.objects.filter(
+        team=team,
+        add_player=player,
+        status=WaiverClaim.Status.PENDING
+    ).exists()
+    if exists:
+        messages.info(request, "Você já tem um claim pendente para esse jogador.")
+        return redirect("free_agents_list", team_id=team.id)
 
+    WaiverClaim.objects.create(
+        team=team,
+        add_player=player,
+        drop_player=drop_player,
+        bid=bid,
+        status=WaiverClaim.Status.PENDING,
+    )
+
+    messages.success(request, f"Claim criado para {player.name} (bid ${bid}).")
+    return redirect("free_agents_list", team_id=team.id)
 
 @login_required
 def team_roster_legacy(request, team_id: int):
