@@ -412,15 +412,23 @@ class PlayerWeekScore(models.Model):
 from django.db import models
 from django.core.validators import MinValueValidator
 
+# -----------------------------
+# FAAB / Waivers
+# -----------------------------
+from django.core.validators import MinValueValidator
+
 class TeamBudget(models.Model):
-    team = models.OneToOneField("league.Team", on_delete=models.CASCADE, related_name="budget")
+    # ⚠️ NÃO pode ser related_name="budget" porque Team já tem um field chamado budget
+    team = models.OneToOneField(
+        "league.Team",
+        on_delete=models.CASCADE,
+        related_name="faab_budget",  # <-- único ajuste necessário
+    )
     faab_balance = models.PositiveIntegerField(default=100)
 
     def __str__(self):
         return f"{self.team} - FAAB: {self.faab_balance}"
-# league/models.py
-from django.db import models
-from django.core.validators import MinValueValidator
+
 
 class WaiverClaim(models.Model):
     class Status(models.TextChoices):
@@ -432,7 +440,11 @@ class WaiverClaim(models.Model):
     team = models.ForeignKey("league.Team", on_delete=models.CASCADE, related_name="waiver_claims")
     add_player = models.ForeignKey("league.Player", on_delete=models.CASCADE, related_name="waiver_add_claims")
     drop_player = models.ForeignKey(
-        "league.Player", on_delete=models.SET_NULL, null=True, blank=True, related_name="waiver_drop_claims"
+        "league.Player",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="waiver_drop_claims",
     )
 
     bid = models.PositiveIntegerField(validators=[MinValueValidator(0)], default=0)
