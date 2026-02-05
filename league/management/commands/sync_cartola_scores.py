@@ -1,4 +1,6 @@
 import requests
+from decimal import Decimal
+
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
@@ -23,9 +25,8 @@ def compute_team_points(week, team):
     return (
         PlayerWeekScore.objects
         .filter(week=week, player_id__in=player_ids)
-        .aggregate(total=Coalesce(Sum("points"), 0))["total"]
+        .aggregate(total=Coalesce(Sum("points"), Decimal("0")))["total"]
     )
-
 
 
 class Command(BaseCommand):
@@ -206,7 +207,9 @@ class Command(BaseCommand):
         missing = 0
 
         # Para performance e para não sofrer com dados ruins, mapeia por cartola_id
-        players_by_cartola_id = {str(p.cartola_id): p for p in players if p.cartola_id is not None}
+        players_by_cartola_id = {
+            str(p.cartola_id): p for p in players if p.cartola_id is not None
+        }
 
         with transaction.atomic():
             for atleta_id, data in atletas.items():
@@ -239,7 +242,6 @@ class Command(BaseCommand):
         # -----------------------------
         # Atualizar placar dos matchups da Week
         # -----------------------------
-        # (Assim a tela "Rodada atual" consegue mostrar os jogos com pontuação)
         matchups = Matchup.objects.filter(week=week).select_related("home_team", "away_team")
 
         updated_matchups = 0
