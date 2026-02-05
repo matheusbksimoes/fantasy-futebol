@@ -2,10 +2,25 @@ import requests
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
+from django.db.models import Sum
+from django.db.models.functions import Coalesce
 
-from league.models import Draft, Week, Player, PlayerWeekScore
+from league.models import Draft, Week, Player, PlayerWeekScore, Matchup
 
 CARTOLA_BASE = "https://api.cartola.globo.com"
+
+
+def compute_team_points(week, team):
+    # Soma pontos dos jogadores escalados do time na semana
+    return (
+        PlayerWeekScore.objects
+        .filter(
+            week=week,
+            player__lineupspot__lineup__week=week,
+            player__lineupspot__lineup__team=team,
+        )
+        .aggregate(total=Coalesce(Sum("points"), 0))["total"]
+    )
 
 
 class Command(BaseCommand):
@@ -213,5 +228,29 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS(
                 f"Sincronização concluída: {upserts} upserts | {missing} atletas no payload sem player correspondente no banco"
+            )
+        )
+
+        # -----------------------------
+        # Atualizar placar dos matchups da Week
+        # -----------------------------
+        # (Assim a tela "Rodada atual" consegue mostrar os jogos com pontuação)
+        matchups = Matchup.objects.filter(week=week).select_related("home_team", "away_team")
+
+        updated_matchups = 0
+        for m in matchups:
+            home_pts = compute_team_points(week, m.home_team)
+            away_pts = compute_team_points(week, m.away_team)
+
+            # Só salva se mudou
+            if m.home_score != home_pts or m.away_score != away_pts:
+                m.home_score = home_pts
+                m.away_score = away_pts
+                m.save(update_fields=["home_score", "away_score"])
+                updated_matchups += 1
+
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Placar atualizado: {updated_matchups}/{matchups.count()} matchups na Week {week.number}"
             )
         )
