@@ -872,3 +872,31 @@ def matchup_view(request, draft_id: int, week_number: int, team_id: int):
         "home_points_map": home_points_map,
         "away_points_map": away_points_map,
     })
+# league/views.py
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
+from django.views.decorators.http import require_POST
+
+from league.models import Player, WaiverClaim
+
+@require_POST
+def create_waiver_claim(request, player_id):
+    team = request.user.profile.team  # ajuste conforme seu auth
+    add_player = get_object_or_404(Player, id=player_id)
+
+    bid = int(request.POST.get("bid", 0))
+    drop_player_id = request.POST.get("drop_player_id") or None
+
+    drop_player = None
+    if drop_player_id:
+        drop_player = get_object_or_404(Player, id=drop_player_id)
+
+    WaiverClaim.objects.create(
+        team=team,
+        add_player=add_player,
+        drop_player=drop_player,
+        bid=max(bid, 0),
+    )
+
+    messages.success(request, "Waiver claim criado! Vai ser processado no próximo horário.")
+    return redirect("free_agents")

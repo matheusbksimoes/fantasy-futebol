@@ -16,3 +16,12 @@ def add_player_to_roster_when_drafted(sender, instance: DraftPick, created, **kw
         player=instance.player,
         defaults={"active": True},
     )
+# league/signals.py
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from league.models import Team, TeamBudget
+
+@receiver(post_save, sender=Team)
+def create_budget(sender, instance, created, **kwargs):
+    if created:
+        TeamBudget.objects.create(team=instance, faab_balance=100)

@@ -408,3 +408,45 @@ class PlayerWeekScore(models.Model):
 
     def __str__(self):
         return f"Week {self.week.number} — {self.player.name}: {self.points}"
+# league/models.py
+from django.db import models
+from django.core.validators import MinValueValidator
+
+class TeamBudget(models.Model):
+    team = models.OneToOneField("league.Team", on_delete=models.CASCADE, related_name="budget")
+    faab_balance = models.PositiveIntegerField(default=100)
+
+    def __str__(self):
+        return f"{self.team} - FAAB: {self.faab_balance}"
+# league/models.py
+from django.db import models
+from django.core.validators import MinValueValidator
+
+class WaiverClaim(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "PENDING", "Pending"
+        WON = "WON", "Won"
+        LOST = "LOST", "Lost"
+        INVALID = "INVALID", "Invalid"
+
+    team = models.ForeignKey("league.Team", on_delete=models.CASCADE, related_name="waiver_claims")
+    add_player = models.ForeignKey("league.Player", on_delete=models.CASCADE, related_name="waiver_add_claims")
+    drop_player = models.ForeignKey(
+        "league.Player", on_delete=models.SET_NULL, null=True, blank=True, related_name="waiver_drop_claims"
+    )
+
+    bid = models.PositiveIntegerField(validators=[MinValueValidator(0)], default=0)
+
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
+    invalid_reason = models.CharField(max_length=255, blank=True, default="")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    processed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["status", "add_player", "-bid", "created_at"]),
+        ]
+
+    def __str__(self):
+        return f"{self.team} -> ADD {self.add_player} (${self.bid}) [{self.status}]"
