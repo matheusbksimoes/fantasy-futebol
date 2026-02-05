@@ -122,6 +122,15 @@ class Command(BaseCommand):
             )
         )
 
+        # (Opcional, mas útil): avisa se a week do seu app não bate com a rodada atual do Cartola
+        if rodada_atual and week.number != rodada_atual:
+            self.stdout.write(
+                self.style.WARNING(
+                    f"Atenção: Week do app ({week.number}) != rodada_atual do Cartola ({rodada_atual}). "
+                    "Se você usa week.number como rodada, isso pode causar confusão."
+                )
+            )
+
         # -----------------------------
         # Pontuações dos atletas
         # -----------------------------
@@ -153,40 +162,41 @@ class Command(BaseCommand):
             )
             return
 
-        self.stdout.write(self.style.SUCCESS(f"Cartola retornou {len(atletas)} atletas pontuados."))
+        self.stdout.write(
+            self.style.SUCCESS(f"Cartola retornou {len(atletas)} atletas pontuados.")
+        )
 
         # -----------------------------
         # Jogadores do seu banco
         # -----------------------------
-        players = (
-            Player.objects
-            .exclude(cartola_id__isnull=True)
-            .exclude(cartola_id__exact="")
-        )
+        # ✅ FIX: cartola_id é IntegerField -> NÃO comparar com string vazia.
+        players = Player.objects.exclude(cartola_id__isnull=True)
+
+        # (opcional) pra depurar rapidamente se o mapping está batendo:
+        try:
+            sample_atleta_id = next(iter(atletas.keys()))
+            sample_points = (atletas.get(sample_atleta_id) or {}).get("pontuacao")
+            self.stdout.write(
+                f"Amostra retorno: atleta_id={sample_atleta_id} pontuacao={sample_points}"
+            )
+        except StopIteration:
+            pass
 
         upserts = 0
         missing = 0
 
-        # (opcional) pra depurar rapidamente se o mapping está batendo:
-        # pega um atleta qualquer do retorno e imprime
-        try:
-            sample_atleta_id = next(iter(atletas.keys()))
-            sample_points = (atletas.get(sample_atleta_id) or {}).get("pontuacao")
-            self.stdout.write(f"Amostra retorno: atleta_id={sample_atleta_id} pontuacao={sample_points}")
-        except StopIteration:
-            pass
+        # Para performance e para não sofrer com dados ruins, mapeia por cartola_id
+        players_by_cartola_id = {str(p.cartola_id): p for p in players if p.cartola_id is not None}
 
         with transaction.atomic():
-            for player in players:
-                atleta_id = str(player.cartola_id).strip()
-                data = atletas.get(atleta_id)
-
-                if not data:
+            for atleta_id, data in atletas.items():
+                player = players_by_cartola_id.get(str(atleta_id))
+                if not player:
                     missing += 1
                     continue
 
-                points = data.get("pontuacao", 0) or 0
-                scouts = data.get("scout", {}) or {}
+                points = (data or {}).get("pontuacao", 0) or 0
+                scouts = (data or {}).get("scout", {}) or {}
 
                 PlayerWeekScore.objects.update_or_create(
                     week=week,
@@ -198,11 +208,10 @@ class Command(BaseCommand):
                         "fetched_at": timezone.now(),
                     },
                 )
-
                 upserts += 1
 
         self.stdout.write(
             self.style.SUCCESS(
-                f"Sincronização concluída: {upserts} upserts | {missing} sem pontuação (não apareceram no payload)"
+                f"Sincronização concluída: {upserts} upserts | {missing} atletas no payload sem player correspondente no banco"
             )
         )
