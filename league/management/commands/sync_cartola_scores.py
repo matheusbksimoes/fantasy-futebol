@@ -5,22 +5,27 @@ from django.utils import timezone
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
 
-from league.models import Draft, Week, Player, PlayerWeekScore, Matchup
+from league.models import Draft, Week, Player, PlayerWeekScore, Matchup, LineupSpot
 
 CARTOLA_BASE = "https://api.cartola.globo.com"
 
 
 def compute_team_points(week, team):
-    # Soma pontos dos jogadores escalados do time na semana
+    # Soma pontos dos jogadores escalados do time na semana (do jeito mais seguro)
+    player_ids = (
+        LineupSpot.objects
+        .filter(lineup__week=week, lineup__team=team)
+        .exclude(player__isnull=True)
+        .values_list("player_id", flat=True)
+        .distinct()
+    )
+
     return (
         PlayerWeekScore.objects
-        .filter(
-            week=week,
-            player__lineupspot__lineup__week=week,
-            player__lineupspot__lineup__team=team,
-        )
+        .filter(week=week, player_id__in=player_ids)
         .aggregate(total=Coalesce(Sum("points"), 0))["total"]
     )
+
 
 
 class Command(BaseCommand):
