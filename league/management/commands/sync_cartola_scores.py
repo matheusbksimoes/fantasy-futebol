@@ -143,14 +143,14 @@ class Command(BaseCommand):
             )
         )
 
-        # (Opcional, mas útil): avisa se a week do seu app não bate com a rodada atual do Cartola
+        # ✅ REGRA DO CRON: só executa se a rodada do Cartola bater com a Week do app
         if rodada_atual and week.number != rodada_atual:
             self.stdout.write(
                 self.style.WARNING(
-                    f"Atenção: Week do app ({week.number}) != rodada_atual do Cartola ({rodada_atual}). "
-                    "Se você usa week.number como rodada, isso pode causar confusão."
+                    f"Pulando: Week do app ({week.number}) != rodada_atual do Cartola ({rodada_atual})."
                 )
             )
+            return
 
         # -----------------------------
         # Pontuações dos atletas
