@@ -9,36 +9,27 @@
   {% endif %}
 
   {% if current_week %}
-    <p>
-      <b>Week {{ current_week.number }}</b>
-      {% if current_week.is_postponed %}
-        <span style="padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid #b00020; color:#b00020; background:#ffe5e5;">
-          ADIADA
-        </span>
-      {% endif %}
-    </p>
+    <p><b>Week {{ current_week.number }}</b></p>
 
     {% if matchups %}
       <table style="border-collapse:collapse; width:100%;">
         <thead>
           <tr>
             <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Mandante</th>
-            <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Placar</th>
+            <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5; text-align:center;">Placar</th>
             <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Visitante</th>
           </tr>
         </thead>
         <tbody>
           {% for m in matchups %}
             <tr>
-              <td style="border:1px solid #ddd; padding:8px;">
-                {{ m.home_team.name }}
-              </td>
+              <td style="border:1px solid #ddd; padding:8px;">{{ m.home_team.name }}</td>
               <td style="border:1px solid #ddd; padding:8px; text-align:center;">
-                {{ m.home_score|floatformat:2 }} x {{ m.away_score|floatformat:2 }}
+                <b>{{ m.home_score|floatformat:2 }}</b>
+                x
+                <b>{{ m.away_score|floatformat:2 }}</b>
               </td>
-              <td style="border:1px solid #ddd; padding:8px;">
-                {{ m.away_team.name }}
-              </td>
+              <td style="border:1px solid #ddd; padding:8px;">{{ m.away_team.name }}</td>
             </tr>
           {% endfor %}
         </tbody>
