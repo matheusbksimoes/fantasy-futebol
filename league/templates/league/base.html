@@ -23,6 +23,20 @@
     .pill-active { background:#0b57d0; color:#fff; border-color:#0b57d0; }
     .muted { color:#666; margin-left:auto; }
     .divider { width:1px; height:22px; background:#e5e5e5; margin: 0 4px; }
+
+    /* ✅ Flash messages */
+    .messages { margin: 0 0 12px 0; display: grid; gap: 8px; }
+    .message {
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: #fafafa;
+    }
+    /* Django message tags comuns: success, error, warning, info */
+    .message.success { border-color: #b7e1c1; background: #f3fff6; }
+    .message.error { border-color: #f5b7b7; background: #fff5f5; }
+    .message.warning { border-color: #f1d28b; background: #fff9e6; }
+    .message.info { border-color: #b7d6f5; background: #f3f8ff; }
   </style>
   {% block extra_head %}{% endblock %}
 </head>
@@ -100,6 +114,15 @@
       {% if week %} • Week {{ week.number }}{% endif %}
     </div>
   </div>
+
+  {# ✅ Mensagens (feedback de claim criado / erros etc.) #}
+  {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+        <div class="message {{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
 
   {% block content %}{% endblock %}
 </body>

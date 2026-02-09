@@ -11,13 +11,33 @@
     th, td { border: 1px solid #ddd; padding: 8px; }
     th { background: #f5f5f5; }
     .actions { white-space: nowrap; }
+
     .btn {
       border: 1px solid #ccc; background: #fff; padding: 6px 10px;
       cursor: pointer; border-radius: 4px;
     }
+
+    /* mensagens */
+    .messages { margin: 0 0 12px 0; }
+    .message {
+      padding: 8px 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      background: #fafafa;
+    }
+    .message.success { border-color: #b7e1c1; background: #f3fff6; }
+    .message.error { border-color: #f5b7b7; background: #fff5f5; }
+    .message.info { border-color: #b7d6f5; background: #f3f8ff; }
+
+    .bid-input {
+      width: 70px;
+      margin-right: 4px;
+    }
   </style>
 </head>
 <body>
+
   <h1>Free Agents — {{ team.name }}</h1>
 
   {% if draft %}
@@ -27,6 +47,15 @@
     <p><a href="{% url 'team_roster' draft.id team.id %}">Voltar ao roster</a></p>
   {% else %}
     <p>{{ error }}</p>
+  {% endif %}
+
+  {# ✅ FEEDBACK DE CLAIMS / ERROS #}
+  {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+        <div class="message {{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
   {% endif %}
 
   {% if free_agents %}
@@ -46,10 +75,24 @@
             <td><b>{{ p.name }}</b></td>
             <td>{{ p.real_team }}</td>
             <td class="actions">
-              <form method="post" action="{% url 'add_free_agent' team.id p.id %}" style="display:inline;">
+
+              <form method="post"
+                    action="{% url 'add_free_agent' team.id p.id %}"
+                    style="display:inline;">
                 {% csrf_token %}
-                <button class="btn" type="submit">Add</button>
+
+                <!-- ✅ Campo de FAAB (permite 0) -->
+                <input type="number"
+                       name="bid"
+                       min="0"
+                       value="0"
+                       class="bid-input">
+
+                <button class="btn" type="submit">
+                  CLAIM
+                </button>
               </form>
+
             </td>
           </tr>
         {% endfor %}
