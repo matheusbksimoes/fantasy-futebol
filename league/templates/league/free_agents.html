@@ -51,7 +51,90 @@
         {% endfor %}
       </tbody>
     </table>
+  {% else %}{% extends "league/base.html" %}
+{% block title %}Free Agents{% endblock %}
+
+{% block content %}
+  <h1>Free Agents — {{ team.name }}</h1>
+
+  <div style="color:#666; margin-bottom:10px;">
+    {% if draft %}
+      Draft: <b>{{ draft.id }}</b> • Liga: <b>{{ draft.league }}</b> • FAAB: <b>${{ faab_balance }}</b>
+    {% else %}
+      Nenhum draft encontrado.
+    {% endif %}
+  </div>
+
+  {% if free_agents %}
+    <table style="border-collapse:collapse; width:100%;">
+      <thead>
+        <tr>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Posição</th>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Jogador</th>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Time real</th>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Status</th>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in free_agents %}
+          <tr>
+            <td style="border:1px solid #ddd; padding:8px;">{{ p.get_position_display }}</td>
+            <td style="border:1px solid #ddd; padding:8px;"><b>{{ p.name }}</b></td>
+            <td style="border:1px solid #ddd; padding:8px;">{{ p.real_team }}</td>
+
+            <td style="border:1px solid #ddd; padding:8px;">
+              {% if p.id in pending_add_ids %}
+                <span style="display:inline-block; padding:3px 8px; border-radius:999px; border:1px solid #b7d6f5; background:#f3f8ff;">
+                  Claim pendente
+                </span>
+              {% else %}
+                <span style="color:#666;">Livre</span>
+              {% endif %}
+            </td>
+
+            <td style="border:1px solid #ddd; padding:8px; white-space:nowrap;">
+              {% if p.id in pending_add_ids %}
+                <span style="color:#666;">—</span>
+              {% else %}
+                <form method="post" action="{% url 'add_free_agent' team.id p.id %}" style="display:inline;">
+                  {% csrf_token %}
+
+                  <input
+                    type="number"
+                    name="bid"
+                    min="0"
+                    value="0"
+                    style="width:70px; padding:6px 8px; border:1px solid #ccc; border-radius:4px; margin-right:6px;"
+                    aria-label="Bid FAAB"
+                  >
+
+                  <select
+                    name="drop_player_id"
+                    style="padding:6px 8px; border:1px solid #ccc; border-radius:4px; margin-right:6px;"
+                    aria-label="Drop opcional"
+                  >
+                    <option value="">(Sem drop)</option>
+                    {% for spot in active_roster %}
+                      <option value="{{ spot.player.id }}">
+                        DROP: {{ spot.player.name }} ({{ spot.player.get_position_display }})
+                      </option>
+                    {% endfor %}
+                  </select>
+
+                  <button type="submit" style="border:1px solid #ccc; background:#fff; padding:6px 10px; cursor:pointer; border-radius:4px;">
+                    Claim
+                  </button>
+                </form>
+              {% endif %}
+            </td>
+
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   {% else %}
     <p>Nenhum free agent disponível.</p>
   {% endif %}
 {% endblock %}
+
