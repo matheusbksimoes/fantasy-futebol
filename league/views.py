@@ -6,6 +6,7 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
+from .models import TeamBudget, WaiverClaim
 
 from .models import (
     Draft,
@@ -345,6 +346,11 @@ def free_agents_list(request, team_id: int):
             "week": None,
             "free_agents": [],
             "active_tab": "free_agents",
+
+            # ✅ novos (fallback)
+            "faab_balance": 100,
+            "pending_add_ids": set(),
+            "active_roster": [],
         })
 
     week = Week.objects.filter(draft=draft, is_current=True).first()
@@ -356,15 +362,42 @@ def free_agents_list(request, team_id: int):
     )
     free_agents = Player.objects.exclude(id__in=active_player_ids).order_by("name")
 
+    # ✅ FAAB (cria se não existir)
+    budget, _ = TeamBudget.objects.get_or_create(team=team)
+    if budget.faab_balance is None:
+        budget.faab_balance = 100
+        budget.save(update_fields=["faab_balance"])
+
+    # ✅ Claims pendentes do time (pra marcar na lista)
+    pending_add_ids = set(
+        WaiverClaim.objects
+        .filter(team=team, status=WaiverClaim.Status.PENDING)
+        .values_list("add_player_id", flat=True)
+    )
+
+    # ✅ Opções de drop: roster ativo do time
+    active_roster = (
+        RosterSpot.objects
+        .filter(draft=draft, team=team, dropped_at__isnull=True)
+        .select_related("player")
+        .order_by("player__position", "player__name")
+    )
+
     return render(request, "league/free_agents.html", {
         "team": team,
         "draft": draft,
         "week": week,
         "free_agents": free_agents,
         "active_tab": "free_agents",
+
+        # ✅ novos
+        "faab_balance": budget.faab_balance or 0,
+        "pending_add_ids": pending_add_ids,
+        "active_roster": active_roster,
     })
 
 
+# ⚠️ Imports duplicados abaixo (mantidos por compatibilidade). Ideal: remover depois.
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
@@ -372,6 +405,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 
 from .models import Team, Player, Draft, RosterSpot, WaiverClaim  # garanta WaiverClaim aqui
+
 
 @login_required
 @require_POST
@@ -400,7 +434,7 @@ def add_free_agent(request, team_id: int, player_id: int):
         messages.error(request, f"{player.name} já pertence a um time.")
         return redirect("free_agents_list", team_id=team.id)
 
-    # Bid e drop (por enquanto o template provavelmente não manda => bid 0, sem drop)
+    # Bid e drop
     try:
         bid = int(request.POST.get("bid", 0))
     except ValueError:
@@ -424,6 +458,16 @@ def add_free_agent(request, team_id: int, player_id: int):
             messages.error(request, "O jogador selecionado para drop não está no seu roster.")
             return redirect("free_agents_list", team_id=team.id)
 
+    # ✅ valida FAAB do time (impede bid maior que saldo)
+    budget, _ = TeamBudget.objects.get_or_create(team=team)
+    if budget.faab_balance is None:
+        budget.faab_balance = 100
+        budget.save(update_fields=["faab_balance"])
+
+    if bid > budget.faab_balance:
+        messages.error(request, f"FAAB insuficiente. Seu saldo: ${budget.faab_balance}.")
+        return redirect("free_agents_list", team_id=team.id)
+
     # Evita claims duplicados (mesmo time, mesmo jogador, PENDING)
     exists = WaiverClaim.objects.filter(
         team=team,
@@ -444,6 +488,7 @@ def add_free_agent(request, team_id: int, player_id: int):
 
     messages.success(request, f"Claim criado para {player.name} (bid ${bid}).")
     return redirect("free_agents_list", team_id=team.id)
+
 
 @login_required
 def team_roster_legacy(request, team_id: int):
@@ -730,7 +775,6 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
     })
 
 
-
 # ============================================================
 # Week controls
 # ============================================================
@@ -828,6 +872,8 @@ def edit_week_scores(request, draft_id: int, week_number: int):
         "team": None,
         "active_tab": "current_week",
     })
+
+
 from django.db.models import Q
 
 def lineup_display_data(week, team):
@@ -906,6 +952,8 @@ def matchup_view(request, draft_id: int, week_number: int, team_id: int):
         "home_points_map": home_points_map,
         "away_points_map": away_points_map,
     })
+
+
 # league/views.py
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
@@ -914,11 +962,27 @@ from django.views.decorators.http import require_POST
 from league.models import Player, WaiverClaim
 
 @require_POST
-def create_waiver_claim(request, player_id):
-    team = request.user.profile.team  # ajuste conforme seu auth
+@login_required
+def create_waiver_claim(request, team_id: int, player_id: int):
+    """
+    Mantida por compatibilidade.
+    Ajustada para não depender de request.user.profile.team (que pode não existir).
+    """
+    team = get_object_or_404(Team, id=team_id)
+
+    forbidden = forbid_if_not_team_owner(request, team)
+    if forbidden:
+        return forbidden
+
     add_player = get_object_or_404(Player, id=player_id)
 
-    bid = int(request.POST.get("bid", 0))
+    try:
+        bid = int(request.POST.get("bid", 0))
+    except ValueError:
+        bid = 0
+    if bid < 0:
+        bid = 0
+
     drop_player_id = request.POST.get("drop_player_id") or None
 
     drop_player = None
@@ -929,8 +993,8 @@ def create_waiver_claim(request, player_id):
         team=team,
         add_player=add_player,
         drop_player=drop_player,
-        bid=max(bid, 0),
+        bid=bid,
     )
 
     messages.success(request, "Waiver claim criado! Vai ser processado no próximo horário.")
-    return redirect("free_agents")
+    return redirect("free_agents_list", team_id=team.id)
