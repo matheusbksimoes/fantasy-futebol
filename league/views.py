@@ -998,3 +998,240 @@ def create_waiver_claim(request, team_id: int, player_id: int):
 
     messages.success(request, "Waiver claim criado! Vai ser processado no próximo horário.")
     return redirect("free_agents_list", team_id=team.id)
+
+@login_required
+def my_claims(request, team_id: int):
+    team = get_object_or_404(Team, id=team_id)
+
+    forbidden = forbid_if_not_team_owner(request, team)
+    if forbidden:
+        return forbidden
+
+    draft = Draft.objects.order_by("-id").first()
+    week = None
+    if draft:
+        week = Week.objects.filter(draft=draft, is_current=True).first()
+
+    # orçamento FAAB
+    budget, _ = TeamBudget.objects.get_or_create(team=team)
+    if budget.faab_balance is None:
+        budget.faab_balance = 100
+        budget.save(update_fields=["faab_balance"])
+
+    claims = (
+        WaiverClaim.objects
+        .filter(team=team, status=WaiverClaim.Status.PENDING)
+        .select_related("add_player", "drop_player")
+        .order_by("-created_at")
+    )
+
+    # roster ativo para opções de drop
+    active_roster = []
+    if draft:
+        active_roster = (
+            RosterSpot.objects
+            .filter(draft=draft, team=team, dropped_at__isnull=True)
+            .select_related("player")
+            .order_by("player__position", "player__name")
+        )
+
+    return render(request, "league/my_claims.html", {
+        "draft": draft,
+        "week": week,
+        "team": team,
+        "active_tab": "my_claims",
+        "faab_balance": budget.faab_balance or 0,
+        "claims": claims,
+        "active_roster": active_roster,
+    })
+
+
+@login_required
+@require_POST
+def update_claim(request, team_id: int, claim_id: int):
+    team = get_object_or_404(Team, id=team_id)
+
+    forbidden = forbid_if_not_team_owner(request, team)
+    if forbidden:
+        return forbidden
+
+    claim = get_object_or_404(WaiverClaim, id=claim_id, team=team)
+
+    if claim.status != WaiverClaim.Status.PENDING:
+        messages.error(request, "Só é possível editar claims pendentes.")
+        return redirect("my_claims", team_id=team.id)
+
+    draft = Draft.objects.order_by("-id").first()
+
+    # bid
+    try:
+        bid = int(request.POST.get("bid", claim.bid or 0))
+    except ValueError:
+        bid = claim.bid or 0
+    if bid < 0:
+        bid = 0
+
+    budget, _ = TeamBudget.objects.get_or_create(team=team)
+    if budget.faab_balance is None:
+        budget.faab_balance = 100
+        budget.save(update_fields=["faab_balance"])
+
+    if bid > (budget.faab_balance or 0):
+        messages.error(request, f"FAAB insuficiente. Seu saldo: ${budget.faab_balance}.")
+        return redirect("my_claims", team_id=team.id)
+
+    # drop
+    drop_player_id = request.POST.get("drop_player_id") or ""
+    drop_player = None
+    if drop_player_id.strip():
+        drop_player = get_object_or_404(Player, id=int(drop_player_id))
+
+        # valida roster
+        if not draft:
+            messages.error(request, "Nenhum draft encontrado para validar drop.")
+            return redirect("my_claims", team_id=team.id)
+
+        owns_drop = RosterSpot.objects.filter(
+            draft=draft,
+            team=team,
+            player=drop_player,
+            dropped_at__isnull=True
+        ).exists()
+        if not owns_drop:
+            messages.error(request, "O jogador selecionado para drop não está no seu roster.")
+            return redirect("my_claims", team_id=team.id)
+
+        # não faz sentido dropar o mesmo que está adicionando
+        if drop_player.id == claim.add_player_id:
+            messages.error(request, "Você não pode dropar o mesmo jogador que está tentando adicionar.")
+            return redirect("my_claims", team_id=team.id)
+
+    claim.bid = bid
+    claim.drop_player = drop_player
+    claim.save(update_fields=["bid", "drop_player", "updated_at"])
+
+    messages.success(request, f"Claim atualizado: {claim.add_player.name} (bid ${bid}).")
+    return redirect("my_claims", team_id=team.id)
+
+
+# ============================================================
+# ✅ MEUS CLAIMS (listar / editar / cancelar)
+# ============================================================
+
+@login_required
+def my_claims(request, team_id: int):
+    team = get_object_or_404(Team, id=team_id)
+
+    forbidden = forbid_if_not_team_owner(request, team)
+    if forbidden:
+        return forbidden
+
+    draft = Draft.objects.order_by("-id").first()
+    week = Week.objects.filter(draft=draft, is_current=True).first() if draft else None
+
+    # claims pendentes do time
+    claims = (
+        WaiverClaim.objects
+        .filter(team=team, status=WaiverClaim.Status.PENDING)
+        .select_related("add_player", "drop_player")
+        .order_by("-created_at")
+    )
+
+    # roster ativo (pra dropdown de drop)
+    active_roster = []
+    if draft:
+        active_roster = (
+            RosterSpot.objects
+            .filter(draft=draft, team=team, dropped_at__isnull=True)
+            .select_related("player")
+            .order_by("player__position", "player__name")
+        )
+
+    # FAAB
+    budget, _ = TeamBudget.objects.get_or_create(team=team)
+    if budget.faab_balance is None:
+        budget.faab_balance = 100
+        budget.save(update_fields=["faab_balance"])
+
+    return render(request, "league/my_claims.html", {
+        "draft": draft,
+        "week": week,
+        "team": team,
+        "active_tab": "my_claims",
+
+        "claims": claims,
+        "active_roster": active_roster,
+        "faab_balance": budget.faab_balance,
+    })
+
+
+@login_required
+@require_POST
+@transaction.atomic
+def update_claim(request, team_id: int, claim_id: int):
+    team = get_object_or_404(Team, id=team_id)
+
+    forbidden = forbid_if_not_team_owner(request, team)
+    if forbidden:
+        return forbidden
+
+    claim = get_object_or_404(WaiverClaim, id=claim_id, team=team)
+
+    if claim.status != WaiverClaim.Status.PENDING:
+        messages.error(request, "Você só pode editar claims pendentes.")
+        return redirect("my_claims", team_id=team.id)
+
+    draft = Draft.objects.order_by("-id").first()
+
+    # bid
+    try:
+        bid = int(request.POST.get("bid", claim.bid or 0))
+    except ValueError:
+        bid = claim.bid or 0
+    if bid < 0:
+        bid = 0
+
+    # drop
+    drop_player_id = request.POST.get("drop_player_id") or ""
+    drop_player = None
+    if drop_player_id:
+        drop_player = get_object_or_404(Player, id=drop_player_id)
+
+        if draft:
+            owns_drop = RosterSpot.objects.filter(
+                draft=draft,
+                team=team,
+                player=drop_player,
+                dropped_at__isnull=True
+            ).exists()
+            if not owns_drop:
+                messages.error(request, "O jogador selecionado para drop não está no seu roster.")
+                return redirect("my_claims", team_id=team.id)
+
+    claim.bid = bid
+    claim.drop_player = drop_player
+    claim.save(update_fields=["bid", "drop_player"])
+
+    messages.success(request, "Claim atualizado.")
+    return redirect("my_claims", team_id=team.id)
+
+
+@login_required
+@require_POST
+def cancel_claim(request, team_id: int, claim_id: int):
+    team = get_object_or_404(Team, id=team_id)
+
+    forbidden = forbid_if_not_team_owner(request, team)
+    if forbidden:
+        return forbidden
+
+    claim = get_object_or_404(WaiverClaim, id=claim_id, team=team)
+
+    if claim.status != WaiverClaim.Status.PENDING:
+        messages.error(request, "Você só pode cancelar claims pendentes.")
+        return redirect("my_claims", team_id=team.id)
+
+    claim.delete()
+    messages.success(request, "Claim cancelado.")
+    return redirect("my_claims", team_id=team.id)
+

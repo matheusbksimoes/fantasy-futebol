@@ -1,0 +1,75 @@
+{% extends "league/base.html" %}
+{% block title %}Meus claims{% endblock %}
+
+{% block content %}
+  <h1>Meus claims — {{ team.name }}</h1>
+
+  <div style="color:#666; margin-bottom:10px;">
+    {% if draft %}
+      Draft: <b>{{ draft.id }}</b> • Liga: <b>{{ draft.league }}</b> • FAAB: <b>${{ faab_balance }}</b>
+    {% else %}
+      Nenhum draft encontrado.
+    {% endif %}
+  </div>
+
+  {% if claims %}
+    <table style="border-collapse:collapse; width:100%;">
+      <thead>
+        <tr>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Jogador (ADD)</th>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Bid</th>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Drop</th>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in claims %}
+          <tr>
+            <td style="border:1px solid #ddd; padding:8px;">
+              <b>{{ c.add_player.name }}</b> ({{ c.add_player.get_position_display }}) — {{ c.add_player.real_team }}
+            </td>
+
+            <td style="border:1px solid #ddd; padding:8px; white-space:nowrap;">
+              <form method="post" action="{% url 'update_claim' team.id c.id %}" style="display:inline;">
+                {% csrf_token %}
+                <input type="number" name="bid" min="0" value="{{ c.bid }}"
+                       style="width:90px; padding:6px 8px; border:1px solid #ccc; border-radius:4px;">
+            </td>
+
+            <td style="border:1px solid #ddd; padding:8px;">
+                <select name="drop_player_id"
+                        style="padding:6px 8px; border:1px solid #ccc; border-radius:4px;">
+                  <option value="">(Sem drop)</option>
+                  {% for spot in active_roster %}
+                    <option value="{{ spot.player.id }}"
+                      {% if c.drop_player and c.drop_player.id == spot.player.id %}selected{% endif %}>
+                      {{ spot.player.name }} ({{ spot.player.get_position_display }})
+                    </option>
+                  {% endfor %}
+                </select>
+            </td>
+
+            <td style="border:1px solid #ddd; padding:8px; white-space:nowrap;">
+                <button type="submit"
+                        style="border:1px solid #0b57d0; color:#0b57d0; background:#fff; padding:6px 10px; cursor:pointer; border-radius:4px; margin-right:6px;">
+                  Salvar
+                </button>
+              </form>
+
+              <form method="post" action="{% url 'cancel_claim' team.id c.id %}" style="display:inline;"
+                    onsubmit="return confirm('Cancelar este claim?');">
+                {% csrf_token %}
+                <button type="submit"
+                        style="border:1px solid #d33; color:#d33; background:#fff; padding:6px 10px; cursor:pointer; border-radius:4px;">
+                  Cancelar
+                </button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>Nenhum claim pendente.</p>
+  {% endif %}
+{% endblock %}
