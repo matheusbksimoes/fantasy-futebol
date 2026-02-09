@@ -59,7 +59,6 @@
         Rodada atual
       </a>
 
-      {# Se você criar uma página de schedule depois, deixe isso pronto #}
       {% if schedule_url %}
         <a class="pill {% if active_tab == 'schedule' %}pill-active{% endif %}"
            href="{{ schedule_url }}">
@@ -91,17 +90,19 @@
         Free Agents
       </a>
 
-      {# ✅ NOVO BOTÃO: MEU MATCHUP #}
+      <a class="pill {% if active_tab == 'my_claims' %}pill-active{% endif %}"
+         href="{% url 'my_claims' team.id %}">
+        Meus claims
+      </a>
+
       {% if week %}
         <a class="pill {% if active_tab == 'my_matchup' %}pill-active{% endif %}"
            href="{% url 'matchup_view' draft.id week.number team.id %}">
           Meu matchup
         </a>
       {% endif %}
-
     {% endif %}
 
-    {# ✅ NOVO BOTÃO: TODOS OS MATCHUPS DA RODADA #}
     {% if draft %}
       <a class="pill {% if active_tab == 'all_matchups' %}pill-active{% endif %}"
          href="{% url 'current_week_matchups' draft.id %}">
@@ -115,7 +116,6 @@
     </div>
   </div>
 
-  {# ✅ Mensagens (feedback de claim criado / erros etc.) #}
   {% if messages %}
     <div class="messages">
       {% for message in messages %}

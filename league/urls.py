@@ -22,11 +22,16 @@ urlpatterns = [
     path("teams/<int:team_id>/add/<int:player_id>/", views.add_free_agent, name="add_free_agent"),
     path("teams/<int:team_id>/drop/<int:player_id>/", views.drop_player, name="drop_player"),
 
+    # ✅ claims
+    path("teams/<int:team_id>/claims/", views.my_claims, name="my_claims"),
+    path("teams/<int:team_id>/claims/<int:claim_id>/update/", views.update_claim, name="update_claim"),
+    path("teams/<int:team_id>/claims/<int:claim_id>/cancel/", views.cancel_claim, name="cancel_claim"),
+
     path("draft/<int:draft_id>/weeks/postpone/", views.postpone_current_week, name="postpone_current_week"),
 
     path("draft/<int:draft_id>/week/", views.current_week_view, name="current_week_matchups"),
     path("draft/<int:draft_id>/week/current/", views.current_week_view, name="current_week"),
 
     path("draft/<int:draft_id>/week/<int:week_number>/scores/", views.edit_week_scores, name="edit_week_scores"),
-    path("draft/<int:draft_id>/week/<int:week_number>/matchup/<int:team_id>/",views.matchup_view,name="matchup_view"),
+    path("draft/<int:draft_id>/week/<int:week_number>/matchup/<int:team_id>/", views.matchup_view, name="matchup_view"),
 ]
