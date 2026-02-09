@@ -29,12 +29,28 @@
             <td style="border:1px solid #ddd; padding:8px;"><b>{{ p.name }}</b></td>
             <td style="border:1px solid #ddd; padding:8px;">{{ p.real_team }}</td>
             <td style="border:1px solid #ddd; padding:8px; white-space:nowrap;">
+
               <form method="post" action="{% url 'add_free_agent' team.id p.id %}" style="display:inline;">
                 {% csrf_token %}
-                <button type="submit" style="border:1px solid #ccc; background:#fff; padding:6px 10px; cursor:pointer; border-radius:4px;">
-                  Add
+
+                <!-- ✅ Campo de FAAB (permite 0) -->
+                <input
+                  type="number"
+                  name="bid"
+                  min="0"
+                  value="0"
+                  style="width:70px; padding:6px 8px; border:1px solid #ccc; border-radius:4px; margin-right:6px;"
+                  aria-label="Bid FAAB"
+                >
+
+                <button
+                  type="submit"
+                  style="border:1px solid #ccc; background:#fff; padding:6px 10px; cursor:pointer; border-radius:4px;"
+                >
+                  Claim
                 </button>
               </form>
+
             </td>
           </tr>
         {% endfor %}
