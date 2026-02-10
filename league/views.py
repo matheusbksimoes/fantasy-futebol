@@ -503,6 +503,7 @@ def transactions_list(request, draft_id: int):
     draft = get_object_or_404(Draft, id=draft_id)
     week = Week.objects.filter(draft=draft, is_current=True).first()
 
+    # mantém as transações normais como já era
     transactions = (
         Transaction.objects
         .filter(draft=draft)
@@ -510,19 +511,48 @@ def transactions_list(request, draft_id: int):
         .order_by("-created_at")[:200]
     )
 
+    # ✅ adiciona também TODOS os waiver bids (não só vencedores)
+    # (mostra WON / LOST / INVALID)
+    waiver_claims = (
+        WaiverClaim.objects
+        .exclude(status=WaiverClaim.Status.PENDING)
+        .select_related("team", "add_player", "drop_player")
+        .order_by("-processed_at")[:200]
+    )
+
+    # ✅ unifica num "feed" único sem quebrar o template:
+    # vamos criar objetos "parecidos" com Transaction
+    from types import SimpleNamespace
+
+    feed = list(transactions)
+
+    for c in waiver_claims:
+        feed.append(SimpleNamespace(
+            # campos que normalmente existem em Transaction
+            type="WAIVER_BID",
+            team=c.team,
+            player=c.add_player,
+            created_at=c.processed_at or c.updated_at or c.created_at,
+
+            # ✅ extras (se seu template quiser mostrar depois)
+            bid=c.bid,
+            claim_status=c.status,
+            invalid_reason=getattr(c, "invalid_reason", "") or "",
+            drop_player=c.drop_player,
+        ))
+
+    # ordena tudo por data desc e limita
+    feed.sort(key=lambda x: x.created_at or timezone.now(), reverse=True)
+    feed = feed[:200]
+
     return render(request, "league/transactions.html", {
         "draft": draft,
         "week": week,
         "team": None,
-        "transactions": transactions,
+        "transactions": feed,  # ✅ agora inclui claims também
         "active_tab": "transactions",
     })
 
-
-# ============================================================
-# ✅ ESCALAÇÃO (Week + Lineup + Formation + LineupSpot indexado)
-# ============================================================
-SLOT_ORDER = {"GOL": 0, "ZAG": 1, "LAT": 2, "MEI": 3, "ATA": 4, "TEC": 5}
 
 
 def expected_slots_for_formation(formation: str):
