@@ -64,6 +64,34 @@ class Command(BaseCommand):
         winner_budget.waiver_priority = max_prio
         winner_budget.save(update_fields=["waiver_priority"])
 
+    def _invalidate_other_claims_using_same_drop(self, winner: WaiverClaim, now):
+        """
+        ✅ NOVA REGRA:
+        Se o time ganhou um claim usando drop_player X,
+        qualquer OUTRO claim PENDING do mesmo time usando o MESMO drop_player X
+        deve virar INVALID (não dá pra dropar o mesmo jogador duas vezes).
+        """
+        if not winner.drop_player_id:
+            return 0
+
+        qs = (
+            WaiverClaim.objects
+            .select_for_update()
+            .filter(
+                status=WaiverClaim.Status.PENDING,
+                team_id=winner.team_id,
+                drop_player_id=winner.drop_player_id,
+            )
+            .exclude(id=winner.id)
+        )
+
+        updated = qs.update(
+            status=WaiverClaim.Status.INVALID,
+            invalid_reason="Drop player already used in another winning claim",
+            processed_at=now,
+        )
+        return updated or 0
+
     def _process_player_claims(self, add_player_id: int) -> int:
         """
         Processa todos os claims PENDING para um jogador específico.
@@ -74,7 +102,7 @@ class Command(BaseCommand):
             claims = list(
                 WaiverClaim.objects.select_for_update()
                 .filter(status=WaiverClaim.Status.PENDING, add_player_id=add_player_id)
-                .select_related("team", "add_player")
+                .select_related("team", "add_player", "drop_player")
             )
 
             if not claims:
@@ -122,14 +150,6 @@ class Command(BaseCommand):
                     c.save(update_fields=["status", "invalid_reason", "processed_at"])
                     continue
 
-                # Se você tem regra de limite de roster:
-                # if roster_is_full(c.team) and not c.drop_player_id:
-                #     c.status = WaiverClaim.Status.INVALID
-                #     c.invalid_reason = "Roster full and no drop specified"
-                #     c.processed_at = now
-                #     c.save(...)
-                #     continue
-
                 valid_claims.append(c)
 
             if not valid_claims:
@@ -164,7 +184,6 @@ class Command(BaseCommand):
 
             # ✅ 3) re-check: ainda é FA no momento de aplicar (concorrência)
             if not is_player_free_agent(winner.add_player):
-                # se virou ocupado entre validação e aplicação, invalida tudo
                 for c in claims:
                     if c.status == WaiverClaim.Status.PENDING:
                         c.status = WaiverClaim.Status.INVALID
@@ -188,6 +207,9 @@ class Command(BaseCommand):
             winner.invalid_reason = ""
             winner.save(update_fields=["status", "processed_at", "invalid_reason"])
 
+            # ✅ 4.1) NOVO: invalida outros claims do mesmo time que usam o MESMO drop
+            invalidated_count = self._invalidate_other_claims_using_same_drop(winner, now)
+
             # ✅ 5) rotação de prioridade APENAS se venceu no desempate
             if used_tiebreak:
                 self._rotate_waiver_priority_after_tiebreak(winner.team_id)
@@ -201,4 +223,8 @@ class Command(BaseCommand):
                     c.processed_at = now
                     c.save(update_fields=["status", "processed_at"])
 
-            return len(claims)
+            # ✅ Observação:
+            # os claims invalidados acima podem ser de OUTROS jogadores,
+            # então eles não aparecem no "claims" atual; eles serão contados
+            # quando aqueles jogadores forem processados (ou já aparecem em Transactions via processed_at).
+            return len(claims) + invalidated_count
