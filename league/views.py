@@ -350,7 +350,7 @@ def free_agents_list(request, team_id: int):
             "free_agents": [],
             "active_tab": "free_agents",
             "faab_balance": 100,
-            "pending_claims_count": {},
+            "pending_claims_count": {},   # ✅ dict: add_player_id -> count
             "active_roster": [],
         })
 
@@ -363,22 +363,24 @@ def free_agents_list(request, team_id: int):
     )
     free_agents = Player.objects.exclude(id__in=active_player_ids).order_by("name")
 
-    # FAAB
+    # ✅ FAAB (cria se não existir)
     budget, _ = TeamBudget.objects.get_or_create(team=team)
     if budget.faab_balance is None:
         budget.faab_balance = 100
         budget.save(update_fields=["faab_balance"])
 
     # ✅ contador de claims pendentes por jogador (do próprio time)
-    pending_claims_count = dict(
-        WaiverClaim.objects
-        .filter(team=team, status=WaiverClaim.Status.PENDING)
-        .values_list("add_player_id")
-        .annotate(cnt=Count("id"))
-        .values_list("add_player_id", "cnt")
-    )
+    pending_claims_count = {
+        row["add_player_id"]: row["cnt"]
+        for row in (
+            WaiverClaim.objects
+            .filter(team=team, status=WaiverClaim.Status.PENDING)
+            .values("add_player_id")
+            .annotate(cnt=models.Count("id"))
+        )
+    }
 
-    # roster ativo pra drop
+    # ✅ Opções de drop: roster ativo do time
     active_roster = (
         RosterSpot.objects
         .filter(draft=draft, team=team, dropped_at__isnull=True)
@@ -393,10 +395,9 @@ def free_agents_list(request, team_id: int):
         "free_agents": free_agents,
         "active_tab": "free_agents",
         "faab_balance": budget.faab_balance or 0,
-        "pending_claims_count": pending_claims_count,
+        "pending_claims_count": pending_claims_count,  # ✅ dict p/ usar no template
         "active_roster": active_roster,
     })
-
 
 @login_required
 @require_POST
