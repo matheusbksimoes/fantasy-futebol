@@ -65,7 +65,7 @@ class Command(BaseCommand):
             claims = list(
                 WaiverClaim.objects.select_for_update()
                 .filter(status=WaiverClaim.Status.PENDING, add_player_id=add_player_id)
-                .select_related("team", "drop_player", "add_player")
+                .select_related("team", "add_player")
             )
 
             if not claims:
