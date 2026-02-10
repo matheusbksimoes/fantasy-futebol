@@ -3,7 +3,7 @@ from types import SimpleNamespace
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
-from django.db import transaction, models
+from django.db import transaction, models, IntegrityError
 from django.db.models import Q
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
@@ -350,7 +350,8 @@ def free_agents_list(request, team_id: int):
             "free_agents": [],
             "active_tab": "free_agents",
             "faab_balance": 100,
-            "pending_claims_count": {},   # ✅ dict: add_player_id -> count
+            "pending_claims_count": {},
+            "pending_add_ids": set(),   # ✅ mantém compat com template antigo
             "active_roster": [],
         })
 
@@ -363,7 +364,7 @@ def free_agents_list(request, team_id: int):
     )
     free_agents = Player.objects.exclude(id__in=active_player_ids).order_by("name")
 
-    # ✅ FAAB (cria se não existir)
+    # ✅ FAAB
     budget, _ = TeamBudget.objects.get_or_create(team=team)
     if budget.faab_balance is None:
         budget.faab_balance = 100
@@ -380,6 +381,9 @@ def free_agents_list(request, team_id: int):
         )
     }
 
+    # ✅ compat com template antigo (set)
+    pending_add_ids = set(pending_claims_count.keys())
+
     # ✅ Opções de drop: roster ativo do time
     active_roster = (
         RosterSpot.objects
@@ -395,9 +399,11 @@ def free_agents_list(request, team_id: int):
         "free_agents": free_agents,
         "active_tab": "free_agents",
         "faab_balance": budget.faab_balance or 0,
-        "pending_claims_count": pending_claims_count,  # ✅ dict p/ usar no template
+        "pending_claims_count": pending_claims_count,
+        "pending_add_ids": pending_add_ids,  # ✅ mantém compat
         "active_roster": active_roster,
     })
+
 
 @login_required
 @require_POST
@@ -421,19 +427,18 @@ def add_free_agent(request, team_id: int, player_id: int):
         player=player,
         dropped_at__isnull=True
     ).first()
-
     if active_spot:
         messages.error(request, f"{player.name} já pertence a um time.")
         return redirect("free_agents_list", team_id=team.id)
 
-    # Bid e drop
+    # Bid
     try:
         bid = int(request.POST.get("bid", 0))
     except ValueError:
         bid = 0
-    if bid < 0:
-        bid = 0
+    bid = max(bid, 0)
 
+    # Drop
     drop_player_id = request.POST.get("drop_player_id") or None
     drop_player = None
     if drop_player_id:
@@ -449,6 +454,10 @@ def add_free_agent(request, team_id: int, player_id: int):
             messages.error(request, "O jogador selecionado para drop não está no seu roster.")
             return redirect("free_agents_list", team_id=team.id)
 
+        if drop_player.id == player.id:
+            messages.error(request, "Você não pode dropar o mesmo jogador que está tentando adicionar.")
+            return redirect("free_agents_list", team_id=team.id)
+
     # ✅ valida FAAB do time (impede bid maior que saldo)
     budget, _ = TeamBudget.objects.get_or_create(team=team)
     if budget.faab_balance is None:
@@ -459,14 +468,22 @@ def add_free_agent(request, team_id: int, player_id: int):
         messages.error(request, f"FAAB insuficiente. Seu saldo: ${budget.faab_balance}.")
         return redirect("free_agents_list", team_id=team.id)
 
-
-    WaiverClaim.objects.create(
-        team=team,
-        add_player=player,
-        drop_player=drop_player,
-        bid=bid,
-        status=WaiverClaim.Status.PENDING,
-    )
+    # ✅ cria claim
+    try:
+        WaiverClaim.objects.create(
+            team=team,
+            add_player=player,
+            drop_player=drop_player,
+            bid=bid,
+            status=WaiverClaim.Status.PENDING,
+        )
+    except IntegrityError:
+        # ⚠️ enquanto a constraint existir, o 2º claim pro mesmo jogador estoura aqui.
+        messages.error(
+            request,
+            "Você já tem um claim pendente para este jogador. (Ainda existe uma trava no banco; precisa remover a constraint pra permitir múltiplos lances.)"
+        )
+        return redirect("free_agents_list", team_id=team.id)
 
     messages.success(request, f"Claim criado para {player.name} (bid ${bid}).")
     return redirect("free_agents_list", team_id=team.id)
