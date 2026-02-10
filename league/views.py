@@ -456,15 +456,6 @@ def add_free_agent(request, team_id: int, player_id: int):
         messages.error(request, f"FAAB insuficiente. Seu saldo: ${budget.faab_balance}.")
         return redirect("free_agents_list", team_id=team.id)
 
-    # Evita claims duplicados (mesmo time, mesmo jogador, PENDING)
-    exists = WaiverClaim.objects.filter(
-        team=team,
-        add_player=player,
-        status=WaiverClaim.Status.PENDING
-    ).exists()
-    if exists:
-        messages.info(request, "Você já tem um claim pendente para esse jogador.")
-        return redirect("free_agents_list", team_id=team.id)
 
     WaiverClaim.objects.create(
         team=team,
@@ -508,11 +499,26 @@ def transactions_list(request, draft_id: int):
     feed = list(transactions)
 
     for c in waiver_claims:
+        status_label = str(c.status)
+
+        # tenta mapear pra algo curto e bonito
+        if c.status == WaiverClaim.Status.WON:
+            status_label = "WON"
+        elif c.status == WaiverClaim.Status.LOST:
+            status_label = "LOST"
+        elif c.status == WaiverClaim.Status.INVALID:
+            status_label = "INVALID"
+
+        # ✅ o template já costuma exibir `type`, então colocamos o resumo aqui
+        pretty_type = f"WAIVER {status_label} (${c.bid})"
+
         feed.append(SimpleNamespace(
-            type="WAIVER_BID",
+            type=pretty_type,
             team=c.team,
             player=c.add_player,
             created_at=c.processed_at or getattr(c, "updated_at", None) or c.created_at,
+
+            # extras (caso você queira usar no template depois)
             bid=c.bid,
             claim_status=c.status,
             invalid_reason=getattr(c, "invalid_reason", "") or "",
@@ -529,6 +535,7 @@ def transactions_list(request, draft_id: int):
         "transactions": feed,
         "active_tab": "transactions",
     })
+
 
 
 # ============================================================
