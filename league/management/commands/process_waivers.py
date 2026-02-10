@@ -87,7 +87,7 @@ class Command(BaseCommand):
 
         updated = qs.update(
             status=WaiverClaim.Status.INVALID,
-            invalid_reason="Drop player already used in another winning claim",
+            invalid_reason="Você já usou este jogador como drop em outro claim vencedor",
             processed_at=now,
         )
         return updated or 0
