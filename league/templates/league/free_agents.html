@@ -30,49 +30,48 @@
             <td style="border:1px solid #ddd; padding:8px;">{{ p.real_team }}</td>
 
             <td style="border:1px solid #ddd; padding:8px;">
-              {% if p.id in pending_add_ids %}
-                <span style="display:inline-block; padding:3px 8px; border-radius:999px; border:1px solid #b7d6f5; background:#f3f8ff;">
-                  Claim pendente
-                </span>
-              {% else %}
-                <span style="color:#666;">Livre</span>
-              {% endif %}
+              {% with cnt=pending_claims_count|get_item:p.id %}
+                {% if cnt %}
+                  <span style="display:inline-block; padding:3px 8px; border-radius:999px; border:1px solid #b7d6f5; background:#f3f8ff;">
+                    Claim pendente ({{ cnt }})
+                  </span>
+                {% else %}
+                  <span style="color:#666;">Livre</span>
+                {% endif %}
+              {% endwith %}
             </td>
 
             <td style="border:1px solid #ddd; padding:8px; white-space:nowrap;">
-              {% if p.id in pending_add_ids %}
-                <span style="color:#666;">—</span>
-              {% else %}
-                <form method="post" action="{% url 'add_free_agent' team.id p.id %}" style="display:inline;">
-                  {% csrf_token %}
+              {# ✅ SEMPRE deixa dar claim, mesmo com claim pendente #}
+              <form method="post" action="{% url 'add_free_agent' team.id p.id %}" style="display:inline;">
+                {% csrf_token %}
 
-                  <input
-                    type="number"
-                    name="bid"
-                    min="0"
-                    value="0"
-                    style="width:70px; padding:6px 8px; border:1px solid #ccc; border-radius:4px; margin-right:6px;"
-                    aria-label="Bid FAAB"
-                  >
+                <input
+                  type="number"
+                  name="bid"
+                  min="0"
+                  value="0"
+                  style="width:70px; padding:6px 8px; border:1px solid #ccc; border-radius:4px; margin-right:6px;"
+                  aria-label="Bid FAAB"
+                >
 
-                  <select
-                    name="drop_player_id"
-                    style="padding:6px 8px; border:1px solid #ccc; border-radius:4px; margin-right:6px;"
-                    aria-label="Drop opcional"
-                  >
-                    <option value="">(Sem drop)</option>
-                    {% for spot in active_roster %}
-                      <option value="{{ spot.player.id }}">
-                        DROP: {{ spot.player.name }} ({{ spot.player.get_position_display }})
-                      </option>
-                    {% endfor %}
-                  </select>
+                <select
+                  name="drop_player_id"
+                  style="padding:6px 8px; border:1px solid #ccc; border-radius:4px; margin-right:6px;"
+                  aria-label="Drop opcional"
+                >
+                  <option value="">(Sem drop)</option>
+                  {% for spot in active_roster %}
+                    <option value="{{ spot.player.id }}">
+                      DROP: {{ spot.player.name }} ({{ spot.player.get_position_display }})
+                    </option>
+                  {% endfor %}
+                </select>
 
-                  <button type="submit" style="border:1px solid #ccc; background:#fff; padding:6px 10px; cursor:pointer; border-radius:4px;">
-                    Claim
-                  </button>
-                </form>
-              {% endif %}
+                <button type="submit" style="border:1px solid #ccc; background:#fff; padding:6px 10px; cursor:pointer; border-radius:4px;">
+                  Claim
+                </button>
+              </form>
             </td>
 
           </tr>

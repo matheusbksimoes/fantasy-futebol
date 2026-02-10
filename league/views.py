@@ -3,7 +3,7 @@ from types import SimpleNamespace
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
-from django.db import transaction
+from django.db import transaction, models
 from django.db.models import Q
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
@@ -350,7 +350,7 @@ def free_agents_list(request, team_id: int):
             "free_agents": [],
             "active_tab": "free_agents",
             "faab_balance": 100,
-            "pending_add_ids": set(),
+            "pending_claims_count": {},   # ✅ novo
             "active_roster": [],
         })
 
@@ -369,12 +369,16 @@ def free_agents_list(request, team_id: int):
         budget.faab_balance = 100
         budget.save(update_fields=["faab_balance"])
 
-    # ✅ Claims pendentes do time (pra marcar na lista)
-    pending_add_ids = set(
-        WaiverClaim.objects
-        .filter(team=team, status=WaiverClaim.Status.PENDING)
-        .values_list("add_player_id", flat=True)
-    )
+    # ✅ agora não trava mais: conta quantos claims pendentes o time tem por jogador
+    pending_claims_count = {
+        row["add_player_id"]: row["cnt"]
+        for row in (
+            WaiverClaim.objects
+            .filter(team=team, status=WaiverClaim.Status.PENDING)
+            .values("add_player_id")
+            .annotate(cnt=models.Count("id"))
+        )
+    }
 
     # ✅ Opções de drop: roster ativo do time
     active_roster = (
@@ -391,9 +395,13 @@ def free_agents_list(request, team_id: int):
         "free_agents": free_agents,
         "active_tab": "free_agents",
         "faab_balance": budget.faab_balance or 0,
-        "pending_add_ids": pending_add_ids,
+
+        # ✅ troca o set bloqueador por contador
+        "pending_claims_count": pending_claims_count,
+
         "active_roster": active_roster,
     })
+
 
 
 @login_required

@@ -17,10 +17,32 @@
       <tbody>
         {% for t in transactions %}
           <tr>
-            <td style="border:1px solid #ddd; padding:8px;">{{ t.created_at|date:"d/m/Y H:i" }}</td>
-            <td style="border:1px solid #ddd; padding:8px;"><b>{{ t.team.name }}</b></td>
-            <td style="border:1px solid #ddd; padding:8px;">{{ t.get_type_display }}</td>
-            <td style="border:1px solid #ddd; padding:8px;">{{ t.player.name }}</td>
+            <td style="border:1px solid #ddd; padding:8px;">
+              {{ t.created_at|date:"d/m/Y H:i" }}
+            </td>
+
+            <td style="border:1px solid #ddd; padding:8px;">
+              <b>{{ t.team.name }}</b>
+            </td>
+
+            <td style="border:1px solid #ddd; padding:8px;">
+              {% if t.type == "WAIVER_BID" %}
+                WAIVER {{ t.claim_status }}
+                (bid ${{ t.bid }})
+                {% if t.drop_player %}
+                  — drop {{ t.drop_player.name }}
+                {% endif %}
+                {% if t.invalid_reason %}
+                  — <span style="color:#b00;">{{ t.invalid_reason }}</span>
+                {% endif %}
+              {% else %}
+                {{ t.get_type_display }}
+              {% endif %}
+            </td>
+
+            <td style="border:1px solid #ddd; padding:8px;">
+              {{ t.player.name }}
+            </td>
           </tr>
         {% endfor %}
       </tbody>
