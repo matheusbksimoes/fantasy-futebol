@@ -12,19 +12,28 @@
     {% endif %}
   </div>
 
+  <div style="color:#666; margin-bottom:12px; font-size:14px;">
+    <b>Ordem (seu time)</b> = a sequência interna dos seus próprios claims (não mostra a ordem do leilão da liga).
+  </div>
+
   {% if claims %}
     <table style="border-collapse:collapse; width:100%;">
       <thead>
         <tr>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5; width:110px;">Ordem (seu time)</th>
           <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Jogador (ADD)</th>
-          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Bid</th>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5; width:120px;">Bid</th>
           <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Drop</th>
-          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Ações</th>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5; width:220px;">Ações</th>
         </tr>
       </thead>
       <tbody>
         {% for c in claims %}
           <tr>
+            <td style="border:1px solid #ddd; padding:8px; text-align:center;">
+              <b>#{{ forloop.counter }}</b>
+            </td>
+
             <td style="border:1px solid #ddd; padding:8px;">
               <b>{{ c.add_player.name }}</b> ({{ c.add_player.get_position_display }}) — {{ c.add_player.real_team }}
             </td>
