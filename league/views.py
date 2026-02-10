@@ -1,12 +1,14 @@
+from types import SimpleNamespace
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.db.models import Q
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
-from .models import TeamBudget, WaiverClaim
 
 from .models import (
     Draft,
@@ -17,10 +19,12 @@ from .models import (
     Transaction,
     Week,
     Matchup,
-    Lineup,          # ✅ novo
-    LineupSpot,      # ✅ novo (lineup/slot_type/slot_index/player)
+    Lineup,
+    LineupSpot,
     PlayerWeekScore,
-    FORMATION_MAP,   # ✅ novo
+    FORMATION_MAP,
+    TeamBudget,
+    WaiverClaim,
 )
 
 from league.services.lock_service import player_locked
@@ -180,7 +184,6 @@ def make_pick(request, draft_id: int):
     )
 
     available_players = base_qs
-
     if pos in {"GOL", "LAT", "ZAG", "MEI", "ATA", "TEC"}:
         available_players = available_players.filter(position=pos)
     if real_team:
@@ -346,8 +349,6 @@ def free_agents_list(request, team_id: int):
             "week": None,
             "free_agents": [],
             "active_tab": "free_agents",
-
-            # ✅ novos (fallback)
             "faab_balance": 100,
             "pending_add_ids": set(),
             "active_roster": [],
@@ -389,22 +390,10 @@ def free_agents_list(request, team_id: int):
         "week": week,
         "free_agents": free_agents,
         "active_tab": "free_agents",
-
-        # ✅ novos
         "faab_balance": budget.faab_balance or 0,
         "pending_add_ids": pending_add_ids,
         "active_roster": active_roster,
     })
-
-
-# ⚠️ Imports duplicados abaixo (mantidos por compatibilidade). Ideal: remover depois.
-from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect
-from django.utils import timezone
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
-
-from .models import Team, Player, Draft, RosterSpot, WaiverClaim  # garanta WaiverClaim aqui
 
 
 @login_required
@@ -447,7 +436,6 @@ def add_free_agent(request, team_id: int, player_id: int):
     if drop_player_id:
         drop_player = get_object_or_404(Player, id=drop_player_id)
 
-        # valida que o drop está no roster do time (ativo)
         owns_drop = RosterSpot.objects.filter(
             draft=draft,
             team=team,
@@ -503,7 +491,6 @@ def transactions_list(request, draft_id: int):
     draft = get_object_or_404(Draft, id=draft_id)
     week = Week.objects.filter(draft=draft, is_current=True).first()
 
-    # mantém as transações normais como já era
     transactions = (
         Transaction.objects
         .filter(draft=draft)
@@ -511,8 +498,6 @@ def transactions_list(request, draft_id: int):
         .order_by("-created_at")[:200]
     )
 
-    # ✅ adiciona também TODOS os waiver bids (não só vencedores)
-    # (mostra WON / LOST / INVALID)
     waiver_claims = (
         WaiverClaim.objects
         .exclude(status=WaiverClaim.Status.PENDING)
@@ -520,28 +505,20 @@ def transactions_list(request, draft_id: int):
         .order_by("-processed_at")[:200]
     )
 
-    # ✅ unifica num "feed" único sem quebrar o template:
-    # vamos criar objetos "parecidos" com Transaction
-    from types import SimpleNamespace
-
     feed = list(transactions)
 
     for c in waiver_claims:
         feed.append(SimpleNamespace(
-            # campos que normalmente existem em Transaction
             type="WAIVER_BID",
             team=c.team,
             player=c.add_player,
-            created_at=c.processed_at or c.updated_at or c.created_at,
-
-            # ✅ extras (se seu template quiser mostrar depois)
+            created_at=c.processed_at or getattr(c, "updated_at", None) or c.created_at,
             bid=c.bid,
             claim_status=c.status,
             invalid_reason=getattr(c, "invalid_reason", "") or "",
             drop_player=c.drop_player,
         ))
 
-    # ordena tudo por data desc e limita
     feed.sort(key=lambda x: x.created_at or timezone.now(), reverse=True)
     feed = feed[:200]
 
@@ -549,10 +526,191 @@ def transactions_list(request, draft_id: int):
         "draft": draft,
         "week": week,
         "team": None,
-        "transactions": feed,  # ✅ agora inclui claims também
+        "transactions": feed,
         "active_tab": "transactions",
     })
 
+
+# ============================================================
+# Compat: criar waiver claim (não usado no urls.py atual, mas mantido)
+# ============================================================
+@require_POST
+@login_required
+def create_waiver_claim(request, team_id: int, player_id: int):
+    team = get_object_or_404(Team, id=team_id)
+
+    forbidden = forbid_if_not_team_owner(request, team)
+    if forbidden:
+        return forbidden
+
+    add_player = get_object_or_404(Player, id=player_id)
+
+    try:
+        bid = int(request.POST.get("bid", 0))
+    except ValueError:
+        bid = 0
+    if bid < 0:
+        bid = 0
+
+    drop_player_id = request.POST.get("drop_player_id") or None
+    drop_player = get_object_or_404(Player, id=drop_player_id) if drop_player_id else None
+
+    WaiverClaim.objects.create(
+        team=team,
+        add_player=add_player,
+        drop_player=drop_player,
+        bid=bid,
+        status=WaiverClaim.Status.PENDING,
+    )
+
+    messages.success(request, "Waiver claim criado! Vai ser processado no próximo horário.")
+    return redirect("free_agents_list", team_id=team.id)
+
+
+# ============================================================
+# ✅ MEUS CLAIMS (listar / editar / cancelar)  (usado no urls.py)
+# ============================================================
+@login_required
+def my_claims(request, team_id: int):
+    team = get_object_or_404(Team, id=team_id)
+
+    forbidden = forbid_if_not_team_owner(request, team)
+    if forbidden:
+        return forbidden
+
+    draft = Draft.objects.order_by("-id").first()
+    week = Week.objects.filter(draft=draft, is_current=True).first() if draft else None
+
+    # FAAB
+    budget, _ = TeamBudget.objects.get_or_create(team=team)
+    if budget.faab_balance is None:
+        budget.faab_balance = 100
+        budget.save(update_fields=["faab_balance"])
+
+    # ✅ Ordena por maior bid -> menor
+    claims = (
+        WaiverClaim.objects
+        .filter(team=team, status=WaiverClaim.Status.PENDING)
+        .select_related("add_player", "drop_player")
+        .order_by("-bid", "created_at", "id")
+    )
+
+    # roster ativo (pra dropdown de drop)
+    active_roster = []
+    if draft:
+        active_roster = (
+            RosterSpot.objects
+            .filter(draft=draft, team=team, dropped_at__isnull=True)
+            .select_related("player")
+            .order_by("player__position", "player__name")
+        )
+
+    return render(request, "league/my_claims.html", {
+        "draft": draft,
+        "week": week,
+        "team": team,
+        "active_tab": "my_claims",
+        "claims": claims,
+        "active_roster": active_roster,
+        "faab_balance": budget.faab_balance or 0,
+    })
+
+
+@login_required
+@require_POST
+@transaction.atomic
+def update_claim(request, team_id: int, claim_id: int):
+    team = get_object_or_404(Team, id=team_id)
+
+    forbidden = forbid_if_not_team_owner(request, team)
+    if forbidden:
+        return forbidden
+
+    claim = get_object_or_404(WaiverClaim, id=claim_id, team=team)
+
+    if claim.status != WaiverClaim.Status.PENDING:
+        messages.error(request, "Só é possível editar claims pendentes.")
+        return redirect("my_claims", team_id=team.id)
+
+    draft = Draft.objects.order_by("-id").first()
+
+    # bid
+    try:
+        bid = int(request.POST.get("bid", claim.bid or 0))
+    except ValueError:
+        bid = claim.bid or 0
+    if bid < 0:
+        bid = 0
+
+    budget, _ = TeamBudget.objects.get_or_create(team=team)
+    if budget.faab_balance is None:
+        budget.faab_balance = 100
+        budget.save(update_fields=["faab_balance"])
+
+    if bid > (budget.faab_balance or 0):
+        messages.error(request, f"FAAB insuficiente. Seu saldo: ${budget.faab_balance}.")
+        return redirect("my_claims", team_id=team.id)
+
+    # drop
+    drop_player_id = request.POST.get("drop_player_id") or ""
+    drop_player = None
+    if drop_player_id.strip():
+        drop_player = get_object_or_404(Player, id=int(drop_player_id))
+
+        if not draft:
+            messages.error(request, "Nenhum draft encontrado para validar drop.")
+            return redirect("my_claims", team_id=team.id)
+
+        owns_drop = RosterSpot.objects.filter(
+            draft=draft,
+            team=team,
+            player=drop_player,
+            dropped_at__isnull=True
+        ).exists()
+        if not owns_drop:
+            messages.error(request, "O jogador selecionado para drop não está no seu roster.")
+            return redirect("my_claims", team_id=team.id)
+
+        if drop_player.id == claim.add_player_id:
+            messages.error(request, "Você não pode dropar o mesmo jogador que está tentando adicionar.")
+            return redirect("my_claims", team_id=team.id)
+
+    claim.bid = bid
+    claim.drop_player = drop_player
+    # se você tem updated_at no model, ok; se não tiver, remova updated_at daqui
+    try:
+        claim.save(update_fields=["bid", "drop_player", "updated_at"])
+    except Exception:
+        claim.save(update_fields=["bid", "drop_player"])
+
+    messages.success(request, f"Claim atualizado: {claim.add_player.name} (bid ${bid}).")
+    return redirect("my_claims", team_id=team.id)
+
+
+@login_required
+@require_POST
+def cancel_claim(request, team_id: int, claim_id: int):
+    team = get_object_or_404(Team, id=team_id)
+
+    forbidden = forbid_if_not_team_owner(request, team)
+    if forbidden:
+        return forbidden
+
+    claim = get_object_or_404(WaiverClaim, id=claim_id, team=team)
+
+    if claim.status != WaiverClaim.Status.PENDING:
+        messages.error(request, "Você só pode cancelar claims pendentes.")
+        return redirect("my_claims", team_id=team.id)
+
+    claim.delete()
+    messages.success(request, "Claim cancelado.")
+    return redirect("my_claims", team_id=team.id)
+
+
+# ============================================================
+# ✅ ESCALAÇÃO (Week + Lineup + Formation + LineupSpot indexado)
+# ============================================================
+SLOT_ORDER = {"GOL": 0, "ZAG": 1, "LAT": 2, "MEI": 3, "ATA": 4, "TEC": 5}
 
 
 def expected_slots_for_formation(formation: str):
@@ -585,7 +743,6 @@ def ensure_spots_for_lineup(lineup: Lineup):
     qs = LineupSpot.objects.filter(lineup=lineup).select_related("player")
     existing = {(s.slot_type, s.slot_index): s for s in qs}
 
-    # criar faltantes
     to_create = []
     for (t, idx) in expected:
         if (t, idx) not in existing:
@@ -593,7 +750,6 @@ def ensure_spots_for_lineup(lineup: Lineup):
     if to_create:
         LineupSpot.objects.bulk_create(to_create)
 
-    # remover extras (só se vazio)
     for key, spot in existing.items():
         if key not in expected:
             if spot.player_id is not None:
@@ -613,7 +769,6 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
 
     draft = get_object_or_404(Draft, id=draft_id)
 
-    # week alvo
     if week_number is not None:
         week, _ = Week.objects.get_or_create(
             draft=draft,
@@ -629,30 +784,22 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
                 defaults={"is_current": True},
             )
 
-    # Week travada: só admin mexe
     if week.is_locked and not request.user.is_superuser:
         return HttpResponseForbidden("Esta Week está travada. Não é possível editar a escalação.")
 
     round_number = week.number
 
-    # 🔹 1) pega formação do PREVIEW (GET) se existir, senão usa a salva no banco
-    preview_formation = request.GET.get("formation")
-
-    # 🔹 2) garante que existe Lineup no banco (sempre com a formação salva)
     lineup, _ = Lineup.objects.get_or_create(
         week=week,
         team=team,
         defaults={"formation": "433"},
     )
 
-    # 🔹 3) formação efetiva usada para MONTAR OS SLOTS NA TELA (preview)
-    # ✅ PREVIEW de formação via GET (não salva no banco)
     preview_formation = request.GET.get("formation")
     selected_formation = preview_formation or lineup.formation
     if selected_formation not in FORMATION_MAP:
         selected_formation = lineup.formation
 
-    # Roster disponível do time (ativos)
     roster_spots = (
         RosterSpot.objects
         .filter(draft=draft, team=team, dropped_at__isnull=True)
@@ -674,7 +821,6 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
 
         try:
             with transaction.atomic():
-                # trocando formação: bloqueia se existir jogador travado já escalado
                 if new_formation != lineup.formation:
                     current_players = (
                         LineupSpot.objects.filter(lineup=lineup, player__isnull=False)
@@ -690,11 +836,9 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
                     lineup.full_clean()
                     lineup.save(update_fields=["formation", "updated_at"])
 
-                # ✅ garante slots REAIS da formação salva (agora sim)
                 ensure_spots_for_lineup(lineup)
                 expected = expected_slots_for_formation(lineup.formation)
 
-                # map de slots atuais
                 spots = {
                     (s.slot_type, s.slot_index): s
                     for s in LineupSpot.objects.filter(lineup=lineup).select_related("player")
@@ -747,14 +891,9 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
                 team_id=team.id,
             )
 
-            if week_number is not None:
-                return redirect("set_lineup_week", draft_id=draft.id, team_id=team.id, week_number=week_number)
-            return redirect("set_lineup", draft_id=draft.id, team_id=team.id)
-
         except (ValidationError, Player.DoesNotExist) as e:
             messages.error(request, str(e))
 
-    # ✅ GET: renderiza slots conforme selected_formation (preview), sem mexer no banco
     try:
         expected = expected_slots_for_formation(selected_formation)
 
@@ -767,7 +906,6 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
             if s:
                 slots.append(s)
             else:
-                # objeto "fake" só pra render (sem id)
                 slots.append(LineupSpot(lineup=lineup, slot_type=t, slot_index=idx, player=None))
 
     except ValidationError as e:
@@ -777,7 +915,6 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
     slots.sort(key=lambda s: (SLOT_ORDER.get(s.slot_type, 99), s.slot_index or 999))
 
     locked_player_ids = set()
-    # ✅ trava deve considerar os slots reais existentes (do banco)
     for s in LineupSpot.objects.filter(lineup=lineup).select_related("player"):
         if s.player_id and player_locked(s.player, round_number):
             locked_player_ids.add(s.player_id)
@@ -789,13 +926,11 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
         "team": team,
         "week": week,
         "active_tab": "lineup",
-
         "lineup": lineup,
         "formation_choices": formation_choices,
-        "selected_formation": selected_formation,  # ✅ IMPORTANTE pro template
+        "selected_formation": selected_formation,
         "slots": slots,
         "locked_player_ids": locked_player_ids,
-
         "gols": gols,
         "zags": zags,
         "lats": lats,
@@ -904,15 +1039,12 @@ def edit_week_scores(request, draft_id: int, week_number: int):
     })
 
 
-from django.db.models import Q
-
 def lineup_display_data(week, team):
     """
     Retorna (lineup, spots_ordenados, total_points, points_map)
     """
     lineup, _ = Lineup.objects.get_or_create(week=week, team=team, defaults={"formation": "433"})
 
-    # garante slots reais do banco para formação salva
     try:
         ensure_spots_for_lineup(lineup)
     except ValidationError:
@@ -952,7 +1084,6 @@ def matchup_view(request, draft_id: int, week_number: int, team_id: int):
     )
 
     if not matchup:
-        # se não tiver schedule ainda, volta pra week view
         messages.error(request, "Nenhum matchup encontrado para este time nesta week.")
         return redirect("current_week", draft_id=draft.id)
 
@@ -962,306 +1093,17 @@ def matchup_view(request, draft_id: int, week_number: int, team_id: int):
     return render(request, "league/matchup.html", {
         "draft": draft,
         "week": week,
-        "team": team,  # pro base.html não quebrar (aba Meu roster etc.)
+        "team": team,
         "active_tab": "my_matchup",
-
         "matchup": matchup,
-
         "home_team": matchup.home_team,
         "away_team": matchup.away_team,
-
         "home_lineup": home_lineup,
         "away_lineup": away_lineup,
-
         "home_spots": home_spots,
         "away_spots": away_spots,
-
         "home_total": home_total,
         "away_total": away_total,
-
         "home_points_map": home_points_map,
         "away_points_map": away_points_map,
     })
-
-
-# league/views.py
-from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect
-from django.views.decorators.http import require_POST
-
-from league.models import Player, WaiverClaim
-
-@require_POST
-@login_required
-def create_waiver_claim(request, team_id: int, player_id: int):
-    """
-    Mantida por compatibilidade.
-    Ajustada para não depender de request.user.profile.team (que pode não existir).
-    """
-    team = get_object_or_404(Team, id=team_id)
-
-    forbidden = forbid_if_not_team_owner(request, team)
-    if forbidden:
-        return forbidden
-
-    add_player = get_object_or_404(Player, id=player_id)
-
-    try:
-        bid = int(request.POST.get("bid", 0))
-    except ValueError:
-        bid = 0
-    if bid < 0:
-        bid = 0
-
-    drop_player_id = request.POST.get("drop_player_id") or None
-
-    drop_player = None
-    if drop_player_id:
-        drop_player = get_object_or_404(Player, id=drop_player_id)
-
-    WaiverClaim.objects.create(
-        team=team,
-        add_player=add_player,
-        drop_player=drop_player,
-        bid=bid,
-    )
-
-    messages.success(request, "Waiver claim criado! Vai ser processado no próximo horário.")
-    return redirect("free_agents_list", team_id=team.id)
-
-@login_required
-def my_claims(request, team_id: int):
-    team = get_object_or_404(Team, id=team_id)
-
-    forbidden = forbid_if_not_team_owner(request, team)
-    if forbidden:
-        return forbidden
-
-    draft = Draft.objects.order_by("-id").first()
-    week = None
-    if draft:
-        week = Week.objects.filter(draft=draft, is_current=True).first()
-
-    # orçamento FAAB
-    budget, _ = TeamBudget.objects.get_or_create(team=team)
-    if budget.faab_balance is None:
-        budget.faab_balance = 100
-        budget.save(update_fields=["faab_balance"])
-
-    claims = (
-        WaiverClaim.objects
-        .filter(team=team, status=WaiverClaim.Status.PENDING)
-        .select_related("add_player", "drop_player")
-        .order_by("-created_at")
-    )
-
-    # roster ativo para opções de drop
-    active_roster = []
-    if draft:
-        active_roster = (
-            RosterSpot.objects
-            .filter(draft=draft, team=team, dropped_at__isnull=True)
-            .select_related("player")
-            .order_by("player__position", "player__name")
-        )
-
-    return render(request, "league/my_claims.html", {
-        "draft": draft,
-        "week": week,
-        "team": team,
-        "active_tab": "my_claims",
-        "faab_balance": budget.faab_balance or 0,
-        "claims": claims,
-        "active_roster": active_roster,
-    })
-
-
-@login_required
-@require_POST
-def update_claim(request, team_id: int, claim_id: int):
-    team = get_object_or_404(Team, id=team_id)
-
-    forbidden = forbid_if_not_team_owner(request, team)
-    if forbidden:
-        return forbidden
-
-    claim = get_object_or_404(WaiverClaim, id=claim_id, team=team)
-
-    if claim.status != WaiverClaim.Status.PENDING:
-        messages.error(request, "Só é possível editar claims pendentes.")
-        return redirect("my_claims", team_id=team.id)
-
-    draft = Draft.objects.order_by("-id").first()
-
-    # bid
-    try:
-        bid = int(request.POST.get("bid", claim.bid or 0))
-    except ValueError:
-        bid = claim.bid or 0
-    if bid < 0:
-        bid = 0
-
-    budget, _ = TeamBudget.objects.get_or_create(team=team)
-    if budget.faab_balance is None:
-        budget.faab_balance = 100
-        budget.save(update_fields=["faab_balance"])
-
-    if bid > (budget.faab_balance or 0):
-        messages.error(request, f"FAAB insuficiente. Seu saldo: ${budget.faab_balance}.")
-        return redirect("my_claims", team_id=team.id)
-
-    # drop
-    drop_player_id = request.POST.get("drop_player_id") or ""
-    drop_player = None
-    if drop_player_id.strip():
-        drop_player = get_object_or_404(Player, id=int(drop_player_id))
-
-        # valida roster
-        if not draft:
-            messages.error(request, "Nenhum draft encontrado para validar drop.")
-            return redirect("my_claims", team_id=team.id)
-
-        owns_drop = RosterSpot.objects.filter(
-            draft=draft,
-            team=team,
-            player=drop_player,
-            dropped_at__isnull=True
-        ).exists()
-        if not owns_drop:
-            messages.error(request, "O jogador selecionado para drop não está no seu roster.")
-            return redirect("my_claims", team_id=team.id)
-
-        # não faz sentido dropar o mesmo que está adicionando
-        if drop_player.id == claim.add_player_id:
-            messages.error(request, "Você não pode dropar o mesmo jogador que está tentando adicionar.")
-            return redirect("my_claims", team_id=team.id)
-
-    claim.bid = bid
-    claim.drop_player = drop_player
-    claim.save(update_fields=["bid", "drop_player", "updated_at"])
-
-    messages.success(request, f"Claim atualizado: {claim.add_player.name} (bid ${bid}).")
-    return redirect("my_claims", team_id=team.id)
-
-
-# ============================================================
-# ✅ MEUS CLAIMS (listar / editar / cancelar)
-# ============================================================
-
-@login_required
-def my_claims(request, team_id: int):
-    team = get_object_or_404(Team, id=team_id)
-
-    forbidden = forbid_if_not_team_owner(request, team)
-    if forbidden:
-        return forbidden
-
-    draft = Draft.objects.order_by("-id").first()
-    week = Week.objects.filter(draft=draft, is_current=True).first() if draft else None
-
-    # claims pendentes do time
-    claims = (
-        WaiverClaim.objects
-        .filter(team=team, status=WaiverClaim.Status.PENDING)
-        .select_related("add_player", "drop_player")
-        .order_by("-created_at")
-    )
-
-    # roster ativo (pra dropdown de drop)
-    active_roster = []
-    if draft:
-        active_roster = (
-            RosterSpot.objects
-            .filter(draft=draft, team=team, dropped_at__isnull=True)
-            .select_related("player")
-            .order_by("player__position", "player__name")
-        )
-
-    # FAAB
-    budget, _ = TeamBudget.objects.get_or_create(team=team)
-    if budget.faab_balance is None:
-        budget.faab_balance = 100
-        budget.save(update_fields=["faab_balance"])
-
-    return render(request, "league/my_claims.html", {
-        "draft": draft,
-        "week": week,
-        "team": team,
-        "active_tab": "my_claims",
-
-        "claims": claims,
-        "active_roster": active_roster,
-        "faab_balance": budget.faab_balance,
-    })
-
-
-@login_required
-@require_POST
-@transaction.atomic
-def update_claim(request, team_id: int, claim_id: int):
-    team = get_object_or_404(Team, id=team_id)
-
-    forbidden = forbid_if_not_team_owner(request, team)
-    if forbidden:
-        return forbidden
-
-    claim = get_object_or_404(WaiverClaim, id=claim_id, team=team)
-
-    if claim.status != WaiverClaim.Status.PENDING:
-        messages.error(request, "Você só pode editar claims pendentes.")
-        return redirect("my_claims", team_id=team.id)
-
-    draft = Draft.objects.order_by("-id").first()
-
-    # bid
-    try:
-        bid = int(request.POST.get("bid", claim.bid or 0))
-    except ValueError:
-        bid = claim.bid or 0
-    if bid < 0:
-        bid = 0
-
-    # drop
-    drop_player_id = request.POST.get("drop_player_id") or ""
-    drop_player = None
-    if drop_player_id:
-        drop_player = get_object_or_404(Player, id=drop_player_id)
-
-        if draft:
-            owns_drop = RosterSpot.objects.filter(
-                draft=draft,
-                team=team,
-                player=drop_player,
-                dropped_at__isnull=True
-            ).exists()
-            if not owns_drop:
-                messages.error(request, "O jogador selecionado para drop não está no seu roster.")
-                return redirect("my_claims", team_id=team.id)
-
-    claim.bid = bid
-    claim.drop_player = drop_player
-    claim.save(update_fields=["bid", "drop_player"])
-
-    messages.success(request, "Claim atualizado.")
-    return redirect("my_claims", team_id=team.id)
-
-
-@login_required
-@require_POST
-def cancel_claim(request, team_id: int, claim_id: int):
-    team = get_object_or_404(Team, id=team_id)
-
-    forbidden = forbid_if_not_team_owner(request, team)
-    if forbidden:
-        return forbidden
-
-    claim = get_object_or_404(WaiverClaim, id=claim_id, team=team)
-
-    if claim.status != WaiverClaim.Status.PENDING:
-        messages.error(request, "Você só pode cancelar claims pendentes.")
-        return redirect("my_claims", team_id=team.id)
-
-    claim.delete()
-    messages.success(request, "Claim cancelado.")
-    return redirect("my_claims", team_id=team.id)
-
