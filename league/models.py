@@ -417,17 +417,31 @@ from django.core.validators import MinValueValidator
 # -----------------------------
 from django.core.validators import MinValueValidator
 
+# -----------------------------
+# FAAB / Waivers
+# -----------------------------
 class TeamBudget(models.Model):
-    # ⚠️ NÃO pode ser related_name="budget" porque Team já tem um field chamado budget
+    """
+    Controle de FAAB e prioridade de waiver (desempate).
+
+    - faab_balance: saldo atual
+    - waiver_priority: 1 = maior prioridade; números maiores = menor prioridade
+      (usado apenas como desempate quando bids empatam)
+    """
+    # ⚠️ NÃO usar related_name="budget" porque Team já tem field budget
     team = models.OneToOneField(
         "league.Team",
         on_delete=models.CASCADE,
-        related_name="faab_budget",  # <-- único ajuste necessário
+        related_name="faab_budget",
     )
+
     faab_balance = models.PositiveIntegerField(default=100)
 
+    # ✅ desempate por prioridade (1 é melhor)
+    waiver_priority = models.PositiveIntegerField(default=999, db_index=True)
+
     def __str__(self):
-        return f"{self.team} - FAAB: {self.faab_balance}"
+        return f"{self.team} - FAAB: {self.faab_balance} - PRIO: {self.waiver_priority}"
 
 
 class WaiverClaim(models.Model):
@@ -436,9 +450,20 @@ class WaiverClaim(models.Model):
         WON = "WON", "Won"
         LOST = "LOST", "Lost"
         INVALID = "INVALID", "Invalid"
+        CANCELLED = "CANCELLED", "Cancelled"  # ✅ útil pra sua tela "Meus claims"
 
-    team = models.ForeignKey("league.Team", on_delete=models.CASCADE, related_name="waiver_claims")
-    add_player = models.ForeignKey("league.Player", on_delete=models.CASCADE, related_name="waiver_add_claims")
+    team = models.ForeignKey(
+        "league.Team",
+        on_delete=models.CASCADE,
+        related_name="waiver_claims",
+    )
+
+    add_player = models.ForeignKey(
+        "league.Player",
+        on_delete=models.CASCADE,
+        related_name="waiver_add_claims",
+    )
+
     drop_player = models.ForeignKey(
         "league.Player",
         on_delete=models.SET_NULL,
@@ -449,7 +474,13 @@ class WaiverClaim(models.Model):
 
     bid = models.PositiveIntegerField(validators=[MinValueValidator(0)], default=0)
 
-    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
+    status = models.CharField(
+        max_length=12,
+        choices=Status.choices,
+        default=Status.PENDING,
+        db_index=True,
+    )
+
     invalid_reason = models.CharField(max_length=255, blank=True, default="")
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -458,6 +489,15 @@ class WaiverClaim(models.Model):
     class Meta:
         indexes = [
             models.Index(fields=["status", "add_player", "-bid", "created_at"]),
+            models.Index(fields=["team", "status", "created_at"]),
+        ]
+        constraints = [
+            # ✅ Evita duplicar claim PENDING pro mesmo time+jogador
+            models.UniqueConstraint(
+                fields=["team", "add_player"],
+                condition=Q(status="PENDING"),
+                name="uniq_pending_claim_per_team_player",
+            ),
         ]
 
     def __str__(self):
