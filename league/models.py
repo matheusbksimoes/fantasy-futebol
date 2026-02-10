@@ -491,14 +491,7 @@ class WaiverClaim(models.Model):
             models.Index(fields=["status", "add_player", "-bid", "created_at"]),
             models.Index(fields=["team", "status", "created_at"]),
         ]
-        constraints = [
-            # ✅ Evita duplicar claim PENDING pro mesmo time+jogador
-            models.UniqueConstraint(
-                fields=["team", "add_player"],
-                condition=Q(status="PENDING"),
-                name="uniq_pending_claim_per_team_player",
-            ),
-        ]
+    
 
     def __str__(self):
         return f"{self.team} -> ADD {self.add_player} (${self.bid}) [{self.status}]"
