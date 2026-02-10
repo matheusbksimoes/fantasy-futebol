@@ -1,7 +1,7 @@
 # league/management/commands/process_waivers.py
 from django.core.management.base import BaseCommand
 from django.db import transaction, models
-from django.db.models import Max
+from django.db.models import Max, Min
 from django.utils import timezone
 
 from league.models import WaiverClaim, TeamBudget
@@ -19,17 +19,26 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write("Processando waivers...")
 
-        # Pega a lista de jogadores com claims pendentes
-        add_player_ids = (
-            WaiverClaim.objects.filter(status=WaiverClaim.Status.PENDING)
-            .values_list("add_player_id", flat=True)
-            .distinct()
+        # ✅ Ordem global por MAIOR BID:
+        # 1) agrupa por jogador (add_player_id)
+        # 2) calcula o maior bid pendente daquele jogador (max_bid)
+        # 3) processa primeiro os jogadores com max_bid maior
+        # 4) empate entre jogadores: earliest_created_at e add_player_id (determinístico)
+        player_groups = (
+            WaiverClaim.objects
+            .filter(status=WaiverClaim.Status.PENDING)
+            .values("add_player_id")
+            .annotate(
+                max_bid=Max("bid"),
+                earliest_created_at=Min("created_at"),
+            )
+            .order_by("-max_bid", "earliest_created_at", "add_player_id")
         )
 
         total_processed = 0
 
-        for pid in add_player_ids:
-            total_processed += self._process_player_claims(pid)
+        for g in player_groups:
+            total_processed += self._process_player_claims(g["add_player_id"])
 
         self.stdout.write(self.style.SUCCESS(f"OK. Claims processados em {total_processed} linhas."))
 
