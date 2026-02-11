@@ -21,65 +21,43 @@ class Command(BaseCommand):
 
         total_processed = 0
 
-        # Loop: enquanto existir claim pendente, processa em “rodadas”
-        # Em cada rodada:
-        # 1) pega 1 claim ATIVO por time (o mais antigo: created_at, id)
-        # 2) dentre esses ativos, escolhe qual jogador processar primeiro por MAIOR BID
+        # Loop por “rodadas”:
+        # em cada rodada, considera apenas 1 claim ATIVO por time (o mais antigo).
+        # dentre os ativos, escolhe qual jogador processar primeiro por MAIOR BID.
         while True:
-            # ✅ pega todos os PENDING ordenados, e escolhe o 1º por time (ativo)
-            pending = (
+            active_rows = list(
                 WaiverClaim.objects
                 .filter(status=WaiverClaim.Status.PENDING)
-                .values("team_id", "add_player_id", "bid", "created_at", "id")
+                .values("id", "team_id", "add_player_id", "bid", "created_at")
                 .order_by("team_id", "created_at", "id")
             )
 
+            if not active_rows:
+                break
+
+            # 1º claim por time
             active_by_team = {}
-            for row in pending:
-                tid = row["team_id"]
+            for r in active_rows:
+                tid = r["team_id"]
                 if tid not in active_by_team:
-                    active_by_team[tid] = row
+                    active_by_team[tid] = r
 
             active_claims = list(active_by_team.values())
-
-            # Se não tem mais ativos, acabou
             if not active_claims:
                 break
 
-            # ✅ escolhe qual jogador processar primeiro (entre os ATIVOS), por:
-            # - maior bid (max)
-            # - empate: earliest created_at
-            # - empate final: add_player_id
-            best = None  # dict: add_player_id -> {"max_bid":..., "earliest_created_at":...}
-            groups = {}
-
-            for c in active_claims:
-                pid = c["add_player_id"]
-                if pid not in groups:
-                    groups[pid] = {"max_bid": c["bid"], "earliest_created_at": c["created_at"]}
-                else:
-                    if c["bid"] > groups[pid]["max_bid"]:
-                        groups[pid]["max_bid"] = c["bid"]
-                    if c["created_at"] < groups[pid]["earliest_created_at"]:
-                        groups[pid]["earliest_created_at"] = c["created_at"]
-
-            # escolhe o "melhor" grupo
-            for pid, meta in groups.items():
-                candidate = (meta["max_bid"], meta["earliest_created_at"], pid)
-                if best is None:
-                    best = candidate
-                else:
-                    # queremos: max_bid DESC, earliest_created_at ASC, pid ASC
-                    # então comparamos invertendo max_bid
-                    best_cmp = (-best[0], best[1], best[2])
-                    cand_cmp = (-candidate[0], candidate[1], candidate[2])
-                    if cand_cmp < best_cmp:
-                        best = candidate
+            # escolhe o próximo jogador a processar (entre os ATIVOS)
+            # prioridade: maior bid; empate: created_at mais antigo; empate final: add_player_id
+            best = None
+            for r in active_claims:
+                key = (-int(r["bid"]), r["created_at"], int(r["add_player_id"]))
+                if best is None or key < best[0]:
+                    best = (key, r["add_player_id"])
 
             if not best:
                 break
 
-            add_player_id = best[2]
+            add_player_id = best[1]
             total_processed += self._process_player_claims_active_only(add_player_id)
 
         self.stdout.write(self.style.SUCCESS(f"OK. Claims processados em {total_processed} linhas."))
@@ -113,7 +91,7 @@ class Command(BaseCommand):
         if not winner.drop_player_id:
             return 0
 
-        qs = (
+        updated = (
             WaiverClaim.objects
             .select_for_update()
             .filter(
@@ -122,12 +100,11 @@ class Command(BaseCommand):
                 drop_player_id=winner.drop_player_id,
             )
             .exclude(id=winner.id)
-        )
-
-        updated = qs.update(
-            status=WaiverClaim.Status.INVALID,
-            invalid_reason="Você já usou este jogador como drop em outro claim vencedor",
-            processed_at=now,
+            .update(
+                status=WaiverClaim.Status.INVALID,
+                invalid_reason="Você já usou este jogador como drop em outro claim vencedor",
+                processed_at=now,
+            )
         )
         return updated or 0
 
@@ -139,27 +116,42 @@ class Command(BaseCommand):
         with transaction.atomic():
             now = timezone.now()
 
-            # ✅ IMPORTANTE:
-            # Não podemos usar Window/RowNumber com select_for_update no Postgres.
-            # Então: lock em todos os PENDING e escolhe "o primeiro por time" em Python.
+            # ✅ 1) Trava SOMENTE linhas da tabela WaiverClaim (SEM JOIN!)
             pending_locked = list(
                 WaiverClaim.objects
                 .select_for_update()
                 .filter(status=WaiverClaim.Status.PENDING)
-                .select_related("team", "add_player", "drop_player")
+                .values("id", "team_id", "add_player_id", "created_at")
                 .order_by("team_id", "created_at", "id")
             )
 
             if not pending_locked:
                 return 0
 
-            # 1º por time = claim ativo daquele time
-            active_by_team = {}
-            for c in pending_locked:
-                if c.team_id not in active_by_team:
-                    active_by_team[c.team_id] = c
+            # ✅ 2) Calcula "ativo por time" em Python (primeiro claim pendente do time)
+            first_by_team = {}
+            for r in pending_locked:
+                tid = r["team_id"]
+                if tid not in first_by_team:
+                    first_by_team[tid] = r
 
-            claims = [c for c in active_by_team.values() if c.add_player_id == add_player_id]
+            # pega só os ativos cujo add_player_id é o jogador desta rodada
+            active_ids_for_player = [
+                r["id"]
+                for r in first_by_team.values()
+                if int(r["add_player_id"]) == int(add_player_id)
+            ]
+
+            if not active_ids_for_player:
+                return 0
+
+            # ✅ 3) Agora sim carrega objetos completos (pode ter JOIN, porque lock já foi feito)
+            claims = list(
+                WaiverClaim.objects
+                .filter(id__in=active_ids_for_player)
+                .select_related("team", "add_player", "drop_player")
+            )
+
             if not claims:
                 return 0
 
@@ -180,7 +172,7 @@ class Command(BaseCommand):
             }
             for tid in team_ids:
                 if tid not in budgets:
-                    b, _ = TeamBudget.objects.get_or_create(team_id=tid)
+                    TeamBudget.objects.get_or_create(team_id=tid, defaults={"faab_balance": 100})
                     budgets[tid] = TeamBudget.objects.select_for_update().get(team_id=tid)
 
             # valida claims ativos
@@ -188,7 +180,7 @@ class Command(BaseCommand):
             for c in claims:
                 budget = budgets[c.team_id]
 
-                if (budget.faab_balance or 0) < c.bid:
+                if (budget.faab_balance or 0) < (c.bid or 0):
                     c.status = WaiverClaim.Status.INVALID
                     c.invalid_reason = "Insufficient FAAB"
                     c.processed_at = now
@@ -207,9 +199,9 @@ class Command(BaseCommand):
             if not valid_claims:
                 return len(claims)
 
-            # winner: maior bid, empate: menor waiver_priority, depois created_at
-            max_bid = max(c.bid for c in valid_claims)
-            top = [c for c in valid_claims if c.bid == max_bid]
+            # winner: maior bid, empate: menor waiver_priority, depois created_at, depois id
+            max_bid = max(int(c.bid or 0) for c in valid_claims)
+            top = [c for c in valid_claims if int(c.bid or 0) == max_bid]
 
             used_tiebreak = False
             if len(top) == 1:
@@ -219,7 +211,7 @@ class Command(BaseCommand):
                 winner = sorted(
                     top,
                     key=lambda c: (
-                        budgets[c.team_id].waiver_priority,
+                        int(budgets[c.team_id].waiver_priority or 10**9),
                         c.created_at,
                         c.id,
                     ),
@@ -237,7 +229,7 @@ class Command(BaseCommand):
 
             # aplica vencedor
             winner_budget = budgets[winner.team_id]
-            winner_budget.faab_balance = (winner_budget.faab_balance or 0) - winner.bid
+            winner_budget.faab_balance = int(winner_budget.faab_balance or 0) - int(winner.bid or 0)
             winner_budget.save(update_fields=["faab_balance"])
 
             if winner.drop_player_id:
