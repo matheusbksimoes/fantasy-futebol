@@ -4,6 +4,86 @@
 {% block content %}
   <h1>Atividades — Draft {{ draft.id }}</h1>
 
+  {# ===========================
+     ✅ WAIVERS AGRUPADOS POR JOGADOR
+     =========================== #}
+  <h2 style="margin-top:18px;">Resultados de Waiver (por jogador)</h2>
+
+  {% if waiver_groups %}
+    {% for g in waiver_groups %}
+      <div style="margin:12px 0; border:1px solid #ddd; border-radius:8px; overflow:hidden;">
+        <div style="padding:10px 12px; background:#f7f7f7;">
+          <b>{{ g.player.name }}</b>
+        </div>
+
+        <table style="border-collapse:collapse; width:100%;">
+          <thead>
+            <tr>
+              <th style="border-top:1px solid #ddd; border-bottom:1px solid #ddd; padding:8px; background:#fff;">Time</th>
+              <th style="border-top:1px solid #ddd; border-bottom:1px solid #ddd; padding:8px; background:#fff;">Status</th>
+              <th style="border-top:1px solid #ddd; border-bottom:1px solid #ddd; padding:8px; background:#fff;">Bid</th>
+              <th style="border-top:1px solid #ddd; border-bottom:1px solid #ddd; padding:8px; background:#fff;">Drop</th>
+              <th style="border-top:1px solid #ddd; border-bottom:1px solid #ddd; padding:8px; background:#fff;">Detalhe</th>
+              <th style="border-top:1px solid #ddd; border-bottom:1px solid #ddd; padding:8px; background:#fff;">Data</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in g.rows %}
+              <tr>
+                <td style="border-bottom:1px solid #eee; padding:8px;"><b>{{ r.team.name }}</b></td>
+
+                <td style="border-bottom:1px solid #eee; padding:8px;">
+                  {% if r.status == "WON" %}
+                    <span style="padding:2px 8px; border-radius:999px; background:#e8f7ee; border:1px solid #bfe7cc;">WON</span>
+                  {% elif r.status == "LOST" %}
+                    <span style="padding:2px 8px; border-radius:999px; background:#f4f4f4; border:1px solid #ddd;">LOST</span>
+                  {% elif r.status == "INVALID" %}
+                    <span style="padding:2px 8px; border-radius:999px; background:#ffecec; border:1px solid #f5bcbc;">INVALID</span>
+                  {% elif r.status == "CANCELLED" %}
+                    <span style="padding:2px 8px; border-radius:999px; background:#fff6e6; border:1px solid #f0d2a6;">CANCELLED</span>
+                  {% else %}
+                    {{ r.status }}
+                  {% endif %}
+                </td>
+
+                <td style="border-bottom:1px solid #eee; padding:8px;">
+                  <b>${{ r.bid }}</b>
+                </td>
+
+                <td style="border-bottom:1px solid #eee; padding:8px;">
+                  {% if r.drop_player %}
+                    {{ r.drop_player.name }}
+                  {% else %}
+                    —
+                  {% endif %}
+                </td>
+
+                <td style="border-bottom:1px solid #eee; padding:8px;">
+                  {% if r.invalid_reason %}
+                    <span style="color:#b00;">{{ r.invalid_reason }}</span>
+                  {% else %}
+                    —
+                  {% endif %}
+                </td>
+
+                <td style="border-bottom:1px solid #eee; padding:8px;">
+                  {{ r.when|date:"d/m/Y H:i" }}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p style="color:#666;">Nenhum waiver processado ainda.</p>
+  {% endif %}
+
+  {# ===========================
+     ✅ OUTRAS TRANSAÇÕES (CRONOLÓGICO)
+     =========================== #}
+  <h2 style="margin-top:22px;">Outras transações (cronológico)</h2>
+
   {% if transactions %}
     <table style="border-collapse:collapse; width:100%;">
       <thead>
@@ -20,29 +100,12 @@
             <td style="border:1px solid #ddd; padding:8px;">
               {{ t.created_at|date:"d/m/Y H:i" }}
             </td>
-
             <td style="border:1px solid #ddd; padding:8px;">
               <b>{{ t.team.name }}</b>
             </td>
-
             <td style="border:1px solid #ddd; padding:8px;">
-              {% if t.bid is not None %}
-                {{ t.type }}
-
-                {% if t.drop_player %}
-                  — drop {{ t.drop_player.name }}
-                {% endif %}
-
-                {% if t.invalid_reason %}
-                  — <span style="color:#b00;">{{ t.invalid_reason }}</span>
-                {% endif %}
-
-              {% else %}
-                {# Transações normais do modelo Transaction #}
-                {{ t.get_type_display }}
-              {% endif %}
+              {{ t.get_type_display }}
             </td>
-
             <td style="border:1px solid #ddd; padding:8px;">
               {{ t.player.name }}
             </td>

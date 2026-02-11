@@ -497,11 +497,21 @@ def team_roster_legacy(request, team_id: int):
     return redirect("team_roster", draft_id=draft.id, team_id=team_id)
 
 
+from collections import defaultdict
+from types import SimpleNamespace
+from django.utils import timezone
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, render
+
+from .models import Draft, Week, Transaction, WaiverClaim
+
+
 @login_required
 def transactions_list(request, draft_id: int):
     draft = get_object_or_404(Draft, id=draft_id)
     week = Week.objects.filter(draft=draft, is_current=True).first()
 
+    # Transações "normais" (FA, DROP, DRAFT etc) em ordem cronológica
     transactions = (
         Transaction.objects
         .filter(draft=draft)
@@ -509,91 +519,49 @@ def transactions_list(request, draft_id: int):
         .order_by("-created_at")[:200]
     )
 
+    # Waivers já processados (WON/LOST/INVALID/CANCELLED)
     waiver_claims = (
         WaiverClaim.objects
         .exclude(status=WaiverClaim.Status.PENDING)
         .select_related("team", "add_player", "drop_player")
-        .order_by("-processed_at", "-id")[:400]
+        .order_by("add_player__name", "-bid", "team__name", "-processed_at", "-id")[:800]
     )
 
-    feed = list(transactions)
-
+    # Agrupa por jogador alvo (add_player)
+    grouped = defaultdict(list)
     for c in waiver_claims:
-        when = c.processed_at or getattr(c, "updated_at", None) or c.created_at or timezone.now()
+        when = c.processed_at or c.created_at or timezone.now()
 
-        if c.status == WaiverClaim.Status.WON:
-            # ✅ ADD com bid
-            feed.append(SimpleNamespace(
-                type=f"Add (WAIVER ${c.bid})",
-                team=c.team,
-                player=c.add_player,
-                created_at=when,
-                bid=c.bid,
-                claim_status=c.status,
-                invalid_reason=getattr(c, "invalid_reason", "") or "",
-                drop_player=c.drop_player,
-            ))
+        grouped[c.add_player_id].append(SimpleNamespace(
+            player=c.add_player,
+            team=c.team,
+            status=c.status,
+            bid=c.bid,
+            drop_player=c.drop_player,
+            invalid_reason=(c.invalid_reason or ""),
+            when=when,
+        ))
 
-            # ✅ DROP com bid (se tiver)
-            if c.drop_player_id:
-                feed.append(SimpleNamespace(
-                    type=f"Drop (WAIVER ${c.bid})",
-                    team=c.team,
-                    player=c.drop_player,
-                    created_at=when,
-                    bid=c.bid,
-                    claim_status=c.status,
-                    invalid_reason=getattr(c, "invalid_reason", "") or "",
-                    drop_player=c.drop_player,
-                ))
+    # transforma em lista ordenada por nome do jogador
+    waiver_groups = []
+    for add_player_id, rows in grouped.items():
+        rows.sort(key=lambda r: (-int(r.bid or 0), (r.team.name or ""), -(r.when.timestamp() if r.when else 0)))
+        waiver_groups.append({
+            "player": rows[0].player,
+            "rows": rows,
+        })
 
-        elif c.status == WaiverClaim.Status.LOST:
-            feed.append(SimpleNamespace(
-                type=f"Waiver LOST (${c.bid})",
-                team=c.team,
-                player=c.add_player,
-                created_at=when,
-                bid=c.bid,
-                claim_status=c.status,
-                invalid_reason=getattr(c, "invalid_reason", "") or "",
-                drop_player=c.drop_player,
-            ))
-
-        elif c.status == WaiverClaim.Status.INVALID:
-            extra = f" — {c.invalid_reason}" if getattr(c, "invalid_reason", "") else ""
-            feed.append(SimpleNamespace(
-                type=f"Waiver INVALID (${c.bid}){extra}",
-                team=c.team,
-                player=c.add_player,
-                created_at=when,
-                bid=c.bid,
-                claim_status=c.status,
-                invalid_reason=getattr(c, "invalid_reason", "") or "",
-                drop_player=c.drop_player,
-            ))
-
-        elif getattr(WaiverClaim.Status, "CANCELLED", None) and c.status == WaiverClaim.Status.CANCELLED:
-            feed.append(SimpleNamespace(
-                type=f"Waiver CANCELLED (${c.bid})",
-                team=c.team,
-                player=c.add_player,
-                created_at=when,
-                bid=c.bid,
-                claim_status=c.status,
-                invalid_reason=getattr(c, "invalid_reason", "") or "",
-                drop_player=c.drop_player,
-            ))
-
-    feed.sort(key=lambda x: x.created_at or timezone.now(), reverse=True)
-    feed = feed[:200]
+    waiver_groups.sort(key=lambda g: (g["player"].name or ""))
 
     return render(request, "league/transactions.html", {
         "draft": draft,
         "week": week,
         "team": None,
-        "transactions": feed,
+        "transactions": transactions,
+        "waiver_groups": waiver_groups,
         "active_tab": "transactions",
     })
+
 
 
 
