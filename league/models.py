@@ -450,7 +450,7 @@ class WaiverClaim(models.Model):
         WON = "WON", "Won"
         LOST = "LOST", "Lost"
         INVALID = "INVALID", "Invalid"
-        CANCELLED = "CANCELLED", "Cancelled"  # ✅ útil pra sua tela "Meus claims"
+        CANCELLED = "CANCELLED", "Cancelled"
 
     team = models.ForeignKey(
         "league.Team",
@@ -482,15 +482,16 @@ class WaiverClaim(models.Model):
     )
 
     invalid_reason = models.CharField(max_length=255, blank=True, default="")
-
     created_at = models.DateTimeField(auto_now_add=True)
     processed_at = models.DateTimeField(null=True, blank=True)
 
-        class Meta:
+    class Meta:
         indexes = [
             models.Index(fields=["status", "add_player", "-bid", "created_at"]),
             models.Index(fields=["team", "status", "created_at"]),
         ]
+        # (se você NÃO quer bloquear múltiplos claims PENDING no mesmo jogador,
+        #  NÃO coloque constraints aqui)
 
     def __str__(self):
         return f"{self.team} -> ADD {self.add_player} (${self.bid}) [{self.status}]"
