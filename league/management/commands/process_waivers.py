@@ -1,7 +1,7 @@
 # league/management/commands/process_waivers.py
 from django.core.management.base import BaseCommand
 from django.db import transaction, models
-from django.db.models import Max
+from django.db.models import Max, Min
 from django.utils import timezone
 
 from league.models import WaiverClaim, TeamBudget
@@ -21,44 +21,27 @@ class Command(BaseCommand):
 
         total_processed = 0
 
-        # Loop por “rodadas”:
-        # em cada rodada, considera apenas 1 claim ATIVO por time (o mais antigo).
-        # dentre os ativos, escolhe qual jogador processar primeiro por MAIOR BID.
+        # Processa por "grupos de jogador":
+        # Sempre pega o PRÓXIMO jogador com MAIOR BID entre TODOS os PENDING.
+        # Isso garante: maior lance válido vence, independente da ordem.
         while True:
-            active_rows = list(
+            next_group = (
                 WaiverClaim.objects
                 .filter(status=WaiverClaim.Status.PENDING)
-                .values("id", "team_id", "add_player_id", "bid", "created_at")
-                .order_by("team_id", "created_at", "id")
+                .values("add_player_id")
+                .annotate(
+                    max_bid=Max("bid"),
+                    earliest_created_at=Min("created_at"),
+                )
+                .order_by("-max_bid", "earliest_created_at", "add_player_id")
+                .first()
             )
 
-            if not active_rows:
+            if not next_group:
                 break
 
-            # 1º claim por time
-            active_by_team = {}
-            for r in active_rows:
-                tid = r["team_id"]
-                if tid not in active_by_team:
-                    active_by_team[tid] = r
-
-            active_claims = list(active_by_team.values())
-            if not active_claims:
-                break
-
-            # escolhe o próximo jogador a processar (entre os ATIVOS)
-            # prioridade: maior bid; empate: created_at mais antigo; empate final: add_player_id
-            best = None
-            for r in active_claims:
-                key = (-int(r["bid"]), r["created_at"], int(r["add_player_id"]))
-                if best is None or key < best[0]:
-                    best = (key, r["add_player_id"])
-
-            if not best:
-                break
-
-            add_player_id = best[1]
-            total_processed += self._process_player_claims_active_only(add_player_id)
+            add_player_id = int(next_group["add_player_id"])
+            total_processed += self._process_player_claims_all_pending(add_player_id)
 
         self.stdout.write(self.style.SUCCESS(f"OK. Claims processados em {total_processed} linhas."))
 
@@ -108,55 +91,43 @@ class Command(BaseCommand):
         )
         return updated or 0
 
-    def _process_player_claims_active_only(self, add_player_id: int) -> int:
+    def _process_player_claims_all_pending(self, add_player_id: int) -> int:
         """
-        Processa apenas os claims ATIVOS (1 por time) para um jogador específico.
-        Retorna quantos claims foram marcados (WON/LOST/INVALID).
+        Processa TODOS os claims PENDING para um jogador específico.
+        Regra: maior bid válido vence. Empate: waiver_priority (menor) -> created_at -> id.
+        Retorna quantos claims foram marcados (WON/LOST/INVALID) + invalidações extras.
         """
         with transaction.atomic():
             now = timezone.now()
 
-            # ✅ 1) Trava SOMENTE linhas da tabela WaiverClaim (SEM JOIN!)
-            pending_locked = list(
+            # 1) Trava SOMENTE linhas WaiverClaim (sem JOIN) deste jogador
+            locked_rows = list(
                 WaiverClaim.objects
                 .select_for_update()
-                .filter(status=WaiverClaim.Status.PENDING)
-                .values("id", "team_id", "add_player_id", "created_at")
-                .order_by("team_id", "created_at", "id")
+                .filter(status=WaiverClaim.Status.PENDING, add_player_id=add_player_id)
+                .values("id", "team_id")
+                .order_by("-bid", "created_at", "id")
             )
 
-            if not pending_locked:
+            if not locked_rows:
                 return 0
 
-            # ✅ 2) Calcula "ativo por time" em Python (primeiro claim pendente do time)
-            first_by_team = {}
-            for r in pending_locked:
-                tid = r["team_id"]
-                if tid not in first_by_team:
-                    first_by_team[tid] = r
+            claim_ids = [r["id"] for r in locked_rows]
 
-            # pega só os ativos cujo add_player_id é o jogador desta rodada
-            active_ids_for_player = [
-                r["id"]
-                for r in first_by_team.values()
-                if int(r["add_player_id"]) == int(add_player_id)
-            ]
-
-            if not active_ids_for_player:
-                return 0
-
-            # ✅ 3) Agora sim carrega objetos completos (pode ter JOIN, porque lock já foi feito)
+            # 2) Agora carrega objetos completos (join ok porque lock já aconteceu)
             claims = list(
                 WaiverClaim.objects
-                .filter(id__in=active_ids_for_player)
+                .filter(id__in=claim_ids)
                 .select_related("team", "add_player", "drop_player")
+                .order_by("-bid", "created_at", "id")
             )
-
             if not claims:
                 return 0
 
-            # Se o jogador já não é FA, esses ativos viram INVALID
-            if not is_player_free_agent(claims[0].add_player):
+            player_obj = claims[0].add_player
+
+            # Se já não é FA, TODO mundo vira INVALID
+            if not is_player_free_agent(player_obj):
                 for c in claims:
                     c.status = WaiverClaim.Status.INVALID
                     c.invalid_reason = "Player is no longer a free agent"
@@ -164,7 +135,7 @@ class Command(BaseCommand):
                     c.save(update_fields=["status", "invalid_reason", "processed_at"])
                 return len(claims)
 
-            # budgets com lock para os times envolvidos nesses claims ativos
+            # 3) Trava budgets dos times envolvidos
             team_ids = {c.team_id for c in claims}
             budgets = {
                 b.team_id: b
@@ -175,12 +146,12 @@ class Command(BaseCommand):
                     TeamBudget.objects.get_or_create(team_id=tid, defaults={"faab_balance": 100})
                     budgets[tid] = TeamBudget.objects.select_for_update().get(team_id=tid)
 
-            # valida claims ativos
+            # 4) Valida cada claim (FAAB + drop no roster quando informado)
             valid_claims = []
             for c in claims:
                 budget = budgets[c.team_id]
 
-                if (budget.faab_balance or 0) < (c.bid or 0):
+                if int(budget.faab_balance or 0) < int(c.bid or 0):
                     c.status = WaiverClaim.Status.INVALID
                     c.invalid_reason = "Insufficient FAAB"
                     c.processed_at = now
@@ -196,10 +167,11 @@ class Command(BaseCommand):
 
                 valid_claims.append(c)
 
+            # Se ninguém válido, acabou (já marcou INVALID os inválidos)
             if not valid_claims:
                 return len(claims)
 
-            # winner: maior bid, empate: menor waiver_priority, depois created_at, depois id
+            # 5) Escolhe vencedor: maior bid, empate por waiver_priority, depois created_at, depois id
             max_bid = max(int(c.bid or 0) for c in valid_claims)
             top = [c for c in valid_claims if int(c.bid or 0) == max_bid]
 
@@ -217,7 +189,7 @@ class Command(BaseCommand):
                     ),
                 )[0]
 
-            # re-check: ainda é FA
+            # Re-check: ainda é FA (segurança extra)
             if not is_player_free_agent(winner.add_player):
                 for c in claims:
                     if c.status == WaiverClaim.Status.PENDING:
@@ -227,7 +199,7 @@ class Command(BaseCommand):
                         c.save(update_fields=["status", "invalid_reason", "processed_at"])
                 return len(claims)
 
-            # aplica vencedor
+            # 6) Aplica vencedor
             winner_budget = budgets[winner.team_id]
             winner_budget.faab_balance = int(winner_budget.faab_balance or 0) - int(winner.bid or 0)
             winner_budget.save(update_fields=["faab_balance"])
@@ -241,12 +213,14 @@ class Command(BaseCommand):
             winner.invalid_reason = ""
             winner.save(update_fields=["status", "processed_at", "invalid_reason"])
 
+            # Invalida outros claims do MESMO time usando o MESMO drop
             invalidated_count = self._invalidate_other_claims_using_same_drop(winner, now)
 
+            # Rotação só se houve desempate
             if used_tiebreak:
                 self._rotate_waiver_priority_after_tiebreak(winner.team_id)
 
-            # restantes ATIVOS desse jogador: LOST (somente os que ainda estão PENDING)
+            # 7) Restantes: se ainda PENDING aqui, vira LOST (disputaram e perderam)
             for c in claims:
                 if c.id == winner.id:
                     continue
