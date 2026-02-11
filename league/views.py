@@ -513,37 +513,76 @@ def transactions_list(request, draft_id: int):
         WaiverClaim.objects
         .exclude(status=WaiverClaim.Status.PENDING)
         .select_related("team", "add_player", "drop_player")
-        .order_by("-processed_at")[:200]
+        .order_by("-processed_at", "-id")[:400]
     )
 
     feed = list(transactions)
 
     for c in waiver_claims:
-        status_label = str(c.status)
+        when = c.processed_at or getattr(c, "updated_at", None) or c.created_at or timezone.now()
 
-        # tenta mapear pra algo curto e bonito
         if c.status == WaiverClaim.Status.WON:
-            status_label = "WON"
+            # ✅ ADD com bid
+            feed.append(SimpleNamespace(
+                type=f"Add (WAIVER ${c.bid})",
+                team=c.team,
+                player=c.add_player,
+                created_at=when,
+                bid=c.bid,
+                claim_status=c.status,
+                invalid_reason=getattr(c, "invalid_reason", "") or "",
+                drop_player=c.drop_player,
+            ))
+
+            # ✅ DROP com bid (se tiver)
+            if c.drop_player_id:
+                feed.append(SimpleNamespace(
+                    type=f"Drop (WAIVER ${c.bid})",
+                    team=c.team,
+                    player=c.drop_player,
+                    created_at=when,
+                    bid=c.bid,
+                    claim_status=c.status,
+                    invalid_reason=getattr(c, "invalid_reason", "") or "",
+                    drop_player=c.drop_player,
+                ))
+
         elif c.status == WaiverClaim.Status.LOST:
-            status_label = "LOST"
+            feed.append(SimpleNamespace(
+                type=f"Waiver LOST (${c.bid})",
+                team=c.team,
+                player=c.add_player,
+                created_at=when,
+                bid=c.bid,
+                claim_status=c.status,
+                invalid_reason=getattr(c, "invalid_reason", "") or "",
+                drop_player=c.drop_player,
+            ))
+
         elif c.status == WaiverClaim.Status.INVALID:
-            status_label = "INVALID"
+            extra = f" — {c.invalid_reason}" if getattr(c, "invalid_reason", "") else ""
+            feed.append(SimpleNamespace(
+                type=f"Waiver INVALID (${c.bid}){extra}",
+                team=c.team,
+                player=c.add_player,
+                created_at=when,
+                bid=c.bid,
+                claim_status=c.status,
+                invalid_reason=getattr(c, "invalid_reason", "") or "",
+                drop_player=c.drop_player,
+            ))
 
-        # ✅ o template já costuma exibir `type`, então colocamos o resumo aqui
-        pretty_type = f"WAIVER {status_label} (${c.bid})"
-
-        feed.append(SimpleNamespace(
-            type=pretty_type,
-            team=c.team,
-            player=c.add_player,
-            created_at=c.processed_at or getattr(c, "updated_at", None) or c.created_at,
-
-            # extras (caso você queira usar no template depois)
-            bid=c.bid,
-            claim_status=c.status,
-            invalid_reason=getattr(c, "invalid_reason", "") or "",
-            drop_player=c.drop_player,
-        ))
+        elif getattr(WaiverClaim.Status, "CANCELLED", None) and c.status == WaiverClaim.Status.CANCELLED:
+            feed.append(SimpleNamespace(
+                type=f"Waiver CANCELLED (${c.bid})",
+                team=c.team,
+                player=c.add_player,
+                created_at=when,
+                bid=c.bid,
+                claim_status=c.status,
+                invalid_reason=getattr(c, "invalid_reason", "") or "",
+                drop_player=c.drop_player,
+            ))
 
     feed.sort(key=lambda x: x.created_at or timezone.now(), reverse=True)
     feed = feed[:200]
@@ -555,6 +594,7 @@ def transactions_list(request, draft_id: int):
         "transactions": feed,
         "active_tab": "transactions",
     })
+
 
 
 
