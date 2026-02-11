@@ -1,8 +1,7 @@
 # league/management/commands/process_waivers.py
 from django.core.management.base import BaseCommand
 from django.db import transaction, models
-from django.db.models import Max, Min, F, Window
-from django.db.models.functions import RowNumber
+from django.db.models import Max
 from django.utils import timezone
 
 from league.models import WaiverClaim, TeamBudget
@@ -27,41 +26,60 @@ class Command(BaseCommand):
         # 1) pega 1 claim ATIVO por time (o mais antigo: created_at, id)
         # 2) dentre esses ativos, escolhe qual jogador processar primeiro por MAIOR BID
         while True:
-            # ✅ 1 claim ativo por time (o primeiro da “fila” do time)
-            active_claims = (
+            # ✅ pega todos os PENDING ordenados, e escolhe o 1º por time (ativo)
+            pending = (
                 WaiverClaim.objects
                 .filter(status=WaiverClaim.Status.PENDING)
-                .annotate(
-                    rn=Window(
-                        expression=RowNumber(),
-                        partition_by=[F("team_id")],
-                        order_by=[F("created_at").asc(), F("id").asc()],
-                    )
-                )
-                .filter(rn=1)
+                .values("team_id", "add_player_id", "bid", "created_at", "id")
+                .order_by("team_id", "created_at", "id")
             )
+
+            active_by_team = {}
+            for row in pending:
+                tid = row["team_id"]
+                if tid not in active_by_team:
+                    active_by_team[tid] = row
+
+            active_claims = list(active_by_team.values())
 
             # Se não tem mais ativos, acabou
-            if not active_claims.exists():
+            if not active_claims:
                 break
 
-            # ✅ escolhe qual jogador processar primeiro (entre os ATIVOS)
-            next_group = (
-                active_claims
-                .values("add_player_id")
-                .annotate(
-                    max_bid=Max("bid"),
-                    earliest_created_at=Min("created_at"),
-                )
-                .order_by("-max_bid", "earliest_created_at", "add_player_id")
-                .first()
-            )
+            # ✅ escolhe qual jogador processar primeiro (entre os ATIVOS), por:
+            # - maior bid (max)
+            # - empate: earliest created_at
+            # - empate final: add_player_id
+            best = None  # dict: add_player_id -> {"max_bid":..., "earliest_created_at":...}
+            groups = {}
 
-            if not next_group:
+            for c in active_claims:
+                pid = c["add_player_id"]
+                if pid not in groups:
+                    groups[pid] = {"max_bid": c["bid"], "earliest_created_at": c["created_at"]}
+                else:
+                    if c["bid"] > groups[pid]["max_bid"]:
+                        groups[pid]["max_bid"] = c["bid"]
+                    if c["created_at"] < groups[pid]["earliest_created_at"]:
+                        groups[pid]["earliest_created_at"] = c["created_at"]
+
+            # escolhe o "melhor" grupo
+            for pid, meta in groups.items():
+                candidate = (meta["max_bid"], meta["earliest_created_at"], pid)
+                if best is None:
+                    best = candidate
+                else:
+                    # queremos: max_bid DESC, earliest_created_at ASC, pid ASC
+                    # então comparamos invertendo max_bid
+                    best_cmp = (-best[0], best[1], best[2])
+                    cand_cmp = (-candidate[0], candidate[1], candidate[2])
+                    if cand_cmp < best_cmp:
+                        best = candidate
+
+            if not best:
                 break
 
-            add_player_id = next_group["add_player_id"]
-
+            add_player_id = best[2]
             total_processed += self._process_player_claims_active_only(add_player_id)
 
         self.stdout.write(self.style.SUCCESS(f"OK. Claims processados em {total_processed} linhas."))
@@ -121,23 +139,27 @@ class Command(BaseCommand):
         with transaction.atomic():
             now = timezone.now()
 
-            # ✅ recomputa ativos dentro da transaction (evita corrida)
-            active_claims = (
+            # ✅ IMPORTANTE:
+            # Não podemos usar Window/RowNumber com select_for_update no Postgres.
+            # Então: lock em todos os PENDING e escolhe "o primeiro por time" em Python.
+            pending_locked = list(
                 WaiverClaim.objects
                 .select_for_update()
                 .filter(status=WaiverClaim.Status.PENDING)
-                .annotate(
-                    rn=Window(
-                        expression=RowNumber(),
-                        partition_by=[F("team_id")],
-                        order_by=[F("created_at").asc(), F("id").asc()],
-                    )
-                )
-                .filter(rn=1, add_player_id=add_player_id)
                 .select_related("team", "add_player", "drop_player")
+                .order_by("team_id", "created_at", "id")
             )
 
-            claims = list(active_claims)
+            if not pending_locked:
+                return 0
+
+            # 1º por time = claim ativo daquele time
+            active_by_team = {}
+            for c in pending_locked:
+                if c.team_id not in active_by_team:
+                    active_by_team[c.team_id] = c
+
+            claims = [c for c in active_by_team.values() if c.add_player_id == add_player_id]
             if not claims:
                 return 0
 
@@ -166,7 +188,7 @@ class Command(BaseCommand):
             for c in claims:
                 budget = budgets[c.team_id]
 
-                if budget.faab_balance < c.bid:
+                if (budget.faab_balance or 0) < c.bid:
                     c.status = WaiverClaim.Status.INVALID
                     c.invalid_reason = "Insufficient FAAB"
                     c.processed_at = now
@@ -215,7 +237,7 @@ class Command(BaseCommand):
 
             # aplica vencedor
             winner_budget = budgets[winner.team_id]
-            winner_budget.faab_balance -= winner.bid
+            winner_budget.faab_balance = (winner_budget.faab_balance or 0) - winner.bid
             winner_budget.save(update_fields=["faab_balance"])
 
             if winner.drop_player_id:

@@ -487,11 +487,11 @@ class WaiverClaim(models.Model):
     processed_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        indexes = [
-            models.Index(fields=["status", "add_player", "-bid", "created_at"]),
-            models.Index(fields=["team", "status", "created_at"]),
-        ]
-    
+    indexes = [
+        models.Index(fields=["status", "add_player", "-bid", "created_at"]),
+        models.Index(fields=["team", "status", "created_at"]),
+    ]
 
-    def __str__(self):
-        return f"{self.team} -> ADD {self.add_player} (${self.bid}) [{self.status}]"
+
+def __str__(self):
+    return f"{self.team} -> ADD {self.add_player} (${self.bid}) [{self.status}]"
