@@ -14,7 +14,6 @@
           <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Jogador</th>
         </tr>
       </thead>
-
       <tbody>
         {% for t in transactions %}
           <tr>
@@ -27,16 +26,20 @@
             </td>
 
             <td style="border:1px solid #ddd; padding:8px;">
-              {# ✅ Transactions do Django têm get_type_display; waivers (SimpleNamespace) não.
-                 Então: tenta get_type_display e se não existir/der vazio, cai no t.type #}
-              {{ t.get_type_display|default:t.type }}
+              {% if t.bid is not None %}
+                {{ t.type }}
 
-              {# ✅ Extras (se você quiser que apareça também drop/invalid embaixo do texto) #}
-              {% if t.drop_player %}
-                <span style="color:#666;"> — drop {{ t.drop_player.name }}</span>
-              {% endif %}
-              {% if t.invalid_reason %}
-                <span style="color:#b00;"> — {{ t.invalid_reason }}</span>
+                {% if t.drop_player %}
+                  — drop {{ t.drop_player.name }}
+                {% endif %}
+
+                {% if t.invalid_reason %}
+                  — <span style="color:#b00;">{{ t.invalid_reason }}</span>
+                {% endif %}
+
+              {% else %}
+                {# Transações normais do modelo Transaction #}
+                {{ t.get_type_display }}
               {% endif %}
             </td>
 
