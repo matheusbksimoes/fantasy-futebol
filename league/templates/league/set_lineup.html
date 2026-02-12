@@ -40,14 +40,42 @@
       {% for s in slots %}
         <div style="min-width:260px;">
           <label style="font-weight:600; display:block; margin-bottom:6px;">
-            {{ s.get_slot_type_display }} {{ s.slot_index }}
+            {{ s.get_slot_type_display }}
+            {% if s.slot_index %} {{ s.slot_index }}{% endif %}
           </label>
 
           {% if s.player and s.player.id in locked_player_ids %}
             <select name="slot_{{ s.slot_type }}_{{ s.slot_index }}" disabled style="padding:8px; font-size:14px;">
+              {# sem placeholder quando travado #}
+              {% if s.slot_type == "GOL" %}
+                {% for p in gols %}
+                  <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>{{ p.name }} ({{ p.position }})</option>
+                {% endfor %}
+              {% elif s.slot_type == "ZAG" %}
+                {% for p in zags %}
+                  <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>{{ p.name }} ({{ p.position }})</option>
+                {% endfor %}
+              {% elif s.slot_type == "LAT" %}
+                {% for p in lats %}
+                  <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>{{ p.name }} ({{ p.position }})</option>
+                {% endfor %}
+              {% elif s.slot_type == "MEI" %}
+                {% for p in meis %}
+                  <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>{{ p.name }} ({{ p.position }})</option>
+                {% endfor %}
+              {% elif s.slot_type == "ATA" %}
+                {% for p in atas %}
+                  <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>{{ p.name }} ({{ p.position }})</option>
+                {% endfor %}
+              {% elif s.slot_type == "TEC" %}
+                {% for p in tecs %}
+                  <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>{{ p.name }} ({{ p.position }})</option>
+                {% endfor %}
+              {% endif %}
+            </select>
+
           {% else %}
             <select name="slot_{{ s.slot_type }}_{{ s.slot_index }}" style="padding:8px; font-size:14px;">
-          {% endif %}
               <option value="">-- escolher --</option>
 
               {% if s.slot_type == "GOL" %}
@@ -76,6 +104,7 @@
                 {% endfor %}
               {% endif %}
             </select>
+          {% endif %}
 
           {% if s.player and s.player.id in locked_player_ids %}
             <input type="hidden" name="slot_{{ s.slot_type }}_{{ s.slot_index }}" value="{{ s.player.id }}">

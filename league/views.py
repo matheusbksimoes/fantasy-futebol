@@ -867,11 +867,27 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
                                 "Não é possível mudar a formação: existe jogador travado na escalação (jogo já começou)."
                             )
 
+                    # ✅ valida formação (inclui 451 automaticamente)
+                    if new_formation not in FORMATION_MAP:
+                        raise ValidationError("Formação inválida.")
+
                     lineup.formation = new_formation
                     lineup.full_clean()
                     lineup.save(update_fields=["formation", "updated_at"])
 
                 ensure_spots_for_lineup(lineup)
+
+                # ✅ NOVO: após garantir slots, limpa slots extras que ficaram do lineup anterior
+                # Ex: trocar 433 -> 343/352 (LAT=0) e ainda existir LAT1/LAT2 preenchido no banco
+                limits = FORMATION_MAP.get(lineup.formation, {})
+                for slot_type in ("ZAG", "LAT", "MEI", "ATA"):
+                    allowed = limits.get(slot_type, 0)
+                    LineupSpot.objects.filter(
+                        lineup=lineup,
+                        slot_type=slot_type,
+                        slot_index__gt=allowed,
+                    ).update(player=None)
+
                 expected = expected_slots_for_formation(lineup.formation)
 
                 spots = {
@@ -973,7 +989,6 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
         "atas": atas,
         "tecs": tecs,
     })
-
 
 # ============================================================
 # Week controls

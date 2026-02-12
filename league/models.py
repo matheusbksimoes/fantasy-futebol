@@ -257,6 +257,7 @@ FORMATIONS = [
     ("352", "3-5-2"),
     ("442", "4-4-2"),
     ("433", "4-3-3"),
+    ("451", "4-5-1"),  # ✅ NOVA
     ("532", "5-3-2"),
     ("541", "5-4-1"),
 ]
@@ -267,6 +268,7 @@ FORMATION_MAP = {
     "352": {"ZAG": 3, "LAT": 0, "MEI": 5, "ATA": 2},
     "442": {"ZAG": 2, "LAT": 2, "MEI": 4, "ATA": 2},
     "433": {"ZAG": 2, "LAT": 2, "MEI": 3, "ATA": 3},
+    "451": {"ZAG": 2, "LAT": 2, "MEI": 5, "ATA": 1},  # ✅ NOVA
     "532": {"ZAG": 3, "LAT": 2, "MEI": 3, "ATA": 2},
     "541": {"ZAG": 3, "LAT": 2, "MEI": 4, "ATA": 1},
 }
@@ -288,13 +290,50 @@ class Lineup(models.Model):
             models.UniqueConstraint(fields=["week", "team"], name="uniq_lineup_week_team"),
         ]
 
+    def _cleanup_spots_for_current_formation(self):
+        """
+        ✅ Corrige o bug: ao trocar para formações sem LAT (343/352),
+        remove/desassocia slots que ficaram "sobrando" no banco.
+
+        Observação: nesta fase, como LineupSpot permite nulls para não quebrar legado,
+        vamos "limpar" o slot extra setando player=None.
+        (Assim o slot não atrapalha e nem pontua.)
+
+        Se você preferir deletar os slots extras em vez de zerar player,
+        dá pra trocar por .delete() abaixo.
+        """
+        limits = FORMATION_MAP.get(self.formation)
+        if not limits:
+            return
+
+        # Só faz limpeza se já existir no banco
+        if not self.pk:
+            return
+
+        # Importante: não mexe em GOL/TEC aqui (sempre 1 e normalmente você controla na view)
+        for slot_type in ("ZAG", "LAT", "MEI", "ATA"):
+            allowed = limits.get(slot_type, 0)
+
+            # Qualquer spot com índice maior que o permitido vira "extra"
+            extras_qs = self.spots.filter(slot_type=slot_type, slot_index__gt=allowed)
+
+            # Se existirem extras preenchidos, limpa
+            # (mantemos o registro, mas remove player para não bloquear a troca de formação)
+            extras_qs.update(player=None)
+
+            # Alternativa (se quiser deletar):
+            # extras_qs.delete()
+
     def clean(self):
         if self.formation not in FORMATION_MAP:
             raise ValidationError("Formação inválida.")
 
+        # ✅ limpa slots extras automaticamente ao aplicar formação
+        # (resolve 343/352 acusando LAT1/LAT2 extra quando vinha de 433/442/451/etc)
+        self._cleanup_spots_for_current_formation()
+
     def __str__(self):
         return f"Week {self.week.number} — {self.team.name} ({self.formation})"
-
 
 class LineupSpot(models.Model):
     """
