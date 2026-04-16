@@ -1,0 +1,45 @@
+{% extends "league/base.html" %}
+{% block title %}Classificação{% endblock %}
+
+{% block content %}
+  <h1>Classificação</h1>
+
+  {% if standings %}
+    <table style="border-collapse:collapse; width:100%;">
+      <thead>
+        <tr>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">#</th>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Time</th>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5; text-align:center;">V</th>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5; text-align:center;">D</th>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5; text-align:center;">E</th>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5; text-align:center;">PF</th>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5; text-align:center;">PA</th>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5; text-align:center;">Jogos</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in standings %}
+          <tr>
+            <td style="border:1px solid #ddd; padding:8px; text-align:center;">
+              <b>{{ row.rank }}</b>
+            </td>
+            <td style="border:1px solid #ddd; padding:8px;">
+              <a href="{% url 'team_roster' draft.id row.team.id %}">
+                <b>{{ row.team.name }}</b>
+              </a>
+            </td>
+            <td style="border:1px solid #ddd; padding:8px; text-align:center;">{{ row.wins }}</td>
+            <td style="border:1px solid #ddd; padding:8px; text-align:center;">{{ row.losses }}</td>
+            <td style="border:1px solid #ddd; padding:8px; text-align:center;">{{ row.ties }}</td>
+            <td style="border:1px solid #ddd; padding:8px; text-align:center;">{{ row.points_for|floatformat:2 }}</td>
+            <td style="border:1px solid #ddd; padding:8px; text-align:center;">{{ row.points_against|floatformat:2 }}</td>
+            <td style="border:1px solid #ddd; padding:8px; text-align:center;">{{ row.games }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>Nenhum time encontrado para esta liga.</p>
+  {% endif %}
+{% endblock %}

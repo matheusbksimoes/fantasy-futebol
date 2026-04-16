@@ -1196,3 +1196,94 @@ def matchup_detail(request, draft_id: int, week_number: int, matchup_id: int):
         "away_points_map": away_points_map,
         "my_matchup": my_matchup,
     })
+
+def build_standings(draft):
+    teams = list(Team.objects.filter(league=draft.league).order_by("id"))
+
+    table = {
+        team.id: {
+            "team": team,
+            "wins": 0,
+            "losses": 0,
+            "ties": 0,
+            "points_for": 0.0,
+            "points_against": 0.0,
+            "games": 0,
+        }
+        for team in teams
+    }
+
+    matchups = (
+        Matchup.objects
+        .filter(week__draft=draft)
+        .select_related("home_team", "away_team", "week")
+        .order_by("week__number", "id")
+    )
+
+    for m in matchups:
+        if m.home_team_id not in table or m.away_team_id not in table:
+            continue
+
+        home = table[m.home_team_id]
+        away = table[m.away_team_id]
+
+        home_score = float(m.home_score or 0)
+        away_score = float(m.away_score or 0)
+
+        home["games"] += 1
+        away["games"] += 1
+
+        home["points_for"] += home_score
+        home["points_against"] += away_score
+
+        away["points_for"] += away_score
+        away["points_against"] += home_score
+
+        if home_score > away_score:
+            home["wins"] += 1
+            away["losses"] += 1
+        elif away_score > home_score:
+            away["wins"] += 1
+            home["losses"] += 1
+        else:
+            home["ties"] += 1
+            away["ties"] += 1
+
+    standings = list(table.values())
+    standings.sort(
+        key=lambda row: (
+            -row["wins"],
+            -row["points_for"],
+            row["points_against"],
+            row["team"].name.lower() if row["team"].name else "",
+        )
+    )
+
+    for idx, row in enumerate(standings, start=1):
+        row["rank"] = idx
+
+    return standings
+
+
+@login_required
+def standings_view(request, draft_id: int):
+    draft = get_object_or_404(Draft, id=draft_id)
+    week = Week.objects.filter(draft=draft, is_current=True).first()
+
+    team = None
+    if request.user.is_superuser:
+        team = Team.objects.filter(league=draft.league).order_by("id").first()
+    else:
+        team = Team.objects.filter(league=draft.league, user_id=request.user.id).first()
+
+    my_matchup = get_team_matchup_for_week(week, team) if week and team else None
+    standings = build_standings(draft)
+
+    return render(request, "league/standings.html", {
+        "draft": draft,
+        "week": week,
+        "team": team,
+        "my_matchup": my_matchup,
+        "standings": standings,
+        "active_tab": "standings",
+    })

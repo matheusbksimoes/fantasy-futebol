@@ -10,6 +10,7 @@ urlpatterns = [
     path("team/<int:team_id>/roster/", views.team_roster_legacy, name="team_roster_legacy"),
 
     path("draft/<int:draft_id>/transactions/", views.transactions_list, name="transactions_list"),
+    path("draft/<int:draft_id>/standings/", views.standings_view, name="standings_view"),
 
     path("draft/<int:draft_id>/teams/<int:team_id>/lineup/", views.set_lineup, name="set_lineup"),
     path(
@@ -34,10 +35,10 @@ urlpatterns = [
 
     path("draft/<int:draft_id>/week/<int:week_number>/scores/", views.edit_week_scores, name="edit_week_scores"),
 
-    # ✅ NOVO PADRÃO (matchup independente)
+    # matchup detalhado
     path(
-    "draft/<int:draft_id>/week/<int:week_number>/matchup/<int:matchup_id>/",
-    views.matchup_detail,
-    name="matchup_detail",
-),
+        "draft/<int:draft_id>/week/<int:week_number>/matchup/<int:matchup_id>/",
+        views.matchup_detail,
+        name="matchup_detail",
+    ),
 ]

@@ -57,6 +57,11 @@
         Rodada atual
       </a>
 
+      <a class="pill {% if active_tab == 'standings' %}pill-active{% endif %}"
+         href="{% url 'standings_view' draft.id %}">
+        Classificação
+      </a>
+
       {% if schedule_url %}
         <a class="pill {% if active_tab == 'schedule' %}pill-active{% endif %}"
            href="{{ schedule_url }}">
