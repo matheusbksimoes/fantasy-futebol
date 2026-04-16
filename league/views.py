@@ -295,27 +295,19 @@ def team_roster(request, draft_id: int, team_id: int):
     )
 
     # time do usuário logado nesta liga
-    my_team = None
-    if request.user.is_superuser:
-        my_team = viewed_team
-    else:
-        my_team = Team.objects.filter(
-            league=draft.league,
-            user_id=request.user.id,
-        ).first()
+    my_team = Team.objects.filter(
+        league=draft.league,
+        user_id=request.user.id,
+    ).first()
 
-    # só pode gerenciar se o roster visualizado for o próprio
-    can_manage_team = False
-    if request.user.is_superuser:
-        can_manage_team = True
-    elif my_team and my_team.id == viewed_team.id:
-        can_manage_team = True
+    # só pode gerenciar se o roster visualizado for exatamente o próprio
+    can_manage_team = bool(my_team and my_team.id == viewed_team.id)
 
     my_matchup = get_team_matchup_for_week(week, my_team) if week and my_team else None
 
     return render(request, "league/team_roster.html", {
-        "team": viewed_team,          # time que está sendo visualizado
-        "my_team": my_team,           # time do usuário logado
+        "team": viewed_team,   # time que está sendo visualizado
+        "my_team": my_team,    # time do usuário logado
         "draft": draft,
         "week": week,
         "roster_spots": roster_spots,
