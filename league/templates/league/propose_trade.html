@@ -1,0 +1,19 @@
+{% extends "league/base.html" %}
+{% block title %}Propor troca{% endblock %}
+
+{% block content %}
+  <h1>Propor troca</h1>
+
+  <p>
+    Você está tentando trocar por:
+    <b>{{ target_player.name }}</b> ({{ target_team.name }})
+  </p>
+
+  <p>
+    Em breve aqui você poderá montar a troca completa.
+  </p>
+
+  <a href="{% url 'team_roster' draft.id target_team.id %}">
+    ← Voltar ao roster
+  </a>
+{% endblock %}

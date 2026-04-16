@@ -300,7 +300,13 @@ def team_roster(request, draft_id: int, team_id: int):
     elif team.user_id == request.user.id:
         can_manage_team = True
 
-    my_matchup = get_team_matchup_for_week(week, team)
+    my_team = None
+    if request.user.is_superuser:
+        my_team = team
+    else:
+        my_team = Team.objects.filter(league=draft.league, user_id=request.user.id).first()
+
+    my_matchup = get_team_matchup_for_week(week, my_team) if week and my_team else None
 
     return render(request, "league/team_roster.html", {
         "team": team,
@@ -309,6 +315,7 @@ def team_roster(request, draft_id: int, team_id: int):
         "roster_spots": roster_spots,
         "active_tab": "roster",
         "can_manage_team": can_manage_team,
+        "my_team": my_team,
         "my_matchup": my_matchup,
     })
 
@@ -1286,4 +1293,33 @@ def standings_view(request, draft_id: int):
         "my_matchup": my_matchup,
         "standings": standings,
         "active_tab": "standings",
+    })
+@login_required
+def propose_trade_player(request, draft_id: int, target_team_id: int, target_player_id: int):
+    draft = get_object_or_404(Draft, id=draft_id)
+    target_team = get_object_or_404(Team, id=target_team_id)
+    target_player = get_object_or_404(Player, id=target_player_id)
+
+    my_team = Team.objects.filter(league=draft.league, user_id=request.user.id).first()
+    if not my_team:
+        return HttpResponseForbidden("Você não possui um time nesta liga.")
+
+    if my_team.id == target_team.id:
+        return HttpResponseForbidden("Você não pode propor troca para o próprio time.")
+
+    my_roster = (
+        RosterSpot.objects
+        .filter(draft=draft, team=my_team, dropped_at__isnull=True)
+        .select_related("player")
+        .order_by("player__position", "player__name")
+    )
+
+    return render(request, "league/propose_trade_player.html", {
+        "draft": draft,
+        "team": my_team,
+        "my_team": my_team,
+        "target_team": target_team,
+        "target_player": target_player,
+        "my_roster": my_roster,
+        "active_tab": "roster",
     })

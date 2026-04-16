@@ -41,4 +41,11 @@ urlpatterns = [
         views.matchup_detail,
         name="matchup_detail",
     ),
+
+    # propor troca a partir de um jogador do outro time
+    path(
+        "draft/<int:draft_id>/teams/<int:target_team_id>/trade/player/<int:target_player_id>/",
+        views.propose_trade_player,
+        name="propose_trade_player",
+    ),
 ]
