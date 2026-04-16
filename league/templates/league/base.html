@@ -73,27 +73,29 @@
     {% endif %}
 
     {% if draft and team %}
-      <span class="divider"></span>
+  <span class="divider"></span>
 
-      <a class="pill {% if active_tab == 'roster' %}pill-active{% endif %}"
-         href="{% url 'team_roster' draft.id team.id %}">
-        Meu roster
-      </a>
+  <a class="pill {% if active_tab == 'roster' %}pill-active{% endif %}"
+     href="{% url 'team_roster' draft.id team.id %}">
+    Meu roster
+  </a>
 
-      <a class="pill {% if active_tab == 'lineup' %}pill-active{% endif %}"
-         href="{% url 'set_lineup' draft.id team.id %}">
-        Escalação
-      </a>
+  <a class="pill {% if active_tab == 'lineup' %}pill-active{% endif %}"
+     href="{% url 'set_lineup' draft.id team.id %}">
+    Escalação
+  </a>
 
-      <a class="pill {% if active_tab == 'free_agents' %}pill-active{% endif %}"
-         href="{% url 'free_agents_list' team.id %}">
-        Free Agents
-      </a>
+  <a class="pill {% if active_tab == 'free_agents' %}pill-active{% endif %}"
+     href="{% url 'free_agents_list' team.id %}">
+    Free Agents
+  </a>
 
-      <a class="pill {% if active_tab == 'my_claims' %}pill-active{% endif %}"
-         href="{% url 'my_claims' team.id %}">
-        Meus claims
-      </a>
+  <a class="pill {% if active_tab == 'my_claims' %}pill-active{% endif %}"
+     href="{% url 'my_claims' team.id %}">
+    Meus claims
+  </a>
+
+{% endif %}
 
       {% if week and my_matchup %}
   <a class="pill {% if active_tab == 'my_matchup' or active_tab == 'matchups' %}pill-active{% endif %}"
