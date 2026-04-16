@@ -36,8 +36,8 @@ urlpatterns = [
 
     # ✅ NOVO PADRÃO (matchup independente)
     path(
-        "draft/<int:draft_id>/week/<int:week_number>/matchup/<int:matchup_id>/",
-        views.matchup_detail,
-        name="matchup_detail",
-    ),
+    "draft/<int:draft_id>/week/<int:week_number>/matchup/<int:matchup_id>/",
+    views.matchup_detail,
+    name="matchup_detail",
+),
 ]

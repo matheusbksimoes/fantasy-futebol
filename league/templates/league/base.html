@@ -95,13 +95,12 @@
         Meus claims
       </a>
 
-      {% if week %}
-        <a class="pill {% if active_tab == 'my_matchup' %}pill-active{% endif %}"
-           href="{% url 'matchup_view' draft.id week.number team.id %}">
-          Meu matchup
-        </a>
-      {% endif %}
-    {% endif %}
+      {% if week and my_matchup %}
+  <a class="pill {% if active_tab == 'my_matchup' or active_tab == 'matchups' %}pill-active{% endif %}"
+     href="{% url 'matchup_detail' draft.id week.number my_matchup.id %}">
+    Meu matchup
+  </a>
+{% endif %}
 
     {% if draft %}
       <a class="pill {% if active_tab == 'all_matchups' %}pill-active{% endif %}"

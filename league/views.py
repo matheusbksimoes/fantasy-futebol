@@ -300,6 +300,8 @@ def team_roster(request, draft_id: int, team_id: int):
     elif team.user_id == request.user.id:
         can_manage_team = True
 
+    my_matchup = get_team_matchup_for_week(week, team)
+
     return render(request, "league/team_roster.html", {
         "team": team,
         "draft": draft,
@@ -307,6 +309,7 @@ def team_roster(request, draft_id: int, team_id: int):
         "roster_spots": roster_spots,
         "active_tab": "roster",
         "can_manage_team": can_manage_team,
+        "my_matchup": my_matchup,
     })
 
 @login_required
@@ -869,7 +872,6 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
                                 "Não é possível mudar a formação: existe jogador travado na escalação (jogo já começou)."
                             )
 
-                    # ✅ valida formação (inclui 451 automaticamente)
                     if new_formation not in FORMATION_MAP:
                         raise ValidationError("Formação inválida.")
 
@@ -879,8 +881,6 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
 
                 ensure_spots_for_lineup(lineup)
 
-                # ✅ NOVO: após garantir slots, limpa slots extras que ficaram do lineup anterior
-                # Ex: trocar 433 -> 343/352 (LAT=0) e ainda existir LAT1/LAT2 preenchido no banco
                 limits = FORMATION_MAP.get(lineup.formation, {})
                 for slot_type in ("ZAG", "LAT", "MEI", "ATA"):
                     allowed = limits.get(slot_type, 0)
@@ -999,6 +999,7 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
         "meis": meis,
         "atas": atas,
         "tecs": tecs,
+        "my_matchup": get_team_matchup_for_week(week, team),
     })
 # ============================================================
 # Week controls
@@ -1099,18 +1100,39 @@ def edit_week_scores(request, draft_id: int, week_number: int):
     })
 
 
+def get_team_matchup_for_week(week, team):
+    if not week or not team:
+        return None
+
+    return (
+        Matchup.objects
+        .filter(week=week)
+        .filter(Q(home_team=team) | Q(away_team=team))
+        .select_related("home_team", "away_team", "week")
+        .first()
+    )
+
+
 def lineup_display_data(week, team):
     """
     Retorna (lineup, spots_ordenados, total_points, points_map)
     """
-    lineup, _ = Lineup.objects.get_or_create(week=week, team=team, defaults={"formation": "433"})
+    lineup, _ = Lineup.objects.get_or_create(
+        week=week,
+        team=team,
+        defaults={"formation": "433"},
+    )
 
     try:
         ensure_spots_for_lineup(lineup)
     except ValidationError:
         pass
 
-    spots = list(LineupSpot.objects.filter(lineup=lineup).select_related("player"))
+    spots = list(
+        LineupSpot.objects
+        .filter(lineup=lineup)
+        .select_related("player")
+    )
     spots.sort(key=lambda s: (SLOT_ORDER.get(s.slot_type, 99), s.slot_index or 999))
 
     player_ids = [s.player_id for s in spots if s.player_id]
@@ -1148,10 +1170,18 @@ def matchup_detail(request, draft_id: int, week_number: int, matchup_id: int):
         week, matchup.away_team
     )
 
+    team = None
+    if matchup.home_team.user_id == request.user.id:
+        team = matchup.home_team
+    elif matchup.away_team.user_id == request.user.id:
+        team = matchup.away_team
+
+    my_matchup = get_team_matchup_for_week(week, team) if team else None
+
     return render(request, "league/matchup.html", {
         "draft": draft,
         "week": week,
-        "team": None,
+        "team": team,
         "active_tab": "matchups",
         "matchup": matchup,
         "home_team": matchup.home_team,
@@ -1164,4 +1194,5 @@ def matchup_detail(request, draft_id: int, week_number: int, matchup_id: int):
         "away_total": away_total,
         "home_points_map": home_points_map,
         "away_points_map": away_points_map,
+        "my_matchup": my_matchup,
     })
