@@ -935,12 +935,21 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
 
             messages.success(request, "Escalação salva!")
 
-            return redirect(
-                "matchup_view",
-                draft_id=draft.id,
-                week_number=week.number,
-                team_id=team.id,
-            )
+            matchup = Matchup.objects.filter(
+                week=week
+            ).filter(
+                Q(home_team=team) | Q(away_team=team)
+            ).first()
+
+            if matchup:
+                return redirect(
+                    "matchup_detail",
+                    draft_id=draft.id,
+                    week_number=week.number,
+                    matchup_id=matchup.id,
+                )
+
+            return redirect("current_week", draft_id=draft.id)
 
         except (ValidationError, Player.DoesNotExist) as e:
             messages.error(request, str(e))
@@ -989,7 +998,6 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
         "atas": atas,
         "tecs": tecs,
     })
-
 # ============================================================
 # Week controls
 # ============================================================
@@ -1116,35 +1124,33 @@ def lineup_display_data(week, team):
 
 
 @login_required
-def matchup_view(request, draft_id: int, week_number: int, team_id: int):
+def matchup_detail(request, draft_id: int, week_number: int, matchup_id: int):
     draft = get_object_or_404(Draft, id=draft_id)
     week = get_object_or_404(Week, draft=draft, number=week_number)
-    team = get_object_or_404(Team, id=team_id)
-
-    forbidden = forbid_if_not_team_owner(request, team)
-    if forbidden:
-        return forbidden
 
     matchup = (
         Matchup.objects
-        .filter(week=week)
-        .filter(Q(home_team=team) | Q(away_team=team))
+        .filter(id=matchup_id, week=week)
         .select_related("home_team", "away_team", "week")
         .first()
     )
 
     if not matchup:
-        messages.error(request, "Nenhum matchup encontrado para este time nesta week.")
+        messages.error(request, "Matchup não encontrado.")
         return redirect("current_week", draft_id=draft.id)
 
-    home_lineup, home_spots, home_total, home_points_map = lineup_display_data(week, matchup.home_team)
-    away_lineup, away_spots, away_total, away_points_map = lineup_display_data(week, matchup.away_team)
+    home_lineup, home_spots, home_total, home_points_map = lineup_display_data(
+        week, matchup.home_team
+    )
+    away_lineup, away_spots, away_total, away_points_map = lineup_display_data(
+        week, matchup.away_team
+    )
 
     return render(request, "league/matchup.html", {
         "draft": draft,
         "week": week,
-        "team": team,
-        "active_tab": "my_matchup",
+        "team": None,
+        "active_tab": "matchups",
         "matchup": matchup,
         "home_team": matchup.home_team,
         "away_team": matchup.away_team,
