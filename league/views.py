@@ -296,9 +296,9 @@ def team_roster(request, draft_id: int, team_id: int):
 
     # time do usuário logado nesta liga
     my_team = Team.objects.filter(
-        league=draft.league,
-        user_id=request.user.id,
-    ).first()
+    league=draft.league,
+    user=request.user,
+).first()
 
     # só pode gerenciar se o roster visualizado for exatamente o próprio
     can_manage_team = bool(my_team and my_team.id == viewed_team.id)
