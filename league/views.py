@@ -283,39 +283,44 @@ def make_pick(request, draft_id: int):
 @login_required
 def team_roster(request, draft_id: int, team_id: int):
     draft = get_object_or_404(Draft, id=draft_id)
-    team = get_object_or_404(Team, id=team_id)
+    viewed_team = get_object_or_404(Team, id=team_id)
 
     week = Week.objects.filter(draft=draft, is_current=True).first()
 
     roster_spots = (
         RosterSpot.objects
         .select_related("player")
-        .filter(draft=draft, team=team, dropped_at__isnull=True)
+        .filter(draft=draft, team=viewed_team, dropped_at__isnull=True)
         .order_by("player__position", "player__name")
     )
 
+    # time do usuário logado nesta liga
+    my_team = None
+    if request.user.is_superuser:
+        my_team = viewed_team
+    else:
+        my_team = Team.objects.filter(
+            league=draft.league,
+            user_id=request.user.id,
+        ).first()
+
+    # só pode gerenciar se o roster visualizado for o próprio
     can_manage_team = False
     if request.user.is_superuser:
         can_manage_team = True
-    elif team.user_id == request.user.id:
+    elif my_team and my_team.id == viewed_team.id:
         can_manage_team = True
-
-    my_team = None
-    if request.user.is_superuser:
-        my_team = team
-    else:
-        my_team = Team.objects.filter(league=draft.league, user_id=request.user.id).first()
 
     my_matchup = get_team_matchup_for_week(week, my_team) if week and my_team else None
 
     return render(request, "league/team_roster.html", {
-        "team": team,
+        "team": viewed_team,          # time que está sendo visualizado
+        "my_team": my_team,           # time do usuário logado
         "draft": draft,
         "week": week,
         "roster_spots": roster_spots,
         "active_tab": "roster",
         "can_manage_team": can_manage_team,
-        "my_team": my_team,
         "my_matchup": my_matchup,
     })
 
