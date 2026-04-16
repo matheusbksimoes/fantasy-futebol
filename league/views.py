@@ -285,10 +285,6 @@ def team_roster(request, draft_id: int, team_id: int):
     draft = get_object_or_404(Draft, id=draft_id)
     team = get_object_or_404(Team, id=team_id)
 
-    forbidden = forbid_if_not_team_owner(request, team)
-    if forbidden:
-        return forbidden
-
     week = Week.objects.filter(draft=draft, is_current=True).first()
 
     roster_spots = (
@@ -298,14 +294,20 @@ def team_roster(request, draft_id: int, team_id: int):
         .order_by("player__position", "player__name")
     )
 
+    can_manage_team = False
+    if request.user.is_superuser:
+        can_manage_team = True
+    elif team.user_id == request.user.id:
+        can_manage_team = True
+
     return render(request, "league/team_roster.html", {
         "team": team,
         "draft": draft,
         "week": week,
         "roster_spots": roster_spots,
         "active_tab": "roster",
+        "can_manage_team": can_manage_team,
     })
-
 
 @login_required
 @require_POST
