@@ -57,7 +57,10 @@
     </div>
   </div>
 
+  {% if team %}
   <div style="margin-top:16px;">
-    <a href="{% url 'set_lineup_week' draft.id team.id week.number %}">Voltar para editar minha escalação</a>
+    <a href="{% url 'set_lineup_week' draft.id team.id week.number %}">
+      Voltar para editar minha escalação
+    </a>
   </div>
-{% endblock %}
+{% endif %}
