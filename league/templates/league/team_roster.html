@@ -4,10 +4,6 @@
 {% block content %}
   <h1>Roster — {{ team.name }}</h1>
 
-  <p>can_manage_team = {{ can_manage_team }}</p>
-  <p>my_team = {% if my_team %}{{ my_team.name }}{% else %}nenhum{% endif %}</p>
-  <p>team visualizado = {{ team.name }}</p>
-
   <div style="color:#666; margin-bottom:10px;">
     Draft: <b>{{ draft.id }}</b> • Liga: <b>{{ draft.league }}</b>
   </div>
@@ -31,9 +27,22 @@
 
             <td style="border:1px solid #ddd; padding:8px; white-space:nowrap;">
               {% if can_manage_team %}
-                DROP
+                <form method="post" action="{% url 'drop_player' team.id spot.player.id %}" style="display:inline;">
+                  {% csrf_token %}
+                  <button
+                    type="submit"
+                    style="border:1px solid #d33; color:#d33; background:#fff; padding:6px 10px; cursor:pointer; border-radius:4px;"
+                  >
+                    Drop
+                  </button>
+                </form>
               {% elif my_team and my_team.id != team.id %}
-                TRADE
+                <a
+                  href="{% url 'propose_trade_player' draft.id team.id spot.player.id %}"
+                  style="border:1px solid #0b57d0; color:#0b57d0; background:#fff; padding:6px 10px; cursor:pointer; border-radius:4px; display:inline-block; text-decoration:none;"
+                >
+                  Propor troca
+                </a>
               {% else %}
                 —
               {% endif %}

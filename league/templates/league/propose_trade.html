@@ -4,16 +4,54 @@
 {% block content %}
   <h1>Propor troca</h1>
 
-  <p>
-    Você está tentando trocar por:
-    <b>{{ target_player.name }}</b> ({{ target_team.name }})
-  </p>
+  <div style="margin-bottom:16px; padding:12px; border:1px solid #ddd; border-radius:8px; background:#fafafa;">
+    <p style="margin:0 0 8px 0;">
+      Você está tentando receber:
+    </p>
+    <p style="margin:0; font-size:18px;">
+      <b>{{ target_player.name }}</b>
+      {% if target_player.get_position_display %}
+        ({{ target_player.get_position_display }})
+      {% endif %}
+      — <b>{{ target_team.name }}</b>
+    </p>
+  </div>
 
-  <p>
-    Em breve aqui você poderá montar a troca completa.
-  </p>
+  <form method="post">
+    {% csrf_token %}
 
-  <a href="{% url 'team_roster' draft.id target_team.id %}">
-    ← Voltar ao roster
-  </a>
+    <div style="margin-bottom:16px;">
+      <label for="offered_player_id"><b>Escolha o jogador que você vai oferecer:</b></label>
+      <br><br>
+      <select
+        name="offered_player_id"
+        id="offered_player_id"
+        required
+        style="min-width:320px; padding:8px; border:1px solid #ccc; border-radius:6px;"
+      >
+        <option value="">-- selecione um jogador --</option>
+        {% for spot in my_roster %}
+          <option value="{{ spot.player.id }}">
+            {{ spot.player.get_position_display }} — {{ spot.player.name }} ({{ spot.player.real_team }})
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+      <button
+        type="submit"
+        style="border:1px solid #0b57d0; color:#fff; background:#0b57d0; padding:8px 14px; cursor:pointer; border-radius:6px;"
+      >
+        Enviar proposta de troca
+      </button>
+
+      <a
+        href="{% url 'team_roster' draft.id target_team.id %}"
+        style="border:1px solid #999; color:#333; background:#fff; padding:8px 14px; border-radius:6px; text-decoration:none;"
+      >
+        Cancelar
+      </a>
+    </div>
+  </form>
 {% endblock %}
