@@ -1322,112 +1322,28 @@ def propose_trade_player(request, draft_id: int, target_team_id: int, target_pla
     })
 
 @login_required
-def propose_trade_player(request, draft_id: int, target_team_id: int, target_player_id: int):
+def propose_trade_player(request, draft_id, team_id, player_id):
     draft = get_object_or_404(Draft, id=draft_id)
-    target_team = get_object_or_404(Team, id=target_team_id)
-    target_player = get_object_or_404(Player, id=target_player_id)
+    target_team = get_object_or_404(Team, id=team_id)
+    target_player = get_object_or_404(Player, id=player_id)
 
     my_team = Team.objects.filter(
         league=draft.league,
-        user=request.user,
+        user_id=request.user.id
     ).first()
 
-    if not my_team:
-        return HttpResponseForbidden("Você não possui um time vinculado nesta liga.")
-
-    if my_team.id == target_team.id:
-        return HttpResponseForbidden("Você não pode propor troca para o próprio time.")
-
-    target_spot = RosterSpot.objects.filter(
-        draft=draft,
-        team=target_team,
-        player=target_player,
-        dropped_at__isnull=True,
-    ).first()
-
-    if not target_spot:
-        messages.error(request, "Esse jogador não está mais no roster ativo desse time.")
-        return redirect("team_roster", draft_id=draft.id, team_id=target_team.id)
-
-    my_roster = (
-        RosterSpot.objects
-        .filter(draft=draft, team=my_team, dropped_at__isnull=True)
-        .select_related("player")
-        .order_by("player__position", "player__name")
-    )
-
-    week = Week.objects.filter(draft=draft, is_current=True).first()
-    my_matchup = get_team_matchup_for_week(week, my_team) if week and my_team else None
-
-    if request.method == "POST":
-        offered_player_id = request.POST.get("offered_player_id")
-
-        if not offered_player_id:
-            messages.error(request, "Selecione um jogador para oferecer na troca.")
-            return render(request, "league/propose_trade.html", {
-                "draft": draft,
-                "week": week,
-                "team": my_team,
-                "my_team": my_team,
-                "my_matchup": my_matchup,
-                "target_team": target_team,
-                "target_player": target_player,
-                "my_roster": my_roster,
-                "active_tab": "roster",
-            })
-
-        offered_player = get_object_or_404(Player, id=offered_player_id)
-
-        offered_spot = RosterSpot.objects.filter(
-            draft=draft,
+    my_players = []
+    if my_team:
+        my_players = RosterSpot.objects.filter(
             team=my_team,
-            player=offered_player,
-            dropped_at__isnull=True,
-        ).first()
+            draft=draft,
+            dropped_at__isnull=True
+        ).select_related("player")
 
-        if not offered_spot:
-            messages.error(request, "O jogador oferecido não está no seu roster ativo.")
-            return render(request, "league/propose_trade.html", {
-                "draft": draft,
-                "week": week,
-                "team": my_team,
-                "my_team": my_team,
-                "my_matchup": my_matchup,
-                "target_team": target_team,
-                "target_player": target_player,
-                "my_roster": my_roster,
-                "active_tab": "roster",
-            })
-
-        if offered_player.id == target_player.id:
-            messages.error(request, "Você não pode oferecer o mesmo jogador que está tentando receber.")
-            return render(request, "league/propose_trade.html", {
-                "draft": draft,
-                "week": week,
-                "team": my_team,
-                "my_team": my_team,
-                "my_matchup": my_matchup,
-                "target_team": target_team,
-                "target_player": target_player,
-                "my_roster": my_roster,
-                "active_tab": "roster",
-            })
-
-        messages.success(
-            request,
-            f"Proposta preparada: você oferece {offered_player.name} por {target_player.name}. "
-            f"(A gravação real da troca será o próximo passo.)"
-        )
-        return redirect("team_roster", draft_id=draft.id, team_id=target_team.id)
-
-    return render(request, "league/propose_trade.html", {
+    return render(request, "league/propose_trade_player.html", {
         "draft": draft,
-        "week": week,
-        "team": my_team,
-        "my_team": my_team,
-        "my_matchup": my_matchup,
         "target_team": target_team,
         "target_player": target_player,
-        "my_roster": my_roster,
-        "active_tab": "roster",
+        "my_team": my_team,
+        "my_players": my_players,
     })
