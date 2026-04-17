@@ -2,49 +2,40 @@
 {% block title %}Propor troca{% endblock %}
 
 {% block content %}
-  <h1>Propor troca</h1>
+<h1>Propor troca</h1>
 
-  <p>
-    Jogador alvo:
-    <b>{{ target_player.name }}</b> ({{ target_team.name }})
-  </p>
+<form method="post">
+  {% csrf_token %}
+
+  <h3>Jogadores que você quer RECEBER</h3>
+  {% for p in target_players %}
+    <label>
+      <input type="checkbox" name="target_players" value="{{ p.player.id }}">
+      {{ p.player.name }}
+    </label><br>
+  {% endfor %}
 
   <hr>
 
-  <h3>Escolha um jogador seu para oferecer</h3>
-
-  {% if my_players %}
-    <table style="border-collapse:collapse; width:100%;">
-      <thead>
-        <tr>
-          <th style="border:1px solid #ddd; padding:8px;">Jogador</th>
-          <th style="border:1px solid #ddd; padding:8px;">Ação</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for p in my_players %}
-          <tr>
-            <td style="border:1px solid #ddd; padding:8px;">
-              {{ p.player.name }}
-            </td>
-            <td style="border:1px solid #ddd; padding:8px;">
-              <button
-                style="border:1px solid #0b57d0; color:#fff; background:#0b57d0; padding:6px 10px; border-radius:4px;"
-              >
-                Oferecer este
-              </button>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p>Você não tem jogadores disponíveis.</p>
-  {% endif %}
+  <h3>Jogadores que você vai ENVIAR</h3>
+  {% for p in my_players %}
+    <label>
+      <input type="checkbox" name="my_players" value="{{ p.player.id }}">
+      {{ p.player.name }}
+    </label><br>
+  {% endfor %}
 
   <br>
 
-  <a href="{% url 'team_roster' draft.id target_team.id %}">
-    ← Voltar ao roster
-  </a>
+  <button type="submit"
+    style="border:1px solid #0b57d0; background:#0b57d0; color:white; padding:8px 14px; border-radius:6px;">
+    Enviar proposta
+  </button>
+</form>
+
+<br>
+
+<a href="{% url 'team_roster' draft.id target_team.id %}">
+  ← Voltar
+</a>
 {% endblock %}

@@ -1332,13 +1332,48 @@ def propose_trade_player(request, draft_id, target_team_id, target_player_id):
         user_id=request.user.id
     ).first()
 
-    my_players = []
-    if my_team:
-        my_players = RosterSpot.objects.filter(
-            team=my_team,
+    if not my_team:
+        return redirect("draft_board", draft_id=draft.id)
+
+    my_players = RosterSpot.objects.filter(
+        team=my_team,
+        draft=draft,
+        dropped_at__isnull=True
+    ).select_related("player")
+
+    target_players = RosterSpot.objects.filter(
+        team=target_team,
+        draft=draft,
+        dropped_at__isnull=True
+    ).select_related("player")
+
+    if request.method == "POST":
+        my_selected = request.POST.getlist("my_players")
+        target_selected = request.POST.getlist("target_players")
+
+        trade = TradeProposal.objects.create(
             draft=draft,
-            dropped_at__isnull=True
-        ).select_related("player")
+            from_team=my_team,
+            to_team=target_team
+        )
+
+        # jogadores que EU envio
+        for pid in my_selected:
+            TradeItem.objects.create(
+                trade=trade,
+                player_id=pid,
+                from_team=my_team
+            )
+
+        # jogadores que EU recebo
+        for pid in target_selected:
+            TradeItem.objects.create(
+                trade=trade,
+                player_id=pid,
+                from_team=target_team
+            )
+
+        return redirect("team_roster", draft.id, target_team.id)
 
     return render(request, "league/propose_trade_player.html", {
         "draft": draft,
@@ -1346,4 +1381,5 @@ def propose_trade_player(request, draft_id, target_team_id, target_player_id):
         "target_player": target_player,
         "my_team": my_team,
         "my_players": my_players,
+        "target_players": target_players,
     })

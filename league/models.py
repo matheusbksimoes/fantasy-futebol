@@ -534,3 +534,28 @@ class WaiverClaim(models.Model):
 
     def __str__(self):
         return f"{self.team} -> ADD {self.add_player} (${self.bid}) [{self.status}]"
+
+class TradeProposal(models.Model):
+    draft = models.ForeignKey("Draft", on_delete=models.CASCADE)
+    from_team = models.ForeignKey("Team", on_delete=models.CASCADE, related_name="trades_sent")
+    to_team = models.ForeignKey("Team", on_delete=models.CASCADE, related_name="trades_received")
+
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ("pending", "Pendente"),
+            ("accepted", "Aceita"),
+            ("rejected", "Recusada"),
+        ],
+        default="pending"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class TradeItem(models.Model):
+    trade = models.ForeignKey(TradeProposal, on_delete=models.CASCADE, related_name="items")
+    player = models.ForeignKey("Player", on_delete=models.CASCADE)
+
+    # quem está enviando esse jogador
+    from_team = models.ForeignKey("Team", on_delete=models.CASCADE)
