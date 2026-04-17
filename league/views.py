@@ -25,6 +25,8 @@ from .models import (
     FORMATION_MAP,
     TeamBudget,
     WaiverClaim,
+    TradeProposal,
+    TradeItem,
 )
 
 from league.services.lock_service import player_locked
