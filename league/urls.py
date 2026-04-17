@@ -127,4 +127,5 @@ urlpatterns = [
         views.reject_trade,
         name="reject_trade",
     ),
+    path("players/<int:player_id>/", views.player_detail, name="player_detail")
 ]

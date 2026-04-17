@@ -1,0 +1,86 @@
+{% extends "league/base.html" %}
+
+{% block content %}
+  <div style="max-width:1000px; margin:0 auto;">
+    <div style="margin-bottom:18px;">
+      <a href="javascript:history.back()" style="text-decoration:none; color:#2563eb; font-weight:600;">
+        ← Voltar
+      </a>
+    </div>
+
+    <div style="
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      padding:20px;
+      background:#fff;
+      margin-bottom:20px;
+    ">
+      <h1 style="margin:0 0 10px 0;">{{ player.name }}</h1>
+
+      <div style="color:#4b5563; font-size:15px; margin-bottom:14px;">
+        <b>Posição:</b> {{ player.get_position_display }} |
+        <b>Time real:</b> {{ player.real_team }}
+      </div>
+
+      <div style="display:flex; gap:14px; flex-wrap:wrap;">
+        <div style="
+          min-width:140px;
+          border:1px solid #e5e7eb;
+          border-radius:10px;
+          padding:14px;
+          background:#f9fafb;
+        ">
+          <div style="font-size:13px; color:#6b7280; margin-bottom:4px;">Média</div>
+          <div style="font-size:24px; font-weight:700;">{{ stats.avg|default:"0"|floatformat:2 }}</div>
+        </div>
+
+        <div style="
+          min-width:140px;
+          border:1px solid #e5e7eb;
+          border-radius:10px;
+          padding:14px;
+          background:#f9fafb;
+        ">
+          <div style="font-size:13px; color:#6b7280; margin-bottom:4px;">Total</div>
+          <div style="font-size:24px; font-weight:700;">{{ stats.total|default:"0"|floatformat:2 }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      padding:20px;
+      background:#fff;
+    ">
+      <h2 style="margin-top:0; margin-bottom:16px;">Pontuação por rodada</h2>
+
+      {% if scores %}
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:separate; border-spacing:0;">
+            <thead>
+              <tr>
+                <th style="text-align:left; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb;">Rodada</th>
+                <th style="text-align:center; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb;">Pontos</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for score in scores %}
+                <tr>
+                  <td style="padding:12px 10px; border-bottom:1px solid #eee;">
+                    Week {{ score.week.number }}
+                  </td>
+                  <td style="padding:12px 10px; border-bottom:1px solid #eee; text-align:center; font-weight:600;">
+                    {{ score.points|floatformat:2 }}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p style="color:#6b7280; margin:0;">Nenhuma pontuação encontrada para este jogador.</p>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

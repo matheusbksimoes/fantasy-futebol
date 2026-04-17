@@ -2,9 +2,9 @@
 {% load league_extras %}
 
 {% block content %}
-  <h1>Free Agents — {{ team.name }}</h1>
+  <h1 style="margin-bottom:8px;">Free Agents — {{ team.name }}</h1>
 
-  <div style="color:#666; margin-bottom:10px;">
+  <div style="color:#666; margin-bottom:18px; font-size:14px;">
     {% if draft %}
       Draft: <b>{{ draft.id }}</b> • Liga: <b>{{ draft.league }}</b> • FAAB: <b>${{ faab_balance }}</b>
     {% else %}
@@ -12,68 +12,127 @@
     {% endif %}
   </div>
 
+  <!-- FILTROS -->
+  <div style="
+    margin: 0 0 18px 0;
+    padding: 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fafafa;
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    align-items:end;
+  ">
+    <div>
+      <label style="font-weight:600;">Posição</label>
+      <select id="positionFilter" style="padding:8px; border-radius:6px;">
+        <option value="">Todas</option>
+        <option value="Goleiro">Goleiro</option>
+        <option value="Zagueiro">Zagueiro</option>
+        <option value="Lateral">Lateral</option>
+        <option value="Meia">Meia</option>
+        <option value="Atacante">Atacante</option>
+        <option value="Técnico">Técnico</option>
+      </select>
+    </div>
+
+    <div>
+      <label style="font-weight:600;">Jogador</label>
+      <input id="nameFilter" type="text" placeholder="Buscar..." style="padding:8px; border-radius:6px;">
+    </div>
+
+    <div>
+      <label style="font-weight:600;">Time</label>
+      <select id="teamFilter" style="padding:8px; border-radius:6px;">
+        <option value="">Todos</option>
+        <option value="Atlético-MG">Atlético-MG</option>
+        <option value="Athletico-PR">Athletico-PR</option>
+        <option value="Bahia">Bahia</option>
+        <option value="Botafogo">Botafogo</option>
+        <option value="Bragantino">Bragantino</option>
+        <option value="Chapecoense">Chapecoense</option>
+        <option value="Corinthians">Corinthians</option>
+        <option value="Coritiba">Coritiba</option>
+        <option value="Cruzeiro">Cruzeiro</option>
+        <option value="Flamengo">Flamengo</option>
+        <option value="Fluminense">Fluminense</option>
+        <option value="Grêmio">Grêmio</option>
+        <option value="Internacional">Internacional</option>
+        <option value="Mirassol">Mirassol</option>
+        <option value="Palmeiras">Palmeiras</option>
+        <option value="Remo">Remo</option>
+        <option value="Santos">Santos</option>
+        <option value="São Paulo">São Paulo</option>
+        <option value="Vasco">Vasco</option>
+        <option value="Vitória">Vitória</option>
+      </select>
+    </div>
+
+    <button id="clearFilters">Limpar</button>
+  </div>
+
   {% if free_agents %}
-    <table style="border-collapse:collapse; width:100%;">
+    <table id="freeAgentsTable" style="width:100%; border-collapse:collapse;">
       <thead>
-        <tr>
-          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Posição</th>
-          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Jogador</th>
-          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Time real</th>
-          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Status</th>
-          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Ações</th>
+        <tr style="background:#f3f4f6;">
+          <th>Posição</th>
+          <th>Jogador</th>
+          <th>Time</th>
+          <th>Média</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Ações</th>
+          <th>Ver</th>
         </tr>
       </thead>
 
       <tbody>
         {% for p in free_agents %}
           <tr>
-            <td style="border:1px solid #ddd; padding:8px;">{{ p.get_position_display }}</td>
-            <td style="border:1px solid #ddd; padding:8px;"><b>{{ p.name }}</b></td>
-            <td style="border:1px solid #ddd; padding:8px;">{{ p.real_team }}</td>
+            <td>{{ p.get_position_display }}</td>
 
-            <td style="border:1px solid #ddd; padding:8px;">
+            <td><b>{{ p.name }}</b></td>
+
+            <td>{{ p.real_team }}</td>
+
+            {% with stats=player_stats|get_item:p.id %}
+              <td>{{ stats.avg|default:"0"|floatformat:2 }}</td>
+              <td>{{ stats.total|default:"0"|floatformat:2 }}</td>
+            {% endwith %}
+
+            <td>
               {% with cnt=pending_claims_count|get_item:p.id %}
                 {% if cnt %}
-                  <span style="display:inline-block; padding:3px 8px; border-radius:999px; border:1px solid #b7d6f5; background:#f3f8ff;">
-                    Claim pendente ({{ cnt }})
-                  </span>
+                  <span style="color:blue;">Claim ({{ cnt }})</span>
                 {% else %}
-                  <span style="color:#666;">Livre</span>
+                  Livre
                 {% endif %}
               {% endwith %}
             </td>
 
-            <td style="border:1px solid #ddd; padding:8px; white-space:nowrap;">
-              {# ✅ sempre deixa dar claim, mesmo se já existir claim pendente #}
-              <form method="post" action="{% url 'add_free_agent' team.id p.id %}" style="display:inline;">
+            <td>
+              <form method="post" action="{% url 'add_free_agent' team.id p.id %}">
                 {% csrf_token %}
+                <input type="number" name="bid" value="0" style="width:60px;">
 
-                <input
-                  type="number"
-                  name="bid"
-                  min="0"
-                  value="0"
-                  style="width:70px; padding:6px 8px; border:1px solid #ccc; border-radius:4px; margin-right:6px;"
-                  aria-label="Bid FAAB"
-                >
-
-                <select
-                  name="drop_player_id"
-                  style="padding:6px 8px; border:1px solid #ccc; border-radius:4px; margin-right:6px;"
-                  aria-label="Drop opcional"
-                >
-                  <option value="">(Sem drop)</option>
+                <select name="drop_player_id">
+                  <option value="">Sem drop</option>
                   {% for spot in active_roster %}
                     <option value="{{ spot.player.id }}">
-                      DROP: {{ spot.player.name }} ({{ spot.player.get_position_display }})
+                      {{ spot.player.name }}
                     </option>
                   {% endfor %}
                 </select>
 
-                <button type="submit" style="border:1px solid #ccc; background:#fff; padding:6px 10px; cursor:pointer; border-radius:4px;">
-                  Claim
-                </button>
+                <button type="submit">Claim</button>
               </form>
+            </td>
+
+            <td>
+              <a href="{% url 'player_detail' p.id %}">
+                Ver
+              </a>
             </td>
           </tr>
         {% endfor %}
@@ -82,4 +141,40 @@
   {% else %}
     <p>Nenhum free agent disponível.</p>
   {% endif %}
+
+  <script>
+    const rows = document.querySelectorAll("#freeAgentsTable tbody tr");
+
+    function normalize(t){
+      return t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+    }
+
+    function applyFilters(){
+      const pos = normalize(positionFilter.value);
+      const name = normalize(nameFilter.value);
+      const team = normalize(teamFilter.value);
+
+      rows.forEach(r=>{
+        const cells = r.querySelectorAll("td");
+
+        const match =
+          (!pos || normalize(cells[0].innerText) === pos) &&
+          (!name || normalize(cells[1].innerText).includes(name)) &&
+          (!team || normalize(cells[2].innerText) === team);
+
+        r.style.display = match ? "" : "none";
+      });
+    }
+
+    positionFilter.onchange = applyFilters;
+    nameFilter.oninput = applyFilters;
+    teamFilter.onchange = applyFilters;
+
+    clearFilters.onclick = ()=>{
+      positionFilter.value="";
+      nameFilter.value="";
+      teamFilter.value="";
+      applyFilters();
+    }
+  </script>
 {% endblock %}

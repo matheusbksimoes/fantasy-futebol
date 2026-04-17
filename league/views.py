@@ -353,7 +353,7 @@ def free_agents_list(request, team_id: int):
 
     draft = Draft.objects.order_by("-id").first()
     if not draft:
-        return render(request, "free_agents.html", {
+        return render(request, "league/free_agents.html", {
             "team": team,
             "draft": None,
             "week": None,
@@ -411,7 +411,7 @@ def free_agents_list(request, team_id: int):
         for p in free_agents
     }
 
-    return render(request, "free_agents.html", {
+    return render(request, "league/free_agents.html", {
         "team": team,
         "draft": draft,
         "week": week,
@@ -1602,3 +1602,28 @@ def reject_trade(request, trade_id: int):
 
     messages.success(request, "Trade rejeitada.")
     return redirect("notifications_view", draft_id=trade.draft.id)
+
+@login_required
+def player_detail(request, player_id: int):
+    player = get_object_or_404(Player, id=player_id)
+
+    draft = Draft.objects.order_by("-id").first()
+
+    scores = PlayerWeekScore.objects.filter(player=player)
+
+    if draft:
+        scores = scores.filter(week__draft=draft)
+
+    scores = scores.select_related("week").order_by("week__number")
+
+    stats = scores.aggregate(
+        total=Sum("points"),
+        avg=Avg("points"),
+    )
+
+    return render(request, "player_detail.html", {
+        "player": player,
+        "draft": draft,
+        "scores": scores,
+        "stats": stats,
+    })
