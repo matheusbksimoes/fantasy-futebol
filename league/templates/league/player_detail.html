@@ -1,59 +1,123 @@
 {% extends "league/base.html" %}
 
 {% block content %}
-  <div style="max-width:1000px; margin:0 auto;">
+  <div style="max-width:1100px; margin:0 auto;">
     <div style="margin-bottom:18px;">
       <a href="javascript:history.back()" style="text-decoration:none; color:#2563eb; font-weight:600;">
         ← Voltar
       </a>
     </div>
 
-    <div style="
-      border:1px solid #e5e7eb;
-      border-radius:12px;
-      padding:20px;
-      background:#fff;
-      margin-bottom:20px;
-    ">
-      <h1 style="margin:0 0 10px 0;">{{ player.name }}</h1>
+    <div style="display:grid; grid-template-columns: 1.2fr 1fr; gap:20px; align-items:start;">
+      <div style="
+        border:1px solid #e5e7eb;
+        border-radius:14px;
+        padding:24px;
+        background:#fff;
+      ">
+        <h1 style="margin:0 0 10px 0; font-size:46px; line-height:1;">{{ player.name }}</h1>
 
-      <div style="color:#4b5563; font-size:15px; margin-bottom:14px;">
-        <b>Posição:</b> {{ player.get_position_display }} |
-        <b>Time real:</b> {{ player.real_team }}
+        <div style="color:#4b5563; font-size:16px; margin-bottom:18px;">
+          <b>Posição:</b> {{ player.get_position_display }} |
+          <b>Time real:</b> {{ player.real_team }}
+        </div>
+
+        <div style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:16px;">
+          <div style="
+            min-width:150px;
+            border:1px solid #e5e7eb;
+            border-radius:12px;
+            padding:16px;
+            background:#f9fafb;
+          ">
+            <div style="font-size:13px; color:#6b7280; margin-bottom:4px;">Média</div>
+            <div style="font-size:30px; font-weight:700;">{{ stats.avg|default:"0"|floatformat:2 }}</div>
+          </div>
+
+          <div style="
+            min-width:150px;
+            border:1px solid #e5e7eb;
+            border-radius:12px;
+            padding:16px;
+            background:#f9fafb;
+          ">
+            <div style="font-size:13px; color:#6b7280; margin-bottom:4px;">Total</div>
+            <div style="font-size:30px; font-weight:700;">{{ stats.total|default:"0"|floatformat:2 }}</div>
+          </div>
+        </div>
+
+        <div style="
+          border:1px solid #e5e7eb;
+          border-radius:12px;
+          padding:18px;
+          background:#fbfbfc;
+        ">
+          <div style="font-size:14px; font-weight:700; margin-bottom:12px;">Scouts por rodada</div>
+
+          {% if scores %}
+            <div style="display:grid; gap:10px;">
+              {% for score in scores %}
+                <div style="
+                  display:flex;
+                  justify-content:space-between;
+                  align-items:center;
+                  padding:10px 12px;
+                  border:1px solid #ececec;
+                  border-radius:10px;
+                  background:#fff;
+                ">
+                  <div>
+                    <div style="font-weight:700;">Rodada {{ score.week.number }}</div>
+                    <div style="color:#6b7280; font-size:13px;">
+                      {% if score.match_display %}
+                        {{ score.match_display }}
+                        {% if score.is_home is not None %}
+                          • {% if score.is_home %}Casa{% else %}Fora{% endif %}
+                        {% endif %}
+                      {% else %}
+                        Confronto não disponível
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <div style="font-weight:700; font-size:18px;">
+                    {{ score.points|floatformat:2 }}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p style="color:#6b7280; margin:0;">Nenhuma pontuação encontrada para este jogador.</p>
+          {% endif %}
+        </div>
       </div>
 
-      <div style="display:flex; gap:14px; flex-wrap:wrap;">
-        <div style="
-          min-width:140px;
-          border:1px solid #e5e7eb;
-          border-radius:10px;
-          padding:14px;
-          background:#f9fafb;
-        ">
-          <div style="font-size:13px; color:#6b7280; margin-bottom:4px;">Média</div>
-          <div style="font-size:24px; font-weight:700;">{{ stats.avg|default:"0"|floatformat:2 }}</div>
-        </div>
+      <div style="
+        border:1px solid #e5e7eb;
+        border-radius:14px;
+        padding:24px;
+        background:#fff;
+      ">
+        <h2 style="margin:0 0 18px 0;">Pontuação por rodada</h2>
 
-        <div style="
-          min-width:140px;
-          border:1px solid #e5e7eb;
-          border-radius:10px;
-          padding:14px;
-          background:#f9fafb;
-        ">
-          <div style="font-size:13px; color:#6b7280; margin-bottom:4px;">Total</div>
-          <div style="font-size:24px; font-weight:700;">{{ stats.total|default:"0"|floatformat:2 }}</div>
-        </div>
+        {% if scores %}
+          <div style="height:340px;">
+            <canvas id="pointsChart"></canvas>
+          </div>
+        {% else %}
+          <p style="color:#6b7280; margin:0;">Sem dados para gráfico.</p>
+        {% endif %}
       </div>
     </div>
 
     <div style="
+      margin-top:20px;
       border:1px solid #e5e7eb;
-      border-radius:12px;
-      padding:20px;
+      border-radius:14px;
+      padding:24px;
       background:#fff;
     ">
-      <h2 style="margin-top:0; margin-bottom:16px;">Pontuação por rodada</h2>
+      <h2 style="margin:0 0 16px 0;">Histórico detalhado</h2>
 
       {% if scores %}
         <div style="overflow-x:auto;">
@@ -61,6 +125,8 @@
             <thead>
               <tr>
                 <th style="text-align:left; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb;">Rodada</th>
+                <th style="text-align:left; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb;">Confronto</th>
+                <th style="text-align:center; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb;">Mando</th>
                 <th style="text-align:center; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb;">Pontos</th>
               </tr>
             </thead>
@@ -70,7 +136,23 @@
                   <td style="padding:12px 10px; border-bottom:1px solid #eee;">
                     Week {{ score.week.number }}
                   </td>
-                  <td style="padding:12px 10px; border-bottom:1px solid #eee; text-align:center; font-weight:600;">
+                  <td style="padding:12px 10px; border-bottom:1px solid #eee;">
+                    {% if score.match_display %}
+                      {{ score.match_display }}
+                    {% else %}
+                      —
+                    {% endif %}
+                  </td>
+                  <td style="padding:12px 10px; border-bottom:1px solid #eee; text-align:center;">
+                    {% if score.is_home is None %}
+                      —
+                    {% elif score.is_home %}
+                      Casa
+                    {% else %}
+                      Fora
+                    {% endif %}
+                  </td>
+                  <td style="padding:12px 10px; border-bottom:1px solid #eee; text-align:center; font-weight:700;">
                     {{ score.points|floatformat:2 }}
                   </td>
                 </tr>
@@ -83,4 +165,37 @@
       {% endif %}
     </div>
   </div>
+
+  {% if scores %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      const ctx = document.getElementById("pointsChart");
+
+      new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: {{ chart_labels|safe }},
+          datasets: [{
+            label: "Pontos",
+            data: {{ chart_points|safe }},
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    </script>
+  {% endif %}
 {% endblock %}

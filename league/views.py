@@ -1621,9 +1621,14 @@ def player_detail(request, player_id: int):
         avg=Avg("points"),
     )
 
+    chart_labels = [f"R{score.week.number}" for score in scores]
+    chart_points = [float(score.points) for score in scores]
+
     return render(request, "league/player_detail.html", {
         "player": player,
         "draft": draft,
         "scores": scores,
         "stats": stats,
+        "chart_labels": chart_labels,
+        "chart_points": chart_points,
     })

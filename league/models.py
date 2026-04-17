@@ -440,6 +440,10 @@ class PlayerWeekScore(models.Model):
     source = models.CharField(max_length=20, choices=SOURCE_CHOICES, default="CARTOLA")
     fetched_at = models.DateTimeField(auto_now=True)
 
+    opponent = models.CharField(max_length=100, blank=True, default="")
+    is_home = models.BooleanField(null=True, blank=True)
+    match_display = models.CharField(max_length=100, blank=True, default="")
+
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=["week", "player"], name="uniq_player_score_per_week"),
