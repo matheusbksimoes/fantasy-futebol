@@ -365,6 +365,7 @@ def free_agents_list(request, team_id: int):
             "pending_claims_count": {},
             "pending_add_ids": set(),
             "active_roster": [],
+            "player_stats": {},
         })
 
     week = Week.objects.filter(draft=draft, is_current=True).first()
@@ -401,6 +402,17 @@ def free_agents_list(request, team_id: int):
         .order_by("player__position", "player__name")
     )
 
+    player_stats = {
+        p.id: PlayerWeekScore.objects.filter(
+            player=p,
+            week__draft=draft
+        ).aggregate(
+            total=Sum("points"),
+            avg=Avg("points"),
+        )
+        for p in free_agents
+    }
+
     return render(request, "free_agents.html", {
         "team": team,
         "draft": draft,
@@ -411,8 +423,9 @@ def free_agents_list(request, team_id: int):
         "pending_claims_count": pending_claims_count,
         "pending_add_ids": pending_add_ids,
         "active_roster": active_roster,
+        "player_stats": player_stats,
     })
-    
+
 @login_required
 @require_POST
 def add_free_agent(request, team_id: int, player_id: int):

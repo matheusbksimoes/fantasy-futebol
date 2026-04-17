@@ -14,13 +14,8 @@
 
   <div style="margin: 16px 0; display:flex; gap:12px; flex-wrap:wrap; align-items:end;">
     <div>
-      <label for="positionFilter" style="display:block; margin-bottom:4px; font-weight:600;">
-        Posição
-      </label>
-      <select
-        id="positionFilter"
-        style="padding:6px 8px; border:1px solid #ccc; border-radius:4px;"
-      >
+      <label for="positionFilter" style="display:block; margin-bottom:4px; font-weight:600;">Posição</label>
+      <select id="positionFilter" style="padding:6px 8px; border:1px solid #ccc; border-radius:4px;">
         <option value="">Todas</option>
         <option value="Goleiro">Goleiro</option>
         <option value="Zagueiro">Zagueiro</option>
@@ -32,55 +27,42 @@
     </div>
 
     <div>
-      <label for="nameFilter" style="display:block; margin-bottom:4px; font-weight:600;">
-        Jogador
-      </label>
-      <input
-        type="text"
-        id="nameFilter"
-        placeholder="Buscar por nome"
-        style="padding:6px 8px; border:1px solid #ccc; border-radius:4px;"
-      >
+      <label for="nameFilter" style="display:block; margin-bottom:4px; font-weight:600;">Jogador</label>
+      <input type="text" id="nameFilter" placeholder="Buscar por nome"
+        style="padding:6px 8px; border:1px solid #ccc; border-radius:4px;">
     </div>
 
     <div>
-  <label for="teamFilter" style="display:block; margin-bottom:4px; font-weight:600;">
-    Time real
-  </label>
-  <select
-    id="teamFilter"
-    style="padding:6px 8px; border:1px solid #ccc; border-radius:4px; min-width:190px;"
-  >
-    <option value="">Todos</option>
-<option value="Atlético-MG">Atlético-MG</option>
-<option value="Athletico-PR">Athletico-PR</option>
-<option value="Bahia">Bahia</option>
-<option value="Botafogo">Botafogo</option>
-<option value="Bragantino">Bragantino</option>
-<option value="Chapecoense">Chapecoense</option>
-<option value="Corinthians">Corinthians</option>
-<option value="Coritiba">Coritiba</option>
-<option value="Cruzeiro">Cruzeiro</option>
-<option value="Flamengo">Flamengo</option>
-<option value="Fluminense">Fluminense</option>
-<option value="Grêmio">Grêmio</option>
-<option value="Internacional">Internacional</option>
-<option value="Mirassol">Mirassol</option>
-<option value="Palmeiras">Palmeiras</option>
-<option value="Remo">Remo</option>
-<option value="Santos">Santos</option>
-<option value="São Paulo">São Paulo</option>
-<option value="Vasco">Vasco</option>
-<option value="Vitória">Vitória</option>
-  </select>
-</div>
+      <label for="teamFilter" style="display:block; margin-bottom:4px; font-weight:600;">Time real</label>
+      <select id="teamFilter"
+        style="padding:6px 8px; border:1px solid #ccc; border-radius:4px; min-width:190px;">
+        <option value="">Todos</option>
+        <option value="Atlético-MG">Atlético-MG</option>
+        <option value="Athletico-PR">Athletico-PR</option>
+        <option value="Bahia">Bahia</option>
+        <option value="Botafogo">Botafogo</option>
+        <option value="Bragantino">Bragantino</option>
+        <option value="Chapecoense">Chapecoense</option>
+        <option value="Corinthians">Corinthians</option>
+        <option value="Coritiba">Coritiba</option>
+        <option value="Cruzeiro">Cruzeiro</option>
+        <option value="Flamengo">Flamengo</option>
+        <option value="Fluminense">Fluminense</option>
+        <option value="Grêmio">Grêmio</option>
+        <option value="Internacional">Internacional</option>
+        <option value="Mirassol">Mirassol</option>
+        <option value="Palmeiras">Palmeiras</option>
+        <option value="Remo">Remo</option>
+        <option value="Santos">Santos</option>
+        <option value="São Paulo">São Paulo</option>
+        <option value="Vasco">Vasco</option>
+        <option value="Vitória">Vitória</option>
+      </select>
+    </div>
 
     <div>
-      <button
-        type="button"
-        id="clearFilters"
-        style="border:1px solid #ccc; background:#fff; padding:6px 10px; cursor:pointer; border-radius:4px;"
-      >
+      <button type="button" id="clearFilters"
+        style="border:1px solid #ccc; background:#fff; padding:6px 10px; cursor:pointer; border-radius:4px;">
         Limpar filtros
       </button>
     </div>
@@ -90,65 +72,54 @@
     <table id="freeAgentsTable" style="border-collapse:collapse; width:100%;">
       <thead>
         <tr>
-          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Posição</th>
-          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Jogador</th>
-          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Time real</th>
-          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Status</th>
-          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Ações</th>
+          <th>Posição</th>
+          <th>Jogador</th>
+          <th>Time real</th>
+          <th>Média</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Ações</th>
         </tr>
       </thead>
 
       <tbody>
         {% for p in free_agents %}
           <tr>
-            <td style="border:1px solid #ddd; padding:8px;">{{ p.get_position_display }}</td>
-            <td style="border:1px solid #ddd; padding:8px;"><b>{{ p.name }}</b></td>
-            <td style="border:1px solid #ddd; padding:8px;">{{ p.real_team }}</td>
+            <td>{{ p.get_position_display }}</td>
+            <td><b>{{ p.name }}</b></td>
+            <td>{{ p.real_team }}</td>
 
-            <td style="border:1px solid #ddd; padding:8px;">
+            {% with stats=player_stats|get_item:p.id %}
+              <td>{{ stats.avg|default:"0"|floatformat:2 }}</td>
+              <td>{{ stats.total|default:"0"|floatformat:2 }}</td>
+            {% endwith %}
+
+            <td>
               {% with cnt=pending_claims_count|get_item:p.id %}
                 {% if cnt %}
-                  <span style="display:inline-block; padding:3px 8px; border-radius:999px; border:1px solid #b7d6f5; background:#f3f8ff;">
-                    Claim pendente ({{ cnt }})
-                  </span>
+                  Claim pendente ({{ cnt }})
                 {% else %}
-                  <span style="color:#666;">Livre</span>
+                  Livre
                 {% endif %}
               {% endwith %}
             </td>
 
-            <td style="border:1px solid #ddd; padding:8px; white-space:nowrap;">
-              <form method="post" action="{% url 'add_free_agent' team.id p.id %}" style="display:inline;">
+            <td>
+              <form method="post" action="{% url 'add_free_agent' team.id p.id %}">
                 {% csrf_token %}
 
-                <input
-                  type="number"
-                  name="bid"
-                  min="0"
-                  value="0"
-                  style="width:70px; padding:6px 8px; border:1px solid #ccc; border-radius:4px; margin-right:6px;"
-                  aria-label="Bid FAAB"
-                >
+                <input type="number" name="bid" min="0" value="0" style="width:70px;">
 
-                <select
-                  name="drop_player_id"
-                  style="padding:6px 8px; border:1px solid #ccc; border-radius:4px; margin-right:6px;"
-                  aria-label="Drop opcional"
-                >
+                <select name="drop_player_id">
                   <option value="">(Sem drop)</option>
                   {% for spot in active_roster %}
                     <option value="{{ spot.player.id }}">
-                      DROP: {{ spot.player.name }} ({{ spot.player.get_position_display }})
+                      DROP: {{ spot.player.name }}
                     </option>
                   {% endfor %}
                 </select>
 
-                <button
-                  type="submit"
-                  style="border:1px solid #ccc; background:#fff; padding:6px 10px; cursor:pointer; border-radius:4px;"
-                >
-                  Claim
-                </button>
+                <button type="submit">Claim</button>
               </form>
             </td>
           </tr>
@@ -187,13 +158,13 @@
         rows.forEach((row) => {
           const cells = row.querySelectorAll("td");
 
-          const positionText = normalize(cells[0] ? cells[0].innerText : "");
-          const playerText = normalize(cells[1] ? cells[1].innerText : "");
-          const teamText = normalize(cells[2] ? cells[2].innerText : "");
+          const positionText = normalize(cells[0]?.innerText);
+          const playerText = normalize(cells[1]?.innerText);
+          const teamText = normalize(cells[2]?.innerText);
 
           const matchPosition = !selectedPosition || positionText === selectedPosition;
           const matchName = !playerName || playerText.includes(playerName);
-          const matchTeam = !realTeam || teamText.includes(realTeam);
+          const matchTeam = !realTeam || teamText === realTeam;
 
           row.style.display = (matchPosition && matchName && matchTeam) ? "" : "none";
         });
