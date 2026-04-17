@@ -1322,10 +1322,10 @@ def propose_trade_player(request, draft_id: int, target_team_id: int, target_pla
     })
 
 @login_required
-def propose_trade_player(request, draft_id, target_team_id, player_id):
+def propose_trade_player(request, draft_id, target_team_id, target_player_id):
     draft = get_object_or_404(Draft, id=draft_id)
     target_team = get_object_or_404(Team, id=target_team_id)
-    target_player = get_object_or_404(Player, id=player_id)
+    target_player = get_object_or_404(Player, id=target_player_id)
 
     my_team = Team.objects.filter(
         league=draft.league,
