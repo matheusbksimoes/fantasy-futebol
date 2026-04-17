@@ -1,39 +1,106 @@
 {% extends "league/base.html" %}
-{% block title %}Free Agents{% endblock %}
+{% load league_extras %}
 
 {% block content %}
   <h1>Free Agents — {{ team.name }}</h1>
 
   <div style="color:#666; margin-bottom:10px;">
     {% if draft %}
-      Draft: <b>{{ draft.id }}</b> • Liga: <b>{{ draft.league }}</b>
+      Draft: <b>{{ draft.id }}</b> • Liga: <b>{{ draft.league }}</b> • FAAB: <b>${{ faab_balance }}</b>
     {% else %}
       Nenhum draft encontrado.
     {% endif %}
   </div>
 
+  <div style="margin: 16px 0; display:flex; gap:12px; flex-wrap:wrap; align-items:end;">
+    <div>
+      <label for="positionFilter" style="display:block; margin-bottom:4px; font-weight:600;">
+        Posição
+      </label>
+      <select
+        id="positionFilter"
+        style="padding:6px 8px; border:1px solid #ccc; border-radius:4px;"
+      >
+        <option value="">Todas</option>
+        <option value="Goleiro">Goleiro</option>
+        <option value="Zagueiro">Zagueiro</option>
+        <option value="Lateral">Lateral</option>
+        <option value="Meia">Meia</option>
+        <option value="Atacante">Atacante</option>
+        <option value="Técnico">Técnico</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="nameFilter" style="display:block; margin-bottom:4px; font-weight:600;">
+        Jogador
+      </label>
+      <input
+        type="text"
+        id="nameFilter"
+        placeholder="Buscar por nome"
+        style="padding:6px 8px; border:1px solid #ccc; border-radius:4px;"
+      >
+    </div>
+
+    <div>
+      <label for="teamFilter" style="display:block; margin-bottom:4px; font-weight:600;">
+        Time real
+      </label>
+      <input
+        type="text"
+        id="teamFilter"
+        placeholder="Buscar por time"
+        style="padding:6px 8px; border:1px solid #ccc; border-radius:4px;"
+      >
+    </div>
+
+    <div>
+      <button
+        type="button"
+        id="clearFilters"
+        style="border:1px solid #ccc; background:#fff; padding:6px 10px; cursor:pointer; border-radius:4px;"
+      >
+        Limpar filtros
+      </button>
+    </div>
+  </div>
+
   {% if free_agents %}
-    <table style="border-collapse:collapse; width:100%;">
+    <table id="freeAgentsTable" style="border-collapse:collapse; width:100%;">
       <thead>
         <tr>
           <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Posição</th>
           <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Jogador</th>
           <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Time real</th>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Status</th>
           <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Ações</th>
         </tr>
       </thead>
+
       <tbody>
         {% for p in free_agents %}
           <tr>
             <td style="border:1px solid #ddd; padding:8px;">{{ p.get_position_display }}</td>
             <td style="border:1px solid #ddd; padding:8px;"><b>{{ p.name }}</b></td>
             <td style="border:1px solid #ddd; padding:8px;">{{ p.real_team }}</td>
-            <td style="border:1px solid #ddd; padding:8px; white-space:nowrap;">
 
+            <td style="border:1px solid #ddd; padding:8px;">
+              {% with cnt=pending_claims_count|get_item:p.id %}
+                {% if cnt %}
+                  <span style="display:inline-block; padding:3px 8px; border-radius:999px; border:1px solid #b7d6f5; background:#f3f8ff;">
+                    Claim pendente ({{ cnt }})
+                  </span>
+                {% else %}
+                  <span style="color:#666;">Livre</span>
+                {% endif %}
+              {% endwith %}
+            </td>
+
+            <td style="border:1px solid #ddd; padding:8px; white-space:nowrap;">
               <form method="post" action="{% url 'add_free_agent' team.id p.id %}" style="display:inline;">
                 {% csrf_token %}
 
-                <!-- ✅ Campo de FAAB (permite 0) -->
                 <input
                   type="number"
                   name="bid"
@@ -43,6 +110,19 @@
                   aria-label="Bid FAAB"
                 >
 
+                <select
+                  name="drop_player_id"
+                  style="padding:6px 8px; border:1px solid #ccc; border-radius:4px; margin-right:6px;"
+                  aria-label="Drop opcional"
+                >
+                  <option value="">(Sem drop)</option>
+                  {% for spot in active_roster %}
+                    <option value="{{ spot.player.id }}">
+                      DROP: {{ spot.player.name }} ({{ spot.player.get_position_display }})
+                    </option>
+                  {% endfor %}
+                </select>
+
                 <button
                   type="submit"
                   style="border:1px solid #ccc; background:#fff; padding:6px 10px; cursor:pointer; border-radius:4px;"
@@ -50,7 +130,6 @@
                   Claim
                 </button>
               </form>
-
             </td>
           </tr>
         {% endfor %}
@@ -59,4 +138,57 @@
   {% else %}
     <p>Nenhum free agent disponível.</p>
   {% endif %}
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const positionFilter = document.getElementById("positionFilter");
+      const nameFilter = document.getElementById("nameFilter");
+      const teamFilter = document.getElementById("teamFilter");
+      const clearFilters = document.getElementById("clearFilters");
+      const table = document.getElementById("freeAgentsTable");
+
+      if (!table) return;
+
+      const rows = table.querySelectorAll("tbody tr");
+
+      function normalize(text) {
+        return (text || "")
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .trim();
+      }
+
+      function applyFilters() {
+        const selectedPosition = normalize(positionFilter.value);
+        const playerName = normalize(nameFilter.value);
+        const realTeam = normalize(teamFilter.value);
+
+        rows.forEach((row) => {
+          const cells = row.querySelectorAll("td");
+
+          const positionText = normalize(cells[0] ? cells[0].innerText : "");
+          const playerText = normalize(cells[1] ? cells[1].innerText : "");
+          const teamText = normalize(cells[2] ? cells[2].innerText : "");
+
+          const matchPosition = !selectedPosition || positionText === selectedPosition;
+          const matchName = !playerName || playerText.includes(playerName);
+          const matchTeam = !realTeam || teamText.includes(realTeam);
+
+          row.style.display = (matchPosition && matchName && matchTeam) ? "" : "none";
+        });
+      }
+
+      positionFilter.addEventListener("change", applyFilters);
+      nameFilter.addEventListener("input", applyFilters);
+      teamFilter.addEventListener("input", applyFilters);
+
+      clearFilters.addEventListener("click", function () {
+        positionFilter.value = "";
+        nameFilter.value = "";
+        teamFilter.value = "";
+        applyFilters();
+      });
+    });
+  </script>
 {% endblock %}
