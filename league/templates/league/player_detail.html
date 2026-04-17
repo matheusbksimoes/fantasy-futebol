@@ -52,7 +52,7 @@
           padding:18px;
           background:#fbfbfc;
         ">
-          <div style="font-size:14px; font-weight:700; margin-bottom:12px;">Scouts por rodada</div>
+          <div style="font-size:14px; font-weight:700; margin-bottom:12px;">Resumo por rodada</div>
 
           {% if scores %}
             <div style="display:grid; gap:10px;">
@@ -134,7 +134,7 @@
               {% for score in scores %}
                 <tr>
                   <td style="padding:12px 10px; border-bottom:1px solid #eee;">
-                    Week {{ score.week.number }}
+                    Rodada {{ score.week.number }}
                   </td>
                   <td style="padding:12px 10px; border-bottom:1px solid #eee;">
                     {% if score.match_display %}
