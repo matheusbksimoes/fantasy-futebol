@@ -559,3 +559,81 @@ class TradeItem(models.Model):
 
     # quem está enviando esse jogador
     from_team = models.ForeignKey("Team", on_delete=models.CASCADE)
+
+    # =========================
+# TRADE SYSTEM
+# =========================
+
+class TradeProposal(models.Model):
+    STATUS_CHOICES = [
+        ("pending", "Pendente"),
+        ("accepted", "Aceita"),
+        ("rejected", "Recusada"),
+        ("cancelled", "Cancelada"),
+    ]
+
+    draft = models.ForeignKey("Draft", on_delete=models.CASCADE, related_name="trade_proposals")
+    from_team = models.ForeignKey("Team", on_delete=models.CASCADE, related_name="trades_sent")
+    to_team = models.ForeignKey("Team", on_delete=models.CASCADE, related_name="trades_received")
+
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    created_at = models.DateTimeField(auto_now_add=True)
+    responded_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Trade #{self.id} - {self.from_team} -> {self.to_team} ({self.status})"
+
+
+class TradeItem(models.Model):
+    trade = models.ForeignKey("TradeProposal", on_delete=models.CASCADE, related_name="items")
+    player = models.ForeignKey("Player", on_delete=models.CASCADE)
+
+    # quem está enviando o jogador
+    from_team = models.ForeignKey("Team", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.player} saindo de {self.from_team}"
+
+
+# =========================
+# NOTIFICATIONS
+# =========================
+
+class Notification(models.Model):
+    TYPE_CHOICES = [
+        ("trade_received", "Trade recebida"),
+        ("trade_accepted", "Trade aceita"),
+        ("trade_rejected", "Trade rejeitada"),
+        ("waiver_won", "Waiver ganho"),
+        ("waiver_lost", "Waiver perdido"),
+    ]
+
+    team = models.ForeignKey("Team", on_delete=models.CASCADE, related_name="notifications")
+    draft = models.ForeignKey("Draft", on_delete=models.CASCADE, related_name="notifications")
+
+    type = models.CharField(max_length=30, choices=TYPE_CHOICES)
+    message = models.CharField(max_length=255)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    trade = models.ForeignKey(
+        "TradeProposal",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="notifications",
+    )
+
+    waiver_claim = models.ForeignKey(
+        "WaiverClaim",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="notifications",
+    )
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.team} - {self.type}"

@@ -27,6 +27,7 @@ from .models import (
     WaiverClaim,
     TradeProposal,
     TradeItem,
+    Notification,
 )
 
 from league.services.lock_service import player_locked
@@ -1299,64 +1300,73 @@ def propose_trade_player(request, draft_id: int, target_team_id: int, target_pla
     target_team = get_object_or_404(Team, id=target_team_id)
     target_player = get_object_or_404(Player, id=target_player_id)
 
-    my_team = Team.objects.filter(league=draft.league, user_id=request.user.id).first()
+    my_team = Team.objects.filter(
+        league=draft.league,
+        user_id=request.user.id,
+    ).first()
+
     if not my_team:
         return HttpResponseForbidden("Você não possui um time nesta liga.")
 
     if my_team.id == target_team.id:
         return HttpResponseForbidden("Você não pode propor troca para o próprio time.")
 
-    my_roster = (
+    my_players = (
         RosterSpot.objects
-        .filter(draft=draft, team=my_team, dropped_at__isnull=True)
+        .filter(
+            team=my_team,
+            draft=draft,
+            dropped_at__isnull=True,
+        )
         .select_related("player")
         .order_by("player__position", "player__name")
     )
 
-    return render(request, "league/propose_trade_player.html", {
-        "draft": draft,
-        "team": my_team,
-        "my_team": my_team,
-        "target_team": target_team,
-        "target_player": target_player,
-        "my_roster": my_roster,
-        "active_tab": "roster",
-    })
-
-@login_required
-def propose_trade_player(request, draft_id, target_team_id, target_player_id):
-    draft = get_object_or_404(Draft, id=draft_id)
-    target_team = get_object_or_404(Team, id=target_team_id)
-    target_player = get_object_or_404(Player, id=target_player_id)
-
-    my_team = Team.objects.filter(
-        league=draft.league,
-        user_id=request.user.id
-    ).first()
-
-    if not my_team:
-        return redirect("draft_board", draft_id=draft.id)
-
-    my_players = RosterSpot.objects.filter(
-        team=my_team,
-        draft=draft,
-        dropped_at__isnull=True
-    ).select_related("player")
-
-    target_players = RosterSpot.objects.filter(
-        team=target_team,
-        draft=draft,
-        dropped_at__isnull=True
-    ).select_related("player")
+    target_players = (
+        RosterSpot.objects
+        .filter(
+            team=target_team,
+            draft=draft,
+            dropped_at__isnull=True,
+        )
+        .select_related("player")
+        .order_by("player__position", "player__name")
+    )
 
     if request.method == "POST":
         my_selected = request.POST.getlist("my_players")
         target_selected = request.POST.getlist("target_players")
 
+        if not my_selected:
+            messages.error(request, "Selecione pelo menos um jogador seu para oferecer.")
+            return render(request, "league/propose_trade_player.html", {
+                "draft": draft,
+                "team": my_team,
+                "my_team": my_team,
+                "target_team": target_team,
+                "target_player": target_player,
+                "my_players": my_players,
+                "target_players": target_players,
+                "active_tab": "roster",
+            })
+
+        if not target_selected:
+            messages.error(request, "Selecione pelo menos um jogador do outro time para receber.")
+            return render(request, "league/propose_trade_player.html", {
+                "draft": draft,
+                "team": my_team,
+                "my_team": my_team,
+                "target_team": target_team,
+                "target_player": target_player,
+                "my_players": my_players,
+                "target_players": target_players,
+                "active_tab": "roster",
+            })
+
         trade = TradeProposal.objects.create(
             draft=draft,
             from_team=my_team,
-            to_team=target_team
+            to_team=target_team,
         )
 
         # jogadores que EU envio
@@ -1364,7 +1374,7 @@ def propose_trade_player(request, draft_id, target_team_id, target_player_id):
             TradeItem.objects.create(
                 trade=trade,
                 player_id=pid,
-                from_team=my_team
+                from_team=my_team,
             )
 
         # jogadores que EU recebo
@@ -1372,16 +1382,216 @@ def propose_trade_player(request, draft_id, target_team_id, target_player_id):
             TradeItem.objects.create(
                 trade=trade,
                 player_id=pid,
-                from_team=target_team
+                from_team=target_team,
             )
 
-        return redirect("team_roster", draft.id, target_team.id)
+        Notification.objects.create(
+            draft=draft,
+            team=target_team,
+            type="trade_received",
+            message=f"Nova proposta de trade recebida de {my_team.name}.",
+            trade=trade,
+        )
+
+        messages.success(request, "Proposta de trade enviada com sucesso.")
+        return redirect("team_roster", draft_id=draft.id, team_id=target_team.id)
 
     return render(request, "league/propose_trade_player.html", {
         "draft": draft,
+        "team": my_team,
+        "my_team": my_team,
         "target_team": target_team,
         "target_player": target_player,
-        "my_team": my_team,
         "my_players": my_players,
         "target_players": target_players,
+        "active_tab": "roster",
     })
+
+@login_required
+def notifications_view(request, draft_id: int):
+    draft = get_object_or_404(Draft, id=draft_id)
+    week = Week.objects.filter(draft=draft, is_current=True).first()
+
+    team = Team.objects.filter(league=draft.league, user=request.user).first()
+    if not team:
+        return HttpResponseForbidden("Você não possui um time vinculado nesta liga.")
+
+    my_matchup = get_team_matchup_for_week(week, team) if week and team else None
+
+    notifications = Notification.objects.filter(
+        draft=draft,
+        team=team,
+    ).select_related("trade", "waiver_claim")[:100]
+
+    Notification.objects.filter(
+        draft=draft,
+        team=team,
+        is_read=False,
+    ).update(is_read=True)
+
+    return render(request, "league/notifications.html", {
+        "draft": draft,
+        "week": week,
+        "team": team,
+        "my_matchup": my_matchup,
+        "notifications": notifications,
+        "active_tab": "notifications",
+    })
+@login_required
+@require_POST
+@transaction.atomic
+def accept_trade(request, trade_id: int):
+    trade = get_object_or_404(
+        TradeProposal.objects.select_related("draft", "from_team", "to_team"),
+        id=trade_id,
+    )
+
+    my_team = Team.objects.filter(
+        league=trade.draft.league,
+        user=request.user,
+    ).first()
+
+    if not my_team or my_team.id != trade.to_team_id:
+        return HttpResponseForbidden("Você não pode aceitar esta trade.")
+
+    if trade.status != "pending":
+        messages.error(request, "Essa proposta já foi respondida.")
+        return redirect("notifications_view", draft_id=trade.draft.id)
+
+    sent_items = list(trade.items.filter(from_team=trade.from_team).select_related("player"))
+    received_items = list(trade.items.filter(from_team=trade.to_team).select_related("player"))
+
+    # valida se todos ainda estão nos times corretos
+    for item in sent_items:
+        exists = RosterSpot.objects.filter(
+            draft=trade.draft,
+            team=trade.from_team,
+            player=item.player,
+            dropped_at__isnull=True,
+        ).exists()
+        if not exists:
+            messages.error(request, f"{item.player.name} não está mais no roster de origem.")
+            trade.status = "rejected"
+            trade.responded_at = timezone.now()
+            trade.save(update_fields=["status", "responded_at"])
+            return redirect("notifications_view", draft_id=trade.draft.id)
+
+    for item in received_items:
+        exists = RosterSpot.objects.filter(
+            draft=trade.draft,
+            team=trade.to_team,
+            player=item.player,
+            dropped_at__isnull=True,
+        ).exists()
+        if not exists:
+            messages.error(request, f"{item.player.name} não está mais no roster de origem.")
+            trade.status = "rejected"
+            trade.responded_at = timezone.now()
+            trade.save(update_fields=["status", "responded_at"])
+            return redirect("notifications_view", draft_id=trade.draft.id)
+
+    # executa a troca
+    for item in sent_items:
+        spot = RosterSpot.objects.get(
+            draft=trade.draft,
+            team=trade.from_team,
+            player=item.player,
+            dropped_at__isnull=True,
+        )
+        spot.team = trade.to_team
+        spot.acquired_via = "TRADE"
+        spot.acquired_at = timezone.now()
+        spot.save(update_fields=["team", "acquired_via", "acquired_at"])
+
+        Transaction.objects.create(
+            draft=trade.draft,
+            team=trade.to_team,
+            player=item.player,
+            type="TRADE",
+            notes=f"Recebido em trade de {trade.from_team.name}",
+        )
+
+    for item in received_items:
+        spot = RosterSpot.objects.get(
+            draft=trade.draft,
+            team=trade.to_team,
+            player=item.player,
+            dropped_at__isnull=True,
+        )
+        spot.team = trade.from_team
+        spot.acquired_via = "TRADE"
+        spot.acquired_at = timezone.now()
+        spot.save(update_fields=["team", "acquired_via", "acquired_at"])
+
+        Transaction.objects.create(
+            draft=trade.draft,
+            team=trade.from_team,
+            player=item.player,
+            type="TRADE",
+            notes=f"Recebido em trade de {trade.to_team.name}",
+        )
+
+    trade.status = "accepted"
+    trade.responded_at = timezone.now()
+    trade.save(update_fields=["status", "responded_at"])
+
+    Notification.objects.create(
+        draft=trade.draft,
+        team=trade.from_team,
+        type="trade_accepted",
+        message=f"Sua proposta para {trade.to_team.name} foi aceita.",
+        trade=trade,
+    )
+
+    Notification.objects.create(
+        draft=trade.draft,
+        team=trade.to_team,
+        type="trade_accepted",
+        message=f"Você aceitou a proposta de {trade.from_team.name}.",
+        trade=trade,
+    )
+
+    messages.success(request, "Trade aceita com sucesso.")
+    return redirect("notifications_view", draft_id=trade.draft.id)
+@login_required
+@require_POST
+def reject_trade(request, trade_id: int):
+    trade = get_object_or_404(
+        TradeProposal.objects.select_related("draft", "from_team", "to_team"),
+        id=trade_id,
+    )
+
+    my_team = Team.objects.filter(
+        league=trade.draft.league,
+        user=request.user,
+    ).first()
+
+    if not my_team or my_team.id != trade.to_team_id:
+        return HttpResponseForbidden("Você não pode rejeitar esta trade.")
+
+    if trade.status != "pending":
+        messages.error(request, "Essa proposta já foi respondida.")
+        return redirect("notifications_view", draft_id=trade.draft.id)
+
+    trade.status = "rejected"
+    trade.responded_at = timezone.now()
+    trade.save(update_fields=["status", "responded_at"])
+
+    Notification.objects.create(
+        draft=trade.draft,
+        team=trade.from_team,
+        type="trade_rejected",
+        message=f"Sua proposta para {trade.to_team.name} foi rejeitada.",
+        trade=trade,
+    )
+
+    Notification.objects.create(
+        draft=trade.draft,
+        team=trade.to_team,
+        type="trade_rejected",
+        message=f"Você rejeitou a proposta de {trade.from_team.name}.",
+        trade=trade,
+    )
+
+    messages.success(request, "Trade rejeitada.")
+    return redirect("notifications_view", draft_id=trade.draft.id)

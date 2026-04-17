@@ -1,0 +1,62 @@
+{% extends "league/base.html" %}
+{% block title %}Notificações{% endblock %}
+
+{% block content %}
+  <h1>Notificações</h1>
+
+  {% if notifications %}
+    <div style="display:grid; gap:12px;">
+      {% for n in notifications %}
+        <div style="border:1px solid #ddd; border-radius:8px; padding:12px; background:#fafafa;">
+          <div style="font-size:14px; color:#666; margin-bottom:6px;">
+            {{ n.created_at|date:"d/m/Y H:i" }}
+          </div>
+
+          <div style="margin-bottom:8px;">
+            <b>{{ n.message }}</b>
+          </div>
+
+          {% if n.trade and n.type == "trade_received" and n.trade.status == "pending" %}
+            <div style="margin-bottom:8px;">
+              <b>{{ n.trade.from_team.name }}</b> oferece:
+              <ul>
+                {% for item in n.trade.items.all %}
+                  {% if item.from_team_id == n.trade.from_team_id %}
+                    <li>{{ item.player.name }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+
+              <b>{{ n.trade.to_team.name }}</b> entrega:
+              <ul>
+                {% for item in n.trade.items.all %}
+                  {% if item.from_team_id == n.trade.to_team_id %}
+                    <li>{{ item.player.name }}</li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            </div>
+
+            <div style="display:flex; gap:8px;">
+              <form method="post" action="{% url 'accept_trade' n.trade.id %}">
+                {% csrf_token %}
+                <button type="submit" style="border:1px solid #198754; background:#198754; color:#fff; padding:8px 12px; border-radius:6px; cursor:pointer;">
+                  Aceitar
+                </button>
+              </form>
+
+              <form method="post" action="{% url 'reject_trade' n.trade.id %}">
+                {% csrf_token %}
+                <button type="submit" style="border:1px solid #dc3545; background:#dc3545; color:#fff; padding:8px 12px; border-radius:6px; cursor:pointer;">
+                  Rejeitar
+                </button>
+              </form>
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>Você não tem notificações.</p>
+  {% endif %}
+{% endblock %}
