@@ -1621,7 +1621,7 @@ def player_detail(request, player_id: int):
         avg=Avg("points"),
     )
 
-    return render(request, "player_detail.html", {
+    return render(request, "league/player_detail.html", {
         "player": player,
         "draft": draft,
         "scores": scores,
