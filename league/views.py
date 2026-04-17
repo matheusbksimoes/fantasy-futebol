@@ -355,7 +355,7 @@ def free_agents_list(request, team_id: int):
 
     draft = Draft.objects.order_by("-id").first()
     if not draft:
-        return render(request, "league/free_agents.html", {
+        return render(request, "free_agents.html", {
             "team": team,
             "draft": None,
             "week": None,
@@ -363,7 +363,7 @@ def free_agents_list(request, team_id: int):
             "active_tab": "free_agents",
             "faab_balance": 100,
             "pending_claims_count": {},
-            "pending_add_ids": set(),   # ✅ mantém compat com template antigo
+            "pending_add_ids": set(),
             "active_roster": [],
         })
 
@@ -374,15 +374,14 @@ def free_agents_list(request, team_id: int):
         .filter(dropped_at__isnull=True)
         .values_list("player_id", flat=True)
     )
+
     free_agents = Player.objects.exclude(id__in=active_player_ids).order_by("name")
 
-    # ✅ FAAB
     budget, _ = TeamBudget.objects.get_or_create(team=team)
     if budget.faab_balance is None:
         budget.faab_balance = 100
         budget.save(update_fields=["faab_balance"])
 
-    # ✅ contador de claims pendentes por jogador (do próprio time)
     pending_claims_count = {
         row["add_player_id"]: row["cnt"]
         for row in (
@@ -393,10 +392,8 @@ def free_agents_list(request, team_id: int):
         )
     }
 
-    # ✅ compat com template antigo (set)
     pending_add_ids = set(pending_claims_count.keys())
 
-    # ✅ Opções de drop: roster ativo do time
     active_roster = (
         RosterSpot.objects
         .filter(draft=draft, team=team, dropped_at__isnull=True)
@@ -404,7 +401,7 @@ def free_agents_list(request, team_id: int):
         .order_by("player__position", "player__name")
     )
 
-    return render(request, "league/free_agents.html", {
+    return render(request, "free_agents.html", {
         "team": team,
         "draft": draft,
         "week": week,
@@ -412,11 +409,10 @@ def free_agents_list(request, team_id: int):
         "active_tab": "free_agents",
         "faab_balance": budget.faab_balance or 0,
         "pending_claims_count": pending_claims_count,
-        "pending_add_ids": pending_add_ids,  # ✅ mantém compat
+        "pending_add_ids": pending_add_ids,
         "active_roster": active_roster,
     })
-
-
+    
 @login_required
 @require_POST
 def add_free_agent(request, team_id: int, player_id: int):
