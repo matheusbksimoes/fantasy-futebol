@@ -3,13 +3,12 @@ from types import SimpleNamespace
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
-from django.db import transaction, models, IntegrityError
-from django.db.models import Q
+from django.db import IntegrityError, models, transaction
+from django.db.models import Avg, Q, Sum
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
-from django.db.models import Sum, Avg
 
 from .models import (
     Draft,
@@ -32,8 +31,6 @@ from .models import (
 )
 
 from league.services.lock_service import player_locked
-
-
 # ============================================================
 # 🔒 Permissões: só dono do time (ou admin) pode mexer no time
 # ============================================================
