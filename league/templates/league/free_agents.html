@@ -35,7 +35,7 @@
 
     <input id="nameFilter" placeholder="Buscar jogador..." class="btn btn-secondary">
 
-    <select name="team" id="team">
+    <select name="team" id="team" class="btn btn-secondary">
     <option value="">Todos os times</option>
     <option value="Athletico-PR">Athletico-PR</option>
     <option value="Atlético-MG">Atlético-MG</option>
@@ -167,7 +167,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const positionFilter = document.getElementById("positionFilter");
   const nameFilter = document.getElementById("nameFilter");
-  const teamFilter = document.getElementById("teamFilter");
+  const teamFilter = document.getElementById("team");
   const clearFilters = document.getElementById("clearFilters");
 
   const cards = document.querySelectorAll("[data-player-row]");
