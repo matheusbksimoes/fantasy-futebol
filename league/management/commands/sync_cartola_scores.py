@@ -13,7 +13,6 @@ CARTOLA_BASE = "https://api.cartola.globo.com"
 
 
 def compute_team_points(week, team):
-    # Soma pontos dos jogadores escalados do time na semana (do jeito mais seguro)
     player_ids = (
         LineupSpot.objects
         .filter(lineup__week=week, lineup__team=team)
@@ -52,46 +51,107 @@ class Command(BaseCommand):
             help="Timeout HTTP em segundos",
         )
 
-    # -----------------------------
-    # Helpers
-    # -----------------------------
     def _get_json_or_none(self, url: str, timeout: int):
-        """
-        Retorna:
-          - dict (JSON) quando houver JSON válido
-          - None quando status 204 ou corpo vazio
-        Lança Exception com mensagem útil quando status inesperado ou resposta não-JSON.
-        """
         r = requests.get(url, timeout=timeout)
 
-        # 204: sem conteúdo -> não é erro (apenas nada a importar)
         if r.status_code == 204:
             return None
 
-        # Qualquer coisa diferente de 200/204 é erro
         if r.status_code != 200:
             snippet = (r.text or "")[:200].replace("\n", " ")
             raise Exception(f"HTTP {r.status_code} em {url}. Body: {snippet}")
 
-        # 200 mas sem corpo (raro) -> trate como None
         if not r.content or not (r.text or "").strip():
             return None
 
-        # Tenta parsear JSON com fallback de erro mais legível
         try:
             return r.json()
         except ValueError:
             snippet = (r.text or "")[:200].replace("\n", " ")
             raise Exception(f"Resposta 200 não-JSON em {url}. Body: {snippet}")
 
+    def _build_match_map(self, rodada: int, timeout: int):
+        """
+        Retorna um mapa por clube_id com:
+        {
+            clube_id: {
+                "opponent": "FLU",
+                "is_home": True,
+                "match_display": "SAN x FLU",
+            }
+        }
+        """
+        try:
+            partidas_payload = self._get_json_or_none(
+                f"{CARTOLA_BASE}/partidas/{rodada}",
+                timeout=timeout,
+            )
+        except Exception as e:
+            self.stdout.write(
+                self.style.WARNING(f"Não foi possível buscar partidas da rodada {rodada}: {e}")
+            )
+            return {}
+
+        if not partidas_payload:
+            self.stdout.write(
+                self.style.WARNING(f"partidas/{rodada} retornou vazio; confronto real não será salvo.")
+            )
+            return {}
+
+        partidas = partidas_payload.get("partidas") or []
+        clubes = partidas_payload.get("clubes") or {}
+
+        if not partidas or not clubes:
+            self.stdout.write(
+                self.style.WARNING(f"Payload de partidas/{rodada} sem dados suficientes.")
+            )
+            return {}
+
+        clubes_map = {}
+        for clube_id, clube_data in clubes.items():
+            try:
+                clubes_map[int(clube_id)] = clube_data
+            except (TypeError, ValueError):
+                continue
+
+        match_map = {}
+
+        for partida in partidas:
+            casa_id = partida.get("clube_casa_id")
+            fora_id = partida.get("clube_visitante_id")
+
+            if not casa_id or not fora_id:
+                continue
+
+            casa = clubes_map.get(casa_id, {})
+            fora = clubes_map.get(fora_id, {})
+
+            casa_abv = casa.get("abreviacao") or casa.get("nome") or str(casa_id)
+            fora_abv = fora.get("abreviacao") or fora.get("nome") or str(fora_id)
+
+            match_display = f"{casa_abv} x {fora_abv}"
+
+            match_map[casa_id] = {
+                "opponent": fora_abv,
+                "is_home": True,
+                "match_display": match_display,
+            }
+            match_map[fora_id] = {
+                "opponent": casa_abv,
+                "is_home": False,
+                "match_display": match_display,
+            }
+
+        self.stdout.write(
+            self.style.SUCCESS(f"Mapa de confrontos montado para {len(match_map)} clubes na rodada {rodada}.")
+        )
+        return match_map
+
     def handle(self, *args, **options):
         draft_id = options["draft_id"]
         week_number = options["week"]
         timeout = options["timeout"]
 
-        # -----------------------------
-        # Draft
-        # -----------------------------
         draft = (
             Draft.objects.filter(id=draft_id).first()
             if draft_id
@@ -102,9 +162,6 @@ class Command(BaseCommand):
             self.stderr.write(self.style.ERROR("Nenhum draft encontrado."))
             return
 
-        # -----------------------------
-        # Week
-        # -----------------------------
         if week_number:
             week = Week.objects.filter(draft=draft, number=week_number).first()
         else:
@@ -118,9 +175,6 @@ class Command(BaseCommand):
             )
             return
 
-        # -----------------------------
-        # Status do mercado
-        # -----------------------------
         try:
             status = self._get_json_or_none(
                 f"{CARTOLA_BASE}/mercado/status",
@@ -143,7 +197,6 @@ class Command(BaseCommand):
             )
         )
 
-        # ✅ REGRA DO CRON: só executa se a rodada do Cartola bater com a Week do app
         if rodada_atual and week.number != rodada_atual:
             self.stdout.write(
                 self.style.WARNING(
@@ -152,9 +205,9 @@ class Command(BaseCommand):
             )
             return
 
-        # -----------------------------
-        # Pontuações dos atletas
-        # -----------------------------
+        # 🔥 NOVO: mapa de confrontos da rodada
+        match_map = self._build_match_map(week.number, timeout=timeout)
+
         try:
             payload = self._get_json_or_none(
                 f"{CARTOLA_BASE}/atletas/pontuados",
@@ -164,7 +217,6 @@ class Command(BaseCommand):
             self.stderr.write(self.style.ERROR(f"Erro ao buscar atletas/pontuados: {e}"))
             return
 
-        # 204 (ou corpo vazio): nada a importar agora
         if payload is None:
             self.stdout.write(
                 self.style.WARNING(
@@ -187,18 +239,15 @@ class Command(BaseCommand):
             self.style.SUCCESS(f"Cartola retornou {len(atletas)} atletas pontuados.")
         )
 
-        # -----------------------------
-        # Jogadores do seu banco
-        # -----------------------------
-        # ✅ FIX: cartola_id é IntegerField -> NÃO comparar com string vazia.
         players = Player.objects.exclude(cartola_id__isnull=True)
 
-        # (opcional) pra depurar rapidamente se o mapping está batendo:
         try:
             sample_atleta_id = next(iter(atletas.keys()))
-            sample_points = (atletas.get(sample_atleta_id) or {}).get("pontuacao")
+            sample_data = atletas.get(sample_atleta_id) or {}
+            sample_points = sample_data.get("pontuacao")
+            sample_clube_id = sample_data.get("clube_id")
             self.stdout.write(
-                f"Amostra retorno: atleta_id={sample_atleta_id} pontuacao={sample_points}"
+                f"Amostra retorno: atleta_id={sample_atleta_id} clube_id={sample_clube_id} pontuacao={sample_points}"
             )
         except StopIteration:
             pass
@@ -206,7 +255,6 @@ class Command(BaseCommand):
         upserts = 0
         missing = 0
 
-        # Para performance e para não sofrer com dados ruins, mapeia por cartola_id
         players_by_cartola_id = {
             str(p.cartola_id): p for p in players if p.cartola_id is not None
         }
@@ -221,6 +269,9 @@ class Command(BaseCommand):
                 points = (data or {}).get("pontuacao", 0) or 0
                 scouts = (data or {}).get("scout", {}) or {}
 
+                clube_id = (data or {}).get("clube_id")
+                confronto = match_map.get(clube_id, {})
+
                 PlayerWeekScore.objects.update_or_create(
                     week=week,
                     player=player,
@@ -229,6 +280,9 @@ class Command(BaseCommand):
                         "scouts": scouts,
                         "source": "CARTOLA",
                         "fetched_at": timezone.now(),
+                        "opponent": confronto.get("opponent", ""),
+                        "is_home": confronto.get("is_home"),
+                        "match_display": confronto.get("match_display", ""),
                     },
                 )
                 upserts += 1
@@ -239,9 +293,6 @@ class Command(BaseCommand):
             )
         )
 
-        # -----------------------------
-        # Atualizar placar dos matchups da Week
-        # -----------------------------
         matchups = Matchup.objects.filter(week=week).select_related("home_team", "away_team")
 
         updated_matchups = 0
@@ -249,7 +300,6 @@ class Command(BaseCommand):
             home_pts = compute_team_points(week, m.home_team)
             away_pts = compute_team_points(week, m.away_team)
 
-            # Só salva se mudou
             if m.home_score != home_pts or m.away_score != away_pts:
                 m.home_score = home_pts
                 m.away_score = away_pts
