@@ -12,13 +12,221 @@
 
 {% block content %}
 
-<div class="card" style="margin-bottom: 24px;">
-  <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+<style>
+  .matchup-score-card {
+    margin-bottom: 24px;
+  }
+
+  .matchup-score-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .matchup-side {
+    flex: 1;
+    min-width: 220px;
+  }
+
+  .matchup-side.matchup-side--away {
+    text-align: right;
+  }
+
+  .matchup-team-name {
+    font-size: 24px;
+    font-weight: 800;
+  }
+
+  .matchup-score-center {
+    text-align: center;
+    min-width: 240px;
+  }
+
+  .matchup-score-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 8px;
+  }
+
+  .matchup-score-number {
+    font-size: 36px;
+    font-weight: 900;
+  }
+
+  .matchup-score-x {
+    font-size: 18px;
+    color: var(--text-muted);
+    font-weight: 700;
+  }
+
+  .matchup-advantage-bar {
+    margin-top: 12px;
+    height: 8px;
+    background: #1e293b;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .matchup-advantage-fill {
+    height: 100%;
+    background: #22c55e;
+  }
+
+  .matchup-leader-text {
+    margin-top: 8px;
+  }
+
+  .matchup-team-card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .matchup-lineup-list {
+    display: grid;
+    gap: 10px;
+  }
+
+  .matchup-slot-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid rgba(51, 65, 85, 0.85);
+    border-radius: 14px;
+    background: rgba(15, 23, 42, 0.55);
+  }
+
+  .matchup-slot-meta {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .matchup-slot-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .matchup-slot-player {
+    margin-top: 4px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .matchup-slot-points {
+    font-size: 18px;
+    font-weight: 800;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 768px) {
+    .matchup-score-card {
+      margin-bottom: 16px;
+    }
+
+    .matchup-score-top {
+      gap: 10px;
+    }
+
+    .matchup-side,
+    .matchup-score-center {
+      min-width: 100%;
+      text-align: left;
+    }
+
+    .matchup-side.matchup-side--away {
+      text-align: left;
+    }
+
+    .matchup-team-name {
+      font-size: 18px;
+      line-height: 1.15;
+    }
+
+    .matchup-score-center {
+      padding-top: 4px;
+      padding-bottom: 4px;
+    }
+
+    .matchup-score-row {
+      justify-content: flex-start;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .matchup-score-number {
+      font-size: 24px;
+    }
+
+    .matchup-score-x {
+      font-size: 14px;
+    }
+
+    .matchup-advantage-bar {
+      margin-top: 8px;
+      height: 6px;
+    }
+
+    .matchup-leader-text {
+      margin-top: 6px;
+    }
+
+    .matchup-team-card .section-header {
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .matchup-team-card .section-title {
+      font-size: 16px;
+      line-height: 1.15;
+    }
+
+    .matchup-team-card .badge {
+      font-size: 12px;
+      padding: 6px 10px;
+    }
+
+    .matchup-lineup-list {
+      gap: 8px;
+    }
+
+    .matchup-slot-card {
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+    }
+
+    .matchup-slot-label {
+      font-size: 11px;
+      line-height: 1.1;
+    }
+
+    .matchup-slot-player {
+      margin-top: 3px;
+      font-size: 14px;
+      line-height: 1.15;
+    }
+
+    .matchup-slot-points {
+      font-size: 16px;
+    }
+  }
+</style>
+
+<div class="card matchup-score-card">
+  <div class="matchup-score-top">
 
     <!-- HOME -->
-    <div style="flex:1; min-width:220px;">
+    <div class="matchup-side">
       <div class="section-subtitle">Mandante</div>
-      <div style="font-size:24px; font-weight:800;">{{ home_team.name }}</div>
+      <div class="matchup-team-name">{{ home_team.name }}</div>
 
       {% if home_total > away_total %}
         <div class="badge badge-success" style="margin-top:6px;">Liderando</div>
@@ -26,36 +234,33 @@
     </div>
 
     <!-- SCORE -->
-    <div style="text-align:center; min-width:240px;">
+    <div class="matchup-score-center">
       <div class="section-subtitle">Placar da semana</div>
 
-      <div style="display:flex; align-items:center; justify-content:center; gap:18px; margin-top:8px;">
-        <div style="font-size:36px; font-weight:900; {% if home_total > away_total %}color:#22c55e;{% endif %}">
+      <div class="matchup-score-row">
+        <div class="matchup-score-number" {% if home_total > away_total %}style="color:#22c55e;"{% endif %}>
           {{ home_total|floatformat:2 }}
         </div>
 
-        <div style="font-size:18px; color: var(--text-muted); font-weight:700;">x</div>
+        <div class="matchup-score-x">x</div>
 
-        <div style="font-size:36px; font-weight:900; {% if away_total > home_total %}color:#22c55e;{% endif %}">
+        <div class="matchup-score-number" {% if away_total > home_total %}style="color:#22c55e;"{% endif %}>
           {{ away_total|floatformat:2 }}
         </div>
       </div>
 
-      <!-- BARRA DE VANTAGEM -->
       {% if home_total != away_total %}
-        <div style="margin-top:12px; height:8px; background:#1e293b; border-radius:999px; overflow:hidden;">
+        <div class="matchup-advantage-bar">
           {% with total=home_total|add:away_total %}
-            <div style="
-              height:100%;
-              width:{% widthratio home_total total 100 %}%;
-              background:#22c55e;
-            "></div>
+            <div
+              class="matchup-advantage-fill"
+              style="width:{% widthratio home_total total 100 %}%;">
+            </div>
           {% endwith %}
         </div>
       {% endif %}
 
-      <!-- TEXTO DE LIDERANÇA -->
-      <div style="margin-top:8px;">
+      <div class="matchup-leader-text">
         {% if home_total > away_total %}
           <span class="badge badge-success">{{ home_team.name }} lidera</span>
         {% elif away_total > home_total %}
@@ -67,9 +272,9 @@
     </div>
 
     <!-- AWAY -->
-    <div style="flex:1; min-width:220px; text-align:right;">
+    <div class="matchup-side matchup-side--away">
       <div class="section-subtitle">Visitante</div>
-      <div style="font-size:24px; font-weight:800;">{{ away_team.name }}</div>
+      <div class="matchup-team-name">{{ away_team.name }}</div>
 
       {% if away_total > home_total %}
         <div class="badge badge-success" style="margin-top:6px;">Liderando</div>
@@ -82,7 +287,7 @@
 <div class="grid grid--2">
 
   <!-- HOME TEAM -->
-  <div class="card">
+  <div class="card matchup-team-card">
     <div class="section-header">
       <div>
         <h2 class="section-title">{{ home_team.name }}</h2>
@@ -94,29 +299,20 @@
       </span>
     </div>
 
-    <div style="display:grid; gap:10px;">
+    <div class="matchup-lineup-list">
       {% for spot in home_spots %}
-        <div style="
-          display:flex;
-          justify-content:space-between;
-          align-items:center;
-          gap:12px;
-          padding:12px 14px;
-          border:1px solid rgba(51, 65, 85, 0.85);
-          border-radius:14px;
-          background: rgba(15, 23, 42, 0.55);
-        ">
-          <div>
-            <div style="font-size:12px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">
+        <div class="matchup-slot-card">
+          <div class="matchup-slot-meta">
+            <div class="matchup-slot-label">
               {{ spot.get_slot_type_display }} {{ spot.slot_index }}
             </div>
 
-            <div style="margin-top:4px; font-weight:700;">
+            <div class="matchup-slot-player">
               {{ spot.player.name|default:"—" }}
             </div>
           </div>
 
-          <div style="font-size:18px; font-weight:800;">
+          <div class="matchup-slot-points">
             {% if spot.player %}
               {{ home_points_map|get_item:spot.player_id|default:0|floatformat:2 }}
             {% else %}
@@ -129,7 +325,7 @@
   </div>
 
   <!-- AWAY TEAM -->
-  <div class="card">
+  <div class="card matchup-team-card">
     <div class="section-header">
       <div>
         <h2 class="section-title">{{ away_team.name }}</h2>
@@ -141,29 +337,20 @@
       </span>
     </div>
 
-    <div style="display:grid; gap:10px;">
+    <div class="matchup-lineup-list">
       {% for spot in away_spots %}
-        <div style="
-          display:flex;
-          justify-content:space-between;
-          align-items:center;
-          gap:12px;
-          padding:12px 14px;
-          border:1px solid rgba(51, 65, 85, 0.85);
-          border-radius:14px;
-          background: rgba(15, 23, 42, 0.55);
-        ">
-          <div>
-            <div style="font-size:12px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">
+        <div class="matchup-slot-card">
+          <div class="matchup-slot-meta">
+            <div class="matchup-slot-label">
               {{ spot.get_slot_type_display }} {{ spot.slot_index }}
             </div>
 
-            <div style="margin-top:4px; font-weight:700;">
+            <div class="matchup-slot-player">
               {{ spot.player.name|default:"—" }}
             </div>
           </div>
 
-          <div style="font-size:18px; font-weight:800;">
+          <div class="matchup-slot-points">
             {% if spot.player %}
               {{ away_points_map|get_item:spot.player_id|default:0|floatformat:2 }}
             {% else %}
