@@ -19,6 +19,13 @@ urlpatterns = [
         name="team_roster_legacy",
     ),
 
+    # 🔥 NOVA ROTA (drag and drop)
+    path(
+        "draft/<int:draft_id>/team/<int:team_id>/reorder-roster/",
+        views.reorder_roster,
+        name="reorder_roster",
+    ),
+
     # geral
     path(
         "draft/<int:draft_id>/transactions/",
@@ -127,10 +134,11 @@ urlpatterns = [
         views.reject_trade,
         name="reject_trade",
     ),
-    path("players/<int:player_id>/", views.player_detail, name="player_detail")
+
+    # player detail
     path(
-    "draft/<int:draft_id>/team/<int:team_id>/reorder-roster/",
-    views.reorder_roster,
-    name="reorder_roster",
-),
+        "players/<int:player_id>/",
+        views.player_detail,
+        name="player_detail",
+    ),
 ]
