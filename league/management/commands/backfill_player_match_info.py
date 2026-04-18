@@ -26,18 +26,43 @@ def normalize_team_name(name: str) -> str:
         .replace("õ", "o")
         .replace("ú", "u")
         .replace("ç", "c")
+        .replace("-", " ")
         .strip()
     )
 
     aliases = {
-        "athletico-pr": "athletico-pr",
-        "atletico-pr": "athletico-pr",
+        "atletico mg": "atletico mineiro",
+        "atletico-mg": "atletico mineiro",
+        "clube atletico mineiro": "atletico mineiro",
+
+        "athletico pr": "athletico paranaense",
+        "atletico pr": "athletico paranaense",
+        "athletico-pr": "athletico paranaense",
+
         "vasco": "vasco da gama",
+        "vasco da gama": "vasco da gama",
+
         "vitoria": "ec vitoria",
+        "ec vitoria": "ec vitoria",
+
         "bragantino": "red bull bragantino",
-        "atletico-mg": "atletico-mg",
-        "sao paulo": "sao paulo",
+        "red bull bragantino": "red bull bragantino",
+
         "gremio": "gremio",
+        "sao paulo": "sao paulo",
+        "corinthians": "corinthians",
+        "internacional": "internacional",
+        "flamengo": "flamengo",
+        "fluminense": "fluminense",
+        "bahia": "bahia",
+        "santos": "santos",
+        "palmeiras": "palmeiras",
+        "cruzeiro": "cruzeiro",
+        "coritiba": "coritiba",
+        "remo": "remo",
+        "chapecoense": "chapecoense",
+        "mirassol": "mirassol",
+        "botafogo": "botafogo",
     }
 
     return aliases.get(value, value)

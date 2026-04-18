@@ -126,8 +126,8 @@ class Command(BaseCommand):
             casa = clubes_map.get(casa_id, {})
             fora = clubes_map.get(fora_id, {})
 
-            casa_abv = casa.get("abreviacao") or casa.get("nome") or str(casa_id)
-            fora_abv = fora.get("abreviacao") or fora.get("nome") or str(fora_id)
+            casa_abv = casa.get("abreviacao") or casa.get("nome_fantasia") or casa.get("nome") or str(casa_id)
+            fora_abv = fora.get("abreviacao") or fora.get("nome_fantasia") or fora.get("nome") or str(fora_id)
 
             match_display = f"{casa_abv} x {fora_abv}"
 
@@ -205,7 +205,6 @@ class Command(BaseCommand):
             )
             return
 
-        # 🔥 NOVO: mapa de confrontos da rodada
         match_map = self._build_match_map(week.number, timeout=timeout)
 
         try:
@@ -254,6 +253,7 @@ class Command(BaseCommand):
 
         upserts = 0
         missing = 0
+        club_updates = 0
 
         players_by_cartola_id = {
             str(p.cartola_id): p for p in players if p.cartola_id is not None
@@ -272,6 +272,12 @@ class Command(BaseCommand):
                 clube_id = (data or {}).get("clube_id")
                 confronto = match_map.get(clube_id, {})
 
+                # 🔥 NOVO: salva o clube do Cartola no Player
+                if clube_id and player.cartola_club_id != clube_id:
+                    player.cartola_club_id = clube_id
+                    player.save(update_fields=["cartola_club_id"])
+                    club_updates += 1
+
                 PlayerWeekScore.objects.update_or_create(
                     week=week,
                     player=player,
@@ -289,7 +295,9 @@ class Command(BaseCommand):
 
         self.stdout.write(
             self.style.SUCCESS(
-                f"Sincronização concluída: {upserts} upserts | {missing} atletas no payload sem player correspondente no banco"
+                f"Sincronização concluída: {upserts} upserts | "
+                f"{club_updates} players com cartola_club_id atualizado | "
+                f"{missing} atletas no payload sem player correspondente no banco"
             )
         )
 

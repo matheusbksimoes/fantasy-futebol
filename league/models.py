@@ -44,6 +44,7 @@ class Player(models.Model):
 
     # Cartola ID único quando existe (NULL pode repetir no Postgres; isso é OK).
     cartola_id = models.IntegerField(unique=True, null=True, blank=True)
+    cartola_club_id = models.IntegerField(null=True, blank=True)
 
     name = models.CharField(max_length=100)
     position = models.CharField(max_length=3, choices=POSITION_CHOICES)
