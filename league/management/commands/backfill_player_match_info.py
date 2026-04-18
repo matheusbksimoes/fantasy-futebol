@@ -8,66 +8,6 @@ from league.models import Draft, Week, PlayerWeekScore
 CARTOLA_BASE = "https://api.cartola.globo.com"
 
 
-def normalize_team_name(name: str) -> str:
-    if not name:
-        return ""
-
-    value = (
-        name.lower()
-        .replace("á", "a")
-        .replace("à", "a")
-        .replace("â", "a")
-        .replace("ã", "a")
-        .replace("é", "e")
-        .replace("ê", "e")
-        .replace("í", "i")
-        .replace("ó", "o")
-        .replace("ô", "o")
-        .replace("õ", "o")
-        .replace("ú", "u")
-        .replace("ç", "c")
-        .replace("-", " ")
-        .strip()
-    )
-
-    aliases = {
-        "atletico mg": "atletico mineiro",
-        "atletico-mg": "atletico mineiro",
-        "clube atletico mineiro": "atletico mineiro",
-
-        "athletico pr": "athletico paranaense",
-        "atletico pr": "athletico paranaense",
-        "athletico-pr": "athletico paranaense",
-
-        "vasco": "vasco da gama",
-        "vasco da gama": "vasco da gama",
-
-        "vitoria": "ec vitoria",
-        "ec vitoria": "ec vitoria",
-
-        "bragantino": "red bull bragantino",
-        "red bull bragantino": "red bull bragantino",
-
-        "gremio": "gremio",
-        "sao paulo": "sao paulo",
-        "corinthians": "corinthians",
-        "internacional": "internacional",
-        "flamengo": "flamengo",
-        "fluminense": "fluminense",
-        "bahia": "bahia",
-        "santos": "santos",
-        "palmeiras": "palmeiras",
-        "cruzeiro": "cruzeiro",
-        "coritiba": "coritiba",
-        "remo": "remo",
-        "chapecoense": "chapecoense",
-        "mirassol": "mirassol",
-        "botafogo": "botafogo",
-    }
-
-    return aliases.get(value, value)
-
-
 class Command(BaseCommand):
     help = "Preenche confronto real e mando em PlayerWeekScore já existentes."
 
@@ -109,7 +49,7 @@ class Command(BaseCommand):
             except (ValueError, TypeError):
                 continue
 
-        by_team_name = {}
+        match_map = {}
 
         for partida in partidas:
             casa_id = partida.get("clube_casa_id")
@@ -121,26 +61,24 @@ class Command(BaseCommand):
             casa = clubes_map.get(casa_id, {})
             fora = clubes_map.get(fora_id, {})
 
-            casa_nome = casa.get("nome") or ""
-            fora_nome = fora.get("nome") or ""
-
-            casa_abv = casa.get("abreviacao") or casa_nome
-            fora_abv = fora.get("abreviacao") or fora_nome
+            casa_abv = casa.get("abreviacao") or casa.get("nome_fantasia") or casa.get("nome")
+            fora_abv = fora.get("abreviacao") or fora.get("nome_fantasia") or fora.get("nome")
 
             match_display = f"{casa_abv} x {fora_abv}"
 
-            by_team_name[normalize_team_name(casa_nome)] = {
+            match_map[casa_id] = {
                 "opponent": fora_abv,
                 "is_home": True,
                 "match_display": match_display,
             }
-            by_team_name[normalize_team_name(fora_nome)] = {
+
+            match_map[fora_id] = {
                 "opponent": casa_abv,
                 "is_home": False,
                 "match_display": match_display,
             }
 
-        return by_team_name
+        return match_map
 
     def handle(self, *args, **options):
         draft_id = options["draft_id"]
@@ -185,8 +123,13 @@ class Command(BaseCommand):
 
             with transaction.atomic():
                 for score in scores:
-                    team_key = normalize_team_name(score.player.real_team)
-                    info = match_map.get(team_key)
+                    # 🔥 AGORA USA ID DO CLUBE (CORRETO)
+                    clube_id = score.player.cartola_club_id
+
+                    if not clube_id:
+                        continue
+
+                    info = match_map.get(clube_id)
 
                     if not info:
                         continue
@@ -210,6 +153,7 @@ class Command(BaseCommand):
                         updated_week += 1
 
             updated_total += updated_week
+
             self.stdout.write(
                 self.style.SUCCESS(
                     f"Rodada {week.number}: {updated_week} PlayerWeekScore atualizados."
