@@ -1,119 +1,142 @@
 {% extends "league/base.html" %}
 {% block title %}Transações{% endblock %}
 
+{% block page_title %}
+  Transações
+{% endblock %}
+
+{% block page_subtitle %}
+  Draft #{{ draft.id }} • histórico da liga
+{% endblock %}
+
 {% block content %}
-  <h1>Atividades — Draft {{ draft.id }}</h1>
 
-  {# ===========================
-     ✅ WAIVERS AGRUPADOS POR JOGADOR
-     =========================== #}
-  <h2 style="margin-top:18px;">Resultados de Waiver (por jogador)</h2>
-
-  {% if waiver_groups %}
-    {% for g in waiver_groups %}
-      <div style="margin:12px 0; border:1px solid #ddd; border-radius:8px; overflow:hidden;">
-        <div style="padding:10px 12px; background:#f7f7f7;">
-          <b>{{ g.player.name }}</b>
-        </div>
-
-        <table style="border-collapse:collapse; width:100%;">
-          <thead>
-            <tr>
-              <th style="border-top:1px solid #ddd; border-bottom:1px solid #ddd; padding:8px; background:#fff;">Time</th>
-              <th style="border-top:1px solid #ddd; border-bottom:1px solid #ddd; padding:8px; background:#fff;">Status</th>
-              <th style="border-top:1px solid #ddd; border-bottom:1px solid #ddd; padding:8px; background:#fff;">Bid</th>
-              <th style="border-top:1px solid #ddd; border-bottom:1px solid #ddd; padding:8px; background:#fff;">Drop</th>
-              <th style="border-top:1px solid #ddd; border-bottom:1px solid #ddd; padding:8px; background:#fff;">Detalhe</th>
-              <th style="border-top:1px solid #ddd; border-bottom:1px solid #ddd; padding:8px; background:#fff;">Data</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for r in g.rows %}
-              <tr>
-                <td style="border-bottom:1px solid #eee; padding:8px;"><b>{{ r.team.name }}</b></td>
-
-                <td style="border-bottom:1px solid #eee; padding:8px;">
-                  {% if r.status == "WON" %}
-                    <span style="padding:2px 8px; border-radius:999px; background:#e8f7ee; border:1px solid #bfe7cc;">WON</span>
-                  {% elif r.status == "LOST" %}
-                    <span style="padding:2px 8px; border-radius:999px; background:#f4f4f4; border:1px solid #ddd;">LOST</span>
-                  {% elif r.status == "INVALID" %}
-                    <span style="padding:2px 8px; border-radius:999px; background:#ffecec; border:1px solid #f5bcbc;">INVALID</span>
-                  {% elif r.status == "CANCELLED" %}
-                    <span style="padding:2px 8px; border-radius:999px; background:#fff6e6; border:1px solid #f0d2a6;">CANCELLED</span>
-                  {% else %}
-                    {{ r.status }}
-                  {% endif %}
-                </td>
-
-                <td style="border-bottom:1px solid #eee; padding:8px;">
-                  <b>${{ r.bid }}</b>
-                </td>
-
-                <td style="border-bottom:1px solid #eee; padding:8px;">
-                  {% if r.drop_player %}
-                    {{ r.drop_player.name }}
-                  {% else %}
-                    —
-                  {% endif %}
-                </td>
-
-                <td style="border-bottom:1px solid #eee; padding:8px;">
-                  {% if r.invalid_reason %}
-                    <span style="color:#b00;">{{ r.invalid_reason }}</span>
-                  {% else %}
-                    —
-                  {% endif %}
-                </td>
-
-                <td style="border-bottom:1px solid #eee; padding:8px;">
-                  {{ r.when|date:"d/m/Y H:i" }}
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    {% endfor %}
-  {% else %}
-    <p style="color:#666;">Nenhum waiver processado ainda.</p>
-  {% endif %}
-
-  {# ===========================
-     ✅ OUTRAS TRANSAÇÕES (CRONOLÓGICO)
-     =========================== #}
-  <h2 style="margin-top:22px;">Outras transações (cronológico)</h2>
+<!-- ===========================
+     TRANSAÇÕES GERAIS
+=========================== -->
+<div class="card" style="margin-bottom: 24px;">
+  <div class="section-header">
+    <div>
+      <h2 class="section-title">Outras transações</h2>
+      <div class="section-subtitle">Ordem cronológica</div>
+    </div>
+  </div>
 
   {% if transactions %}
-    <table style="border-collapse:collapse; width:100%;">
-      <thead>
-        <tr>
-          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Data</th>
-          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Time</th>
-          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Ação</th>
-          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Jogador</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for t in transactions %}
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
           <tr>
-            <td style="border:1px solid #ddd; padding:8px;">
-              {{ t.created_at|date:"d/m/Y H:i" }}
-            </td>
-            <td style="border:1px solid #ddd; padding:8px;">
-              <b>{{ t.team.name }}</b>
-            </td>
-            <td style="border:1px solid #ddd; padding:8px;">
-              {{ t.get_type_display }}
-            </td>
-            <td style="border:1px solid #ddd; padding:8px;">
-              {{ t.player.name }}
-            </td>
+            <th>Data</th>
+            <th>Time</th>
+            <th>Ação</th>
+            <th>Jogador</th>
           </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+        </thead>
+
+        <tbody>
+          {% for t in transactions %}
+            <tr>
+              <td>{{ t.created_at|date:"d/m/Y H:i" }}</td>
+              <td><b>{{ t.team.name }}</b></td>
+              <td>{{ t.get_type_display }}</td>
+              <td>{{ t.player.name }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   {% else %}
-    <p>Nenhuma atividade registrada ainda.</p>
+    <div class="empty-state">
+      Nenhuma atividade registrada ainda.
+    </div>
   {% endif %}
+</div>
+
+<!-- ===========================
+     WAIVERS AGRUPADOS
+=========================== -->
+<div class="card">
+  <div class="section-header">
+    <div>
+      <h2 class="section-title">Resultados de Waiver</h2>
+      <div class="section-subtitle">Agrupado por jogador</div>
+    </div>
+  </div>
+
+  {% if waiver_groups %}
+    <div class="grid" style="gap:16px;">
+      {% for g in waiver_groups %}
+        <div class="card" style="background: rgba(15,23,42,0.6);">
+          <div style="font-weight:800; font-size:16px; margin-bottom:10px;">
+            {{ g.player.name }}
+          </div>
+
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Status</th>
+                  <th>Bid</th>
+                  <th>Drop</th>
+                  <th>Detalhe</th>
+                  <th>Data</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for r in g.rows %}
+                  <tr>
+                    <td><b>{{ r.team.name }}</b></td>
+
+                    <td>
+                      {% if r.status == "WON" %}
+                        <span class="badge badge-success">WON</span>
+                      {% elif r.status == "LOST" %}
+                        <span class="badge badge-info">LOST</span>
+                      {% elif r.status == "INVALID" %}
+                        <span class="badge badge-danger">INVALID</span>
+                      {% elif r.status == "CANCELLED" %}
+                        <span class="badge badge-warning">CANCELLED</span>
+                      {% else %}
+                        {{ r.status }}
+                      {% endif %}
+                    </td>
+
+                    <td><b>${{ r.bid }}</b></td>
+
+                    <td>
+                      {% if r.drop_player %}
+                        {{ r.drop_player.name }}
+                      {% else %}
+                        —
+                      {% endif %}
+                    </td>
+
+                    <td>
+                      {% if r.invalid_reason %}
+                        <span class="badge badge-danger">
+                          {{ r.invalid_reason }}
+                        </span>
+                      {% else %}
+                        —
+                      {% endif %}
+                    </td>
+
+                    <td>{{ r.when|date:"d/m/Y H:i" }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      Nenhum waiver processado ainda.
+    </div>
+  {% endif %}
+</div>
+
 {% endblock %}
