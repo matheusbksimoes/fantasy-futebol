@@ -1878,7 +1878,7 @@ def delete_notification(request, notification_id: int):
     if request.method == "POST":
         notification.delete()
 
-    return redirect("notifications")
+    return redirect(request.META.get("HTTP_REFERER", "/"))
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
@@ -1895,7 +1895,7 @@ def delete_notification(request, notification_id: int):
         if not (notification.trade and notification.type == "trade_received" and notification.trade.status == "pending"):
             notification.delete()
 
-    return redirect("notifications")
+    return redirect(request.META.get("HTTP_REFERER", "/"))
 
 
 from django.utils import timezone
@@ -1914,7 +1914,7 @@ def clear_old_notifications(request):
             type="trade_received",
         ).delete()
 
-    return redirect("notifications")
+    return redirect(request.META.get("HTTP_REFERER", "/"))
 
 
 @login_required
@@ -1925,4 +1925,4 @@ def clear_all_notifications(request):
             type="trade_received",
         ).delete()
 
-    return redirect("notifications")
+    return redirect(request.META.get("HTTP_REFERER", "/"))
