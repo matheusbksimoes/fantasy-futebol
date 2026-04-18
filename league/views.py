@@ -295,26 +295,36 @@ def team_roster(request, draft_id: int, team_id: int):
         .order_by("player__position", "player__name")
     )
 
-    # time do usuário logado nesta liga
     my_team = Team.objects.filter(
-    league=draft.league,
-    user=request.user,
-).first()
+        league=draft.league,
+        user=request.user,
+    ).first()
 
-    # só pode gerenciar se o roster visualizado for exatamente o próprio
     can_manage_team = bool(my_team and my_team.id == viewed_team.id)
 
     my_matchup = get_team_matchup_for_week(week, my_team) if week and my_team else None
 
+    player_stats = {
+        spot.player.id: PlayerWeekScore.objects.filter(
+            player=spot.player,
+            week__draft=draft,
+        ).aggregate(
+            total=Sum("points"),
+            avg=Avg("points"),
+        )
+        for spot in roster_spots
+    }
+
     return render(request, "league/team_roster.html", {
-        "team": viewed_team,   # time que está sendo visualizado
-        "my_team": my_team,    # time do usuário logado
+        "team": viewed_team,
+        "my_team": my_team,
         "draft": draft,
         "week": week,
         "roster_spots": roster_spots,
         "active_tab": "roster",
         "can_manage_team": can_manage_team,
         "my_matchup": my_matchup,
+        "player_stats": player_stats,
     })
 
 @login_required
