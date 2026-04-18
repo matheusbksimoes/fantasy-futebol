@@ -11,6 +11,90 @@
 
 {% block content %}
 
+<style>
+  .transactions-mobile {
+    display: none;
+  }
+
+  .transaction-card {
+    background: rgba(15, 23, 42, 0.72);
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+
+  .transaction-line-1,
+  .transaction-line-2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .transaction-line-1 {
+    margin-bottom: 3px;
+  }
+
+  .transaction-team {
+    font-weight: 800;
+    color: #f8fafc;
+    min-width: 0;
+  }
+
+  .transaction-player {
+    color: #cbd5e1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .transaction-date {
+    font-size: 12px;
+    color: #94a3b8;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .transaction-action {
+    font-size: 12px;
+    font-weight: 800;
+    padding: 4px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .transaction-action.add {
+    color: #22c55e;
+    background: rgba(34, 197, 94, 0.12);
+    border: 1px solid rgba(34, 197, 94, 0.25);
+  }
+
+  .transaction-action.drop {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+  }
+
+  .transaction-action.default {
+    color: #e2e8f0;
+    background: rgba(148, 163, 184, 0.12);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+  }
+
+  @media (max-width: 768px) {
+    .transactions-desktop {
+      display: none;
+    }
+
+    .transactions-mobile {
+      display: block;
+    }
+  }
+</style>
+
 <!-- ===========================
      TRANSAÇÕES GERAIS
 =========================== -->
@@ -23,7 +107,9 @@
   </div>
 
   {% if transactions %}
-    <div class="table-wrap">
+
+    <!-- Desktop -->
+    <div class="table-wrap transactions-desktop">
       <table class="table">
         <thead>
           <tr>
@@ -37,7 +123,7 @@
         <tbody>
           {% for t in transactions %}
             <tr>
-              <td>{{ t.created_at|date:"d/m/Y H:i" }}</td>
+              <td>{{ t.created_at|date:"d/m/Y" }}</td>
               <td><b>{{ t.team.name }}</b></td>
               <td>{{ t.get_type_display }}</td>
               <td>{{ t.player.name }}</td>
@@ -46,6 +132,33 @@
         </tbody>
       </table>
     </div>
+
+    <!-- Mobile -->
+    <div class="transactions-mobile">
+      {% for t in transactions %}
+        <div class="transaction-card">
+          <div class="transaction-line-1">
+            <div class="transaction-team">{{ t.team.name }}</div>
+
+            {% with action=t.get_type_display|lower %}
+              {% if "add" in action %}
+                <div class="transaction-action add">{{ t.get_type_display }}</div>
+              {% elif "drop" in action %}
+                <div class="transaction-action drop">{{ t.get_type_display }}</div>
+              {% else %}
+                <div class="transaction-action default">{{ t.get_type_display }}</div>
+              {% endif %}
+            {% endwith %}
+          </div>
+
+          <div class="transaction-line-2">
+            <div class="transaction-player">{{ t.player.name }}</div>
+            <div class="transaction-date">{{ t.created_at|date:"d/m/Y" }}</div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
   {% else %}
     <div class="empty-state">
       Nenhuma atividade registrada ainda.
@@ -123,7 +236,7 @@
                       {% endif %}
                     </td>
 
-                    <td>{{ r.when|date:"d/m/Y H:i" }}</td>
+                    <td>{{ r.when|date:"d/m/Y" }}</td>
                   </tr>
                 {% endfor %}
               </tbody>
