@@ -4,195 +4,770 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Sleeper do Cartola{% endblock %}</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 16px; }
-    h1 { margin: 0 0 6px 0; }
-    a { color: #0b57d0; text-decoration: none; }
-    a:hover { text-decoration: underline; }
 
-    .nav {
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-soft: #111827;
+      --panel: #1e293b;
+      --panel-2: #0b1220;
+      --border: #334155;
+      --border-strong: #475569;
+
+      --text: #f8fafc;
+      --text-soft: #cbd5e1;
+      --text-muted: #94a3b8;
+
+      --green: #22c55e;
+      --green-dark: #14532d;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --blue: #3b82f6;
+
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 10px;
+
+      --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.18);
+      --shadow-hover: 0 14px 36px rgba(0, 0, 0, 0.28);
+
+      --sidebar-width: 260px;
+      --topbar-height: 78px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+    }
+
+    body {
+      font-family: "Inter", Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(59,130,246,0.08), transparent 25%),
+        radial-gradient(circle at top right, rgba(34,197,94,0.08), transparent 20%),
+        var(--bg);
+      color: var(--text);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: var(--sidebar-width) 1fr;
+    }
+
+    .sidebar {
+      background: rgba(9, 14, 26, 0.92);
+      border-right: 1px solid var(--border);
+      padding: 20px 16px;
       display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-bottom: 16px;
+      flex-direction: column;
+      justify-content: space-between;
+      backdrop-filter: blur(10px);
+    }
+
+    .sidebar__top {
+      margin-bottom: 24px;
     }
 
     .brand {
-      font-weight: 700;
-      margin-right: 10px;
       display: flex;
       align-items: center;
+      gap: 12px;
+      padding: 10px 8px;
+    }
+
+    .brand__logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--green), #16a34a);
+      color: #052e16;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-soft);
+      flex-shrink: 0;
+    }
+
+    .brand__text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand__title {
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .brand__subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .sidebar__nav {
+      display: flex;
+      flex-direction: column;
       gap: 8px;
+      flex: 1;
     }
 
-    .pill {
-      padding: 6px 10px;
-      border: 1px solid #ddd;
+    .sidebar__section-label {
+      margin: 18px 8px 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .sidebar__link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 14px;
+      border-radius: 14px;
+      color: var(--text-soft);
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+
+    .sidebar__link:hover {
+      background: rgba(30, 41, 59, 0.75);
+      color: var(--text);
+      border-color: rgba(71, 85, 105, 0.6);
+      transform: translateX(2px);
+    }
+
+    .sidebar__link.is-active {
+      background: rgba(34, 197, 94, 0.14);
+      color: #dcfce7;
+      border-color: rgba(34, 197, 94, 0.35);
+    }
+
+    .sidebar__icon {
+      width: 20px;
+      text-align: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    .sidebar__bottom {
+      padding-top: 20px;
+      border-top: 1px solid rgba(51, 65, 85, 0.7);
+    }
+
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 8px;
+    }
+
+    .sidebar-user__avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #1d4ed8;
+      color: white;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .sidebar-user__name {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .sidebar-user__team {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .main-area {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      min-height: var(--topbar-height);
+      border-bottom: 1px solid rgba(51, 65, 85, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 24px;
+      backdrop-filter: blur(10px);
+      background: rgba(15, 23, 42, 0.75);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .topbar__left,
+    .topbar__right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .page-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .topbar-chip {
+      padding: 9px 12px;
       border-radius: 999px;
-      text-decoration: none;
-      color: #0b57d0;
-      background: #fff;
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid var(--border);
+      color: var(--text-soft);
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
     }
 
-    .pill:hover { background: #fafafa; }
-
-    .pill-active {
-      background: #0b57d0;
-      color: #fff;
-      border-color: #0b57d0;
+    .topbar-chip--highlight {
+      background: rgba(34, 197, 94, 0.14);
+      border-color: rgba(34, 197, 94, 0.35);
+      color: #dcfce7;
     }
 
-    .muted {
-      color: #666;
-      margin-left: auto;
+    .sidebar-toggle {
+      display: none;
+      border: 1px solid var(--border);
+      background: rgba(30, 41, 59, 0.9);
+      color: var(--text);
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      cursor: pointer;
+      flex-shrink: 0;
     }
 
-    .divider {
-      width: 1px;
-      height: 22px;
-      background: #e5e5e5;
-      margin: 0 4px;
+    .page-content {
+      width: 100%;
+      max-width: 1400px;
+      padding: 28px 24px 36px;
     }
 
     .messages {
-      margin: 0 0 12px 0;
+      margin: 0 0 20px 0;
       display: grid;
-      gap: 8px;
+      gap: 12px;
     }
 
     .message {
-      padding: 10px 12px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      background: #fafafa;
+      border-radius: 14px;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      background: rgba(30, 41, 59, 0.9);
+      color: var(--text-soft);
+      font-weight: 500;
     }
 
-    .message.success { border-color: #b7e1c1; background: #f3fff6; }
-    .message.error { border-color: #f5b7b7; background: #fff5f5; }
-    .message.warning { border-color: #f1d28b; background: #fff9e6; }
-    .message.info { border-color: #b7d6f5; background: #f3f8ff; }
+    .message.success {
+      border-color: rgba(34, 197, 94, 0.35);
+      background: rgba(34, 197, 94, 0.12);
+      color: #dcfce7;
+    }
+
+    .message.error {
+      border-color: rgba(239, 68, 68, 0.35);
+      background: rgba(239, 68, 68, 0.12);
+      color: #fee2e2;
+    }
+
+    .message.warning {
+      border-color: rgba(245, 158, 11, 0.35);
+      background: rgba(245, 158, 11, 0.12);
+      color: #fef3c7;
+    }
+
+    .message.info {
+      border-color: rgba(59, 130, 246, 0.35);
+      background: rgba(59, 130, 246, 0.12);
+      color: #dbeafe;
+    }
+
+    /* utilitários reaproveitáveis */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .section-subtitle {
+      margin-top: 4px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.96), rgba(15, 23, 42, 0.96));
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      box-shadow: var(--shadow-soft);
+      transition: all 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid--2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid--3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .grid--4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 12px;
+      padding: 10px 14px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-weight: 700;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--green);
+      color: #052e16;
+    }
+
+    .btn-secondary {
+      background: rgba(30, 41, 59, 0.95);
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    .btn-danger {
+      background: var(--red);
+      color: white;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .badge-success {
+      background: rgba(34, 197, 94, 0.14);
+      color: #dcfce7;
+      border: 1px solid rgba(34, 197, 94, 0.25);
+    }
+
+    .badge-warning {
+      background: rgba(245, 158, 11, 0.14);
+      color: #fef3c7;
+      border: 1px solid rgba(245, 158, 11, 0.25);
+    }
+
+    .badge-danger {
+      background: rgba(239, 68, 68, 0.14);
+      color: #fee2e2;
+      border: 1px solid rgba(239, 68, 68, 0.25);
+    }
+
+    .badge-info {
+      background: rgba(59, 130, 246, 0.14);
+      color: #dbeafe;
+      border: 1px solid rgba(59, 130, 246, 0.25);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(51, 65, 85, 0.9);
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 720px;
+      background: rgba(15, 23, 42, 0.88);
+    }
+
+    .table th,
+    .table td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.65);
+    }
+
+    .table th {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      background: rgba(30, 41, 59, 0.85);
+    }
+
+    .table tr:hover td {
+      background: rgba(30, 41, 59, 0.45);
+    }
+
+    .empty-state {
+      border: 1px dashed rgba(71, 85, 105, 0.9);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      text-align: center;
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.55);
+    }
+
+    @media (max-width: 1100px) {
+      .grid--4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .grid--3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 900px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: 270px;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+        z-index: 50;
+      }
+
+      .sidebar.is-open {
+        transform: translateX(0);
+      }
+
+      .sidebar-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .topbar {
+        padding: 16px 18px;
+      }
+
+      .page-content {
+        padding: 20px 16px 28px;
+      }
+
+      .page-title {
+        font-size: 22px;
+      }
+
+      .grid--2,
+      .grid--3,
+      .grid--4 {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar__right {
+        display: none;
+      }
+    }
   </style>
+
   {% block extra_head %}{% endblock %}
 </head>
 <body>
-
-  <div class="nav">
-    <div class="brand">
-      <span>🌐</span>
-      <span>Sleeper do Cartola</span>
-    </div>
-
-    {% if draft %}
-      <a
-        class="pill {% if active_tab == 'draft' %}pill-active{% endif %}"
-        href="{% url 'draft_board' draft.id %}"
-      >
-        Draft
-      </a>
-
-      <a
-        class="pill {% if active_tab == 'current_week' or active_tab == 'all_matchups' %}pill-active{% endif %}"
-        href="{% url 'current_week_matchups' draft.id %}"
-      >
-        Rodada atual
-      </a>
-
-      <a
-        class="pill {% if active_tab == 'standings' %}pill-active{% endif %}"
-        href="{% url 'standings_view' draft.id %}"
-      >
-        Classificação
-      </a>
-
-      <a
-        class="pill {% if active_tab == 'transactions' %}pill-active{% endif %}"
-        href="{% url 'transactions_list' draft.id %}"
-      >
-        Transações
-      </a>
-
-      <a
-        class="pill {% if active_tab == 'notifications' %}pill-active{% endif %}"
-        href="{% url 'notifications_view' draft.id %}"
-      >
-        Notificações
-      </a>
-
-      {% if schedule_url %}
-        <a
-          class="pill {% if active_tab == 'schedule' %}pill-active{% endif %}"
-          href="{{ schedule_url }}"
-        >
-          Schedule
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar__top">
+        <a href="/" class="brand">
+          <div class="brand__logo">SC</div>
+          <div class="brand__text">
+            <span class="brand__title">Sleeper do Cartola</span>
+            <span class="brand__subtitle">Painel da liga</span>
+          </div>
         </a>
-      {% endif %}
-    {% endif %}
+      </div>
 
-    {% if draft and team %}
-      <span class="divider"></span>
+      <nav class="sidebar__nav">
+        {% if draft %}
+          <div class="sidebar__section-label">Liga</div>
 
-      <a
-        class="pill {% if active_tab == 'roster' %}pill-active{% endif %}"
-        href="{% url 'team_roster' draft.id team.id %}"
-      >
-        Meu roster
-      </a>
+          <a
+            href="{% url 'draft_board' draft.id %}"
+            class="sidebar__link {% if active_tab == 'draft' %}is-active{% endif %}"
+          >
+            <span class="sidebar__icon">📝</span>
+            <span>Draft</span>
+          </a>
 
-      <a
-        class="pill {% if active_tab == 'lineup' %}pill-active{% endif %}"
-        href="{% url 'set_lineup' draft.id team.id %}"
-      >
-        Escalação
-      </a>
+          <a
+            href="{% url 'current_week_matchups' draft.id %}"
+            class="sidebar__link {% if active_tab == 'current_week' or active_tab == 'all_matchups' %}is-active{% endif %}"
+          >
+            <span class="sidebar__icon">⚔️</span>
+            <span>Rodada atual</span>
+          </a>
 
-      <a
-        class="pill {% if active_tab == 'free_agents' %}pill-active{% endif %}"
-        href="{% url 'free_agents_list' team.id %}"
-      >
-        Free Agents
-      </a>
+          <a
+            href="{% url 'standings_view' draft.id %}"
+            class="sidebar__link {% if active_tab == 'standings' %}is-active{% endif %}"
+          >
+            <span class="sidebar__icon">📊</span>
+            <span>Classificação</span>
+          </a>
 
-      <a
-        class="pill {% if active_tab == 'my_claims' %}pill-active{% endif %}"
-        href="{% url 'my_claims' team.id %}"
-      >
-        Meus claims
-      </a>
+          <a
+            href="{% url 'transactions_list' draft.id %}"
+            class="sidebar__link {% if active_tab == 'transactions' %}is-active{% endif %}"
+          >
+            <span class="sidebar__icon">🔄</span>
+            <span>Transações</span>
+          </a>
 
-      {% if week and my_matchup %}
-        <a
-          class="pill {% if active_tab == 'my_matchup' or active_tab == 'matchups' %}pill-active{% endif %}"
-          href="{% url 'matchup_detail' draft.id week.number my_matchup.id %}"
-        >
-          Meu matchup
-        </a>
-      {% endif %}
-    {% endif %}
+          <a
+            href="{% url 'notifications_view' draft.id %}"
+            class="sidebar__link {% if active_tab == 'notifications' %}is-active{% endif %}"
+          >
+            <span class="sidebar__icon">🔔</span>
+            <span>Notificações</span>
+          </a>
 
-    {% if draft %}
-      <a
-        class="pill {% if active_tab == 'all_matchups' %}pill-active{% endif %}"
-        href="{% url 'current_week_matchups' draft.id %}"
-      >
-        Matchups
-      </a>
-    {% endif %}
+          {% if schedule_url %}
+            <a
+              href="{{ schedule_url }}"
+              class="sidebar__link {% if active_tab == 'schedule' %}is-active{% endif %}"
+            >
+              <span class="sidebar__icon">🗓️</span>
+              <span>Schedule</span>
+            </a>
+          {% endif %}
+        {% endif %}
 
-    <div class="muted">
-      {% if draft %}Draft #{{ draft.id }}{% endif %}
-      {% if week %} • Week {{ week.number }}{% endif %}
+        {% if draft and team %}
+          <div class="sidebar__section-label">Meu time</div>
+
+          <a
+            href="{% url 'team_roster' draft.id team.id %}"
+            class="sidebar__link {% if active_tab == 'roster' %}is-active{% endif %}"
+          >
+            <span class="sidebar__icon">🛡️</span>
+            <span>Meu roster</span>
+          </a>
+
+          <a
+            href="{% url 'set_lineup' draft.id team.id %}"
+            class="sidebar__link {% if active_tab == 'lineup' %}is-active{% endif %}"
+          >
+            <span class="sidebar__icon">✅</span>
+            <span>Escalação</span>
+          </a>
+
+          <a
+            href="{% url 'free_agents_list' team.id %}"
+            class="sidebar__link {% if active_tab == 'free_agents' %}is-active{% endif %}"
+          >
+            <span class="sidebar__icon">➕</span>
+            <span>Free Agents</span>
+          </a>
+
+          <a
+            href="{% url 'my_claims' team.id %}"
+            class="sidebar__link {% if active_tab == 'my_claims' %}is-active{% endif %}"
+          >
+            <span class="sidebar__icon">📌</span>
+            <span>Meus claims</span>
+          </a>
+
+          {% if week and my_matchup %}
+            <a
+              href="{% url 'matchup_detail' draft.id week.number my_matchup.id %}"
+              class="sidebar__link {% if active_tab == 'my_matchup' or active_tab == 'matchups' %}is-active{% endif %}"
+            >
+              <span class="sidebar__icon">🔥</span>
+              <span>Meu matchup</span>
+            </a>
+          {% endif %}
+        {% endif %}
+      </nav>
+
+      <div class="sidebar__bottom">
+        <div class="sidebar-user">
+          <div class="sidebar-user__avatar">
+            {% if request.user.is_authenticated %}
+              {{ request.user.username|slice:":1"|upper }}
+            {% else %}
+              U
+            {% endif %}
+          </div>
+
+          <div class="sidebar-user__meta">
+            <div class="sidebar-user__name">
+              {% if request.user.is_authenticated %}
+                {{ request.user.username }}
+              {% else %}
+                Visitante
+              {% endif %}
+            </div>
+
+            <div class="sidebar-user__team">
+              {% if team %}
+                {{ team.name }}
+              {% elif draft %}
+                Draft #{{ draft.id }}
+              {% else %}
+                Sem draft ativo
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main-area">
+      <header class="topbar">
+        <div class="topbar__left">
+          <button class="sidebar-toggle" id="sidebarToggle" type="button">☰</button>
+
+          <div>
+            <h1 class="page-title">
+              {% block page_title %}
+                Sleeper do Cartola
+              {% endblock %}
+            </h1>
+
+            <div class="page-subtitle">
+              {% block page_subtitle %}
+                {% if draft and week %}
+                  Draft #{{ draft.id }} • Week {{ week.number }}
+                {% elif draft %}
+                  Draft #{{ draft.id }}
+                {% else %}
+                  Painel da liga
+                {% endif %}
+              {% endblock %}
+            </div>
+          </div>
+        </div>
+
+        <div class="topbar__right">
+          {% if draft %}
+            <div class="topbar-chip">
+              Draft #{{ draft.id }}
+            </div>
+          {% endif %}
+
+          {% if week %}
+            <div class="topbar-chip">
+              Week {{ week.number }}
+            </div>
+          {% endif %}
+
+          {% if team %}
+            <div class="topbar-chip topbar-chip--highlight">
+              {{ team.name }}
+            </div>
+          {% endif %}
+        </div>
+      </header>
+
+      <main class="page-content">
+        {% if messages %}
+          <div class="messages">
+            {% for message in messages %}
+              <div class="message {{ message.tags|default:'info' }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+      </main>
     </div>
   </div>
 
-  {% if messages %}
-    <div class="messages">
-      {% for message in messages %}
-        <div class="message {{ message.tags }}">{{ message }}</div>
-      {% endfor %}
-    </div>
-  {% endif %}
+  <script>
+    const sidebarToggle = document.getElementById("sidebarToggle");
+    const sidebar = document.getElementById("sidebar");
 
-  {% block content %}{% endblock %}
+    if (sidebarToggle && sidebar) {
+      sidebarToggle.addEventListener("click", () => {
+        sidebar.classList.toggle("is-open");
+      });
+    }
+  </script>
 </body>
 </html>

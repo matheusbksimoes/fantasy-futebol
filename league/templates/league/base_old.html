@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Sleeper do Cartola{% endblock %}</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 16px; }
+    h1 { margin: 0 0 6px 0; }
+    a { color: #0b57d0; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .nav {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .brand {
+      font-weight: 700;
+      margin-right: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pill {
+      padding: 6px 10px;
+      border: 1px solid #ddd;
+      border-radius: 999px;
+      text-decoration: none;
+      color: #0b57d0;
+      background: #fff;
+    }
+
+    .pill:hover { background: #fafafa; }
+
+    .pill-active {
+      background: #0b57d0;
+      color: #fff;
+      border-color: #0b57d0;
+    }
+
+    .muted {
+      color: #666;
+      margin-left: auto;
+    }
+
+    .divider {
+      width: 1px;
+      height: 22px;
+      background: #e5e5e5;
+      margin: 0 4px;
+    }
+
+    .messages {
+      margin: 0 0 12px 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .message {
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: #fafafa;
+    }
+
+    .message.success { border-color: #b7e1c1; background: #f3fff6; }
+    .message.error { border-color: #f5b7b7; background: #fff5f5; }
+    .message.warning { border-color: #f1d28b; background: #fff9e6; }
+    .message.info { border-color: #b7d6f5; background: #f3f8ff; }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <div class="nav">
+    <div class="brand">
+      <span>🌐</span>
+      <span>Sleeper do Cartola</span>
+    </div>
+
+    {% if draft %}
+      <a
+        class="pill {% if active_tab == 'draft' %}pill-active{% endif %}"
+        href="{% url 'draft_board' draft.id %}"
+      >
+        Draft
+      </a>
+
+      <a
+        class="pill {% if active_tab == 'current_week' or active_tab == 'all_matchups' %}pill-active{% endif %}"
+        href="{% url 'current_week_matchups' draft.id %}"
+      >
+        Rodada atual
+      </a>
+
+      <a
+        class="pill {% if active_tab == 'standings' %}pill-active{% endif %}"
+        href="{% url 'standings_view' draft.id %}"
+      >
+        Classificação
+      </a>
+
+      <a
+        class="pill {% if active_tab == 'transactions' %}pill-active{% endif %}"
+        href="{% url 'transactions_list' draft.id %}"
+      >
+        Transações
+      </a>
+
+      <a
+        class="pill {% if active_tab == 'notifications' %}pill-active{% endif %}"
+        href="{% url 'notifications_view' draft.id %}"
+      >
+        Notificações
+      </a>
+
+      {% if schedule_url %}
+        <a
+          class="pill {% if active_tab == 'schedule' %}pill-active{% endif %}"
+          href="{{ schedule_url }}"
+        >
+          Schedule
+        </a>
+      {% endif %}
+    {% endif %}
+
+    {% if draft and team %}
+      <span class="divider"></span>
+
+      <a
+        class="pill {% if active_tab == 'roster' %}pill-active{% endif %}"
+        href="{% url 'team_roster' draft.id team.id %}"
+      >
+        Meu roster
+      </a>
+
+      <a
+        class="pill {% if active_tab == 'lineup' %}pill-active{% endif %}"
+        href="{% url 'set_lineup' draft.id team.id %}"
+      >
+        Escalação
+      </a>
+
+      <a
+        class="pill {% if active_tab == 'free_agents' %}pill-active{% endif %}"
+        href="{% url 'free_agents_list' team.id %}"
+      >
+        Free Agents
+      </a>
+
+      <a
+        class="pill {% if active_tab == 'my_claims' %}pill-active{% endif %}"
+        href="{% url 'my_claims' team.id %}"
+      >
+        Meus claims
+      </a>
+
+      {% if week and my_matchup %}
+        <a
+          class="pill {% if active_tab == 'my_matchup' or active_tab == 'matchups' %}pill-active{% endif %}"
+          href="{% url 'matchup_detail' draft.id week.number my_matchup.id %}"
+        >
+          Meu matchup
+        </a>
+      {% endif %}
+    {% endif %}
+
+    {% if draft %}
+      <a
+        class="pill {% if active_tab == 'all_matchups' %}pill-active{% endif %}"
+        href="{% url 'current_week_matchups' draft.id %}"
+      >
+        Matchups
+      </a>
+    {% endif %}
+
+    <div class="muted">
+      {% if draft %}Draft #{{ draft.id }}{% endif %}
+      {% if week %} • Week {{ week.number }}{% endif %}
+    </div>
+  </div>
+
+  {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+        <div class="message {{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</body>
+</html>
