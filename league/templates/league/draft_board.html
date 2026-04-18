@@ -1,84 +1,138 @@
 {% extends "league/base.html" %}
 {% block title %}Draft Board{% endblock %}
 
+{% block page_title %}
+  Draft Board
+{% endblock %}
+
+{% block page_subtitle %}
+  Liga: {{ draft.league }} • Tipo: {{ draft.draft_type }} • Rounds: {{ draft.rounds }}
+{% endblock %}
+
 {% block content %}
-  <h1>Draft Board</h1>
 
-  <div style="color:#666; margin-bottom:10px;">
-    Liga: <b>{{ draft.league }}</b> • Tipo: <b>{{ draft.draft_type }}</b> • Rounds: <b>{{ draft.rounds }}</b>
-  </div>
-
-  {% if current_pick %}
-    <div style="background:#fff7cc; border:1px solid #f0e29a; padding:10px; border-radius:8px; margin: 10px 0 16px 0;">
-      <b>Rodada atual:</b>
-      {% if current_week and current_week.is_postponed %}
-        <span style="color:#b00020;">(ADIADA)</span>
-      {% endif %}
-      <br>
-
-      <b>Pick atual:</b> #{{ current_pick.overall_number }} — {{ current_pick.team.name }}
-
-      <a class="pill" style="margin-left:10px;" href="{% url 'team_roster' draft.id current_pick.team.id %}">Ver roster</a>
-
-      {% if can_draft %}
-        <a class="pill" href="{% url 'make_pick' draft.id %}">Draftar</a>
-      {% else %}
-        <span style="margin-left:10px; color:#777;">(aguardando o dono do time)</span>
-      {% endif %}
-
-      {% if request.user.is_superuser %}
-        <form method="post" action="{% url 'postpone_current_week' draft.id %}" style="display:inline;">
-          {% csrf_token %}
-          <button type="submit" style="margin-left:10px; padding:6px 10px; border-radius:6px; cursor:pointer; border:1px solid #b00020; background:#ffe5e5; color:#b00020;">
-            Adiar rodada
-          </button>
-        </form>
-      {% endif %}
+{% if current_pick %}
+  <div class="card" style="margin-bottom: 20px;">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Pick atual</h2>
+        <div class="section-subtitle">
+          Acompanhe o andamento do draft
+          {% if current_week and current_week.is_postponed %}
+            • <span style="color:#fca5a5; font-weight:700;">Rodada adiada</span>
+          {% endif %}
+        </div>
+      </div>
     </div>
-  {% endif %}
 
-  <style>
-    table { border-collapse: collapse; width: 100%; }
-    th, td { border: 1px solid #ddd; padding: 8px; vertical-align: top; }
-    th { background: #f5f5f5; position: sticky; top: 0; z-index: 2; }
-    .round { font-weight: bold; background: #fafafa; width: 80px; position: sticky; left: 0; z-index: 1; }
-    .pick { font-size: 14px; }
-    .empty { color: #aaa; }
-    .small { font-size: 12px; color: #777; margin-top: 4px; }
-  </style>
+    <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;">
+      <div>
+        <div class="section-subtitle">Rodada atual</div>
+        <div style="font-size:16px; font-weight:800;">
+          Pick #{{ current_pick.overall_number }} — {{ current_pick.team.name }}
+        </div>
+      </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th class="round">Round</th>
-        {% for t in teams %}
-          <th>
-            <a href="{% url 'team_roster' draft.id t.id %}">{{ t.name }}</a>
-          </th>
-        {% endfor %}
-      </tr>
-    </thead>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <a class="btn btn-secondary" href="{% url 'team_roster' draft.id current_pick.team.id %}">
+          Ver roster
+        </a>
 
-    <tbody>
-      {% for row in board_rows %}
+        {% if can_draft %}
+          <a class="btn btn-primary" href="{% url 'make_pick' draft.id %}">
+            Draftar
+          </a>
+        {% else %}
+          <span class="badge badge-info">Aguardando o dono do time</span>
+        {% endif %}
+
+        {% if request.user.is_superuser %}
+          <form method="post" action="{% url 'postpone_current_week' draft.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+              Adiar rodada
+            </button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+<div class="card">
+  <div class="table-wrap">
+    <table class="table draft-board-table">
+      <thead>
         <tr>
-          <td class="round">{{ forloop.counter }}</td>
-
-          {% for p in row %}
-            <td>
-              {% if p and p.player %}
-                <div class="pick"><b>{{ p.player.name }}</b></div>
-                <div class="small">Pick #{{ p.overall_number }}</div>
-              {% elif p %}
-                <div class="empty">—</div>
-                <div class="small">Pick #{{ p.overall_number }}</div>
-              {% else %}
-                <div class="empty">—</div>
-              {% endif %}
-            </td>
+          <th class="draft-round-col">Round</th>
+          {% for t in teams %}
+            <th>
+              <a href="{% url 'team_roster' draft.id t.id %}">
+                {{ t.name }}
+              </a>
+            </th>
           {% endfor %}
         </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+      </thead>
+
+      <tbody>
+        {% for row in board_rows %}
+          <tr>
+            <td class="draft-round-col">
+              <span class="badge badge-info">{{ forloop.counter }}</span>
+            </td>
+
+            {% for p in row %}
+              <td>
+                {% if p and p.player %}
+                  <div style="font-weight:800; line-height:1.25;">
+                    {{ p.player.name }}
+                  </div>
+                  <div class="section-subtitle" style="margin-top:4px;">
+                    Pick #{{ p.overall_number }}
+                  </div>
+                {% elif p %}
+                  <div style="color: var(--text-muted); font-weight:700;">—</div>
+                  <div class="section-subtitle" style="margin-top:4px;">
+                    Pick #{{ p.overall_number }}
+                  </div>
+                {% else %}
+                  <div style="color: var(--text-muted);">—</div>
+                {% endif %}
+              </td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+  .draft-board-table th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+
+  .draft-round-col {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    background: rgba(30, 41, 59, 0.98) !important;
+    min-width: 88px;
+    text-align: center;
+    font-weight: 800;
+  }
+
+  .draft-board-table td.draft-round-col {
+    background: rgba(15, 23, 42, 0.98) !important;
+  }
+
+  .draft-board-table td {
+    min-width: 150px;
+    vertical-align: top;
+  }
+</style>
+
 {% endblock %}

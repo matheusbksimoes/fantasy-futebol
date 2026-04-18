@@ -1,47 +1,104 @@
 {% extends "league/base.html" %}
 {% block title %}Classificação{% endblock %}
 
+{% block page_title %}
+  Classificação
+{% endblock %}
+
+{% block page_subtitle %}
+  Draft #{{ draft.id }} • top 6 vai aos playoffs, top 2 com bye
+{% endblock %}
+
 {% block content %}
-  <h1>Classificação</h1>
+
+<div class="card">
 
   {% if standings %}
-    <table style="border-collapse:collapse; width:100%;">
-      <thead>
-        <tr>
-          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">#</th>
-          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Time</th>
-          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5; text-align:center;">V</th>
-          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5; text-align:center;">D</th>
-          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5; text-align:center;">PF</th>
-          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5; text-align:center;">PA</th>
-          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5; text-align:center;">Jogos</th>
-          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5; text-align:center;">Saldo</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for row in standings %}
+    <div class="table-wrap">
+      <table class="table">
+
+        <thead>
           <tr>
-            <td style="border:1px solid #ddd; padding:8px; text-align:center;">
-              <b>{{ row.rank }}</b>
-            </td>
-            <td style="border:1px solid #ddd; padding:8px;">
-              <a href="{% url 'team_roster' draft.id row.team.id %}">
-                <b>{{ row.team.name }}</b>
-              </a>
-            </td>
-            <td style="border:1px solid #ddd; padding:8px; text-align:center;">{{ row.wins }}</td>
-            <td style="border:1px solid #ddd; padding:8px; text-align:center;">{{ row.losses }}</td>
-            <td style="border:1px solid #ddd; padding:8px; text-align:center;">{{ row.points_for|floatformat:2 }}</td>
-            <td style="border:1px solid #ddd; padding:8px; text-align:center;">{{ row.points_against|floatformat:2 }}</td>
-            <td style="border:1px solid #ddd; padding:8px; text-align:center;">{{ row.games }}</td>
-            <td style="border:1px solid #ddd; padding:8px; text-align:center;">
-  <b>${{ row.faab_balance }}</b>
-</td>
+            <th>#</th>
+            <th>Time</th>
+            <th style="text-align:center;">V</th>
+            <th style="text-align:center;">D</th>
+            <th style="text-align:center;">PF</th>
+            <th style="text-align:center;">PA</th>
+            <th style="text-align:center;">Jogos</th>
+            <th style="text-align:center;">FAAB</th>
           </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+        </thead>
+
+        <tbody>
+          {% for row in standings %}
+            <tr
+              {% if row.rank <= 2 %}
+                style="background: rgba(34, 197, 94, 0.12);"
+              {% elif row.rank <= 6 %}
+                style="background: rgba(59, 130, 246, 0.10);"
+              {% endif %}
+            >
+
+              <td style="text-align:center;">
+                {% if row.rank <= 2 %}
+                  <span class="badge badge-success">
+                    {{ row.rank }} • Bye
+                  </span>
+                {% elif row.rank <= 6 %}
+                  <span class="badge badge-info">
+                    {{ row.rank }} • PO
+                  </span>
+                {% else %}
+                  <span class="badge badge-info">
+                    {{ row.rank }}
+                  </span>
+                {% endif %}
+              </td>
+
+              <td>
+                <a href="{% url 'team_roster' draft.id row.team.id %}">
+                  <b>{{ row.team.name }}</b>
+                </a>
+              </td>
+
+              <td style="text-align:center;">{{ row.wins }}</td>
+              <td style="text-align:center;">{{ row.losses }}</td>
+
+              <td style="text-align:center;">
+                {{ row.points_for|floatformat:2 }}
+              </td>
+
+              <td style="text-align:center;">
+                {{ row.points_against|floatformat:2 }}
+              </td>
+
+              <td style="text-align:center;">
+                {{ row.games }}
+              </td>
+
+              <td style="text-align:center;">
+                <b>${{ row.faab_balance }}</b>
+              </td>
+
+            </tr>
+          {% endfor %}
+        </tbody>
+
+      </table>
+    </div>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
+      <span class="badge badge-success">Top 2 • Bye</span>
+      <span class="badge badge-info">3º ao 6º • Playoffs</span>
+    </div>
+
   {% else %}
-    <p>Nenhum time encontrado para esta liga.</p>
+    <div class="empty-state">
+      Nenhum time encontrado para esta liga.
+    </div>
   {% endif %}
+
+</div>
+
 {% endblock %}
