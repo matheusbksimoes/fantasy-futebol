@@ -101,8 +101,18 @@ class Command(BaseCommand):
             casa = clubes_map.get(casa_id, {})
             fora = clubes_map.get(fora_id, {})
 
-            casa_abv = casa.get("abreviacao") or casa.get("nome_fantasia") or casa.get("nome") or str(casa_id)
-            fora_abv = fora.get("abreviacao") or fora.get("nome_fantasia") or fora.get("nome") or str(fora_id)
+            casa_abv = (
+                casa.get("abreviacao")
+                or casa.get("nome_fantasia")
+                or casa.get("nome")
+                or str(casa_id)
+            )
+            fora_abv = (
+                fora.get("abreviacao")
+                or fora.get("nome_fantasia")
+                or fora.get("nome")
+                or str(fora_id)
+            )
 
             match_display = f"{casa_abv} x {fora_abv}"
 
@@ -125,9 +135,9 @@ class Command(BaseCommand):
     def _upsert_player_week_score(self, *, week, player, points, scouts, confronto):
         """
         Atualiza/salva PlayerWeekScore e infere live_status com base em mudanças recentes:
+        - pending: ainda não pontuou
         - live: pontuação mudou nesta coleta OU já pontuou e ainda não ficou parada 3 coletas
         - finished: pontuação > 0 e ficou 3 coletas seguidas sem mudar
-        - pending: ainda sem pontuar
         """
         now = timezone.now()
         new_points = Decimal(str(points or 0))
@@ -142,7 +152,6 @@ class Command(BaseCommand):
                 "live_status": "pending" if new_points == 0 else "live",
                 "scouts": scouts or {},
                 "source": "CARTOLA",
-                "fetched_at": now,
                 "opponent": confronto.get("opponent", ""),
                 "is_home": confronto.get("is_home"),
                 "match_display": confronto.get("match_display", ""),
@@ -158,20 +167,21 @@ class Command(BaseCommand):
             score_obj.unchanged_polls_count = 0
             score_obj.live_status = "live"
         else:
-            score_obj.unchanged_polls_count = (score_obj.unchanged_polls_count or 0) + 1
+            if new_points > 0:
+                score_obj.unchanged_polls_count = (score_obj.unchanged_polls_count or 0) + 1
 
-            if new_points > 0 and score_obj.unchanged_polls_count >= 3:
-                score_obj.live_status = "finished"
-            elif new_points > 0:
-                score_obj.live_status = "live"
+                if score_obj.unchanged_polls_count >= 3:
+                    score_obj.live_status = "finished"
+                else:
+                    score_obj.live_status = "live"
             else:
+                score_obj.unchanged_polls_count = 0
                 score_obj.live_status = "pending"
 
         score_obj.last_points = old_points
         score_obj.points = new_points
         score_obj.scouts = scouts or {}
         score_obj.source = "CARTOLA"
-        score_obj.fetched_at = now
         score_obj.opponent = confronto.get("opponent", "")
         score_obj.is_home = confronto.get("is_home")
         score_obj.match_display = confronto.get("match_display", "")

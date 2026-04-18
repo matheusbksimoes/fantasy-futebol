@@ -81,11 +81,16 @@
   }
 
   .matchup-live-summary {
-    margin-top: 8px;
+    margin-top: 10px;
     display: flex;
     justify-content: center;
     gap: 8px;
     flex-wrap: wrap;
+  }
+
+  .matchup-live-summary .badge {
+    min-width: 72px;
+    text-align: center;
   }
 
   .matchup-team-card {
@@ -105,8 +110,17 @@
     gap: 12px;
     padding: 12px 14px;
     border: 1px solid rgba(51, 65, 85, 0.85);
+    border-left: 3px solid transparent;
     border-radius: 14px;
     background: rgba(15, 23, 42, 0.55);
+  }
+
+  .matchup-slot-card.live {
+    border-left-color: #22c55e;
+  }
+
+  .matchup-slot-card.finished {
+    border-left-color: #38bdf8;
   }
 
   .matchup-slot-meta {
@@ -125,6 +139,23 @@
     margin-top: 4px;
     font-weight: 700;
     line-height: 1.2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .matchup-slot-player-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .matchup-slot-status {
+    flex-shrink: 0;
+    font-size: 16px;
+    line-height: 1;
   }
 
   .matchup-slot-points {
@@ -137,6 +168,7 @@
   @media (max-width: 768px) {
     .matchup-score-card {
       margin-bottom: 12px;
+      padding: 12px !important;
     }
 
     .matchup-score-top {
@@ -186,9 +218,20 @@
       margin-top: 5px;
     }
 
+    .matchup-leader-text .badge,
+    .matchup-live-summary .badge {
+      font-size: 11px;
+      padding: 4px 8px;
+    }
+
     .matchup-live-summary {
       justify-content: flex-start;
       margin-top: 6px;
+      gap: 6px;
+    }
+
+    .matchup-live-summary .badge {
+      min-width: 62px;
     }
 
     .matchup-team-card {
@@ -237,6 +280,10 @@
       line-height: 1.1;
     }
 
+    .matchup-slot-status {
+      font-size: 14px;
+    }
+
     .matchup-slot-points {
       font-size: 14px;
       font-weight: 800;
@@ -244,10 +291,10 @@
   }
 </style>
 
+{% with total_live=home_live_count|add:away_live_count total_pending=home_pending_count|add:away_pending_count total_finished=home_finished_count|add:away_finished_count %}
 <div class="card matchup-score-card">
   <div class="matchup-score-top">
 
-    <!-- HOME -->
     <div class="matchup-side">
       <div class="section-subtitle">Mandante</div>
       <div class="matchup-team-name">{{ home_team.name }}</div>
@@ -257,7 +304,6 @@
       {% endif %}
     </div>
 
-    <!-- SCORE -->
     <div class="matchup-score-center">
       <div class="section-subtitle">Placar da semana</div>
 
@@ -294,17 +340,12 @@
       </div>
 
       <div class="matchup-live-summary">
-        <span class="badge badge-success">{{ home_live_count }} ao vivo</span>
-        <span class="badge badge-warning">{{ home_pending_count }} pendentes</span>
-        <span class="badge badge-info">{{ home_finished_count }} finalizados</span>
-
-        <span class="badge badge-success">{{ away_live_count }} ao vivo</span>
-        <span class="badge badge-warning">{{ away_pending_count }} pendentes</span>
-        <span class="badge badge-info">{{ away_finished_count }} finalizados</span>
+        <span class="badge badge-success">🔥 {{ total_live }}</span>
+        <span class="badge badge-warning">⏳ {{ total_pending }}</span>
+        <span class="badge badge-info">✅ {{ total_finished }}</span>
       </div>
     </div>
 
-    <!-- AWAY -->
     <div class="matchup-side matchup-side--away">
       <div class="section-subtitle">Visitante</div>
       <div class="matchup-team-name">{{ away_team.name }}</div>
@@ -316,10 +357,10 @@
 
   </div>
 </div>
+{% endwith %}
 
 <div class="grid grid--2">
 
-  <!-- HOME TEAM -->
   <div class="card matchup-team-card">
     <div class="section-header">
       <div>
@@ -334,42 +375,49 @@
 
     <div class="matchup-lineup-list">
       {% for spot in home_spots %}
-        <div class="matchup-slot-card">
-          <div class="matchup-slot-meta">
-            <div class="matchup-slot-label">
-              {{ spot.get_slot_type_display }} {{ spot.slot_index }}
-            </div>
+        {% if spot.player %}
+          {% with status=home_status_map|get_item:spot.player_id %}
+            <div class="matchup-slot-card {% if status == 'live' %}live{% elif status == 'finished' %}finished{% endif %}">
+              <div class="matchup-slot-meta">
+                <div class="matchup-slot-label">
+                  {{ spot.get_slot_type_display }} {{ spot.slot_index }}
+                </div>
 
-            <div class="matchup-slot-player" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-              <span>{{ spot.player.name|default:"—" }}</span>
+                <div class="matchup-slot-player">
+                  <span class="matchup-slot-player-name">{{ spot.player.name }}</span>
 
-              {% if spot.player %}
-                {% with status=home_status_map|get_item:spot.player_id %}
                   {% if status == "live" %}
-                    <span class="badge badge-success">Ao vivo</span>
+                    <span class="matchup-slot-status">🔥</span>
                   {% elif status == "finished" %}
-                    <span class="badge badge-info">Finalizado</span>
-                  {% else %}
-                    <span class="badge badge-warning">Pendente</span>
+                    <span class="matchup-slot-status">✅</span>
                   {% endif %}
-                {% endwith %}
-              {% endif %}
-            </div>
-          </div>
+                </div>
+              </div>
 
-          <div class="matchup-slot-points">
-            {% if spot.player %}
-              {{ home_points_map|get_item:spot.player_id|default:0|floatformat:2 }}
-            {% else %}
-              0
-            {% endif %}
+              <div class="matchup-slot-points">
+                {{ home_points_map|get_item:spot.player_id|default:0|floatformat:2 }}
+              </div>
+            </div>
+          {% endwith %}
+        {% else %}
+          <div class="matchup-slot-card">
+            <div class="matchup-slot-meta">
+              <div class="matchup-slot-label">
+                {{ spot.get_slot_type_display }} {{ spot.slot_index }}
+              </div>
+
+              <div class="matchup-slot-player">
+                <span class="matchup-slot-player-name">—</span>
+              </div>
+            </div>
+
+            <div class="matchup-slot-points">0</div>
           </div>
-        </div>
+        {% endif %}
       {% endfor %}
     </div>
   </div>
 
-  <!-- AWAY TEAM -->
   <div class="card matchup-team-card">
     <div class="section-header">
       <div>
@@ -384,37 +432,45 @@
 
     <div class="matchup-lineup-list">
       {% for spot in away_spots %}
-        <div class="matchup-slot-card">
-          <div class="matchup-slot-meta">
-            <div class="matchup-slot-label">
-              {{ spot.get_slot_type_display }} {{ spot.slot_index }}
-            </div>
+        {% if spot.player %}
+          {% with status=away_status_map|get_item:spot.player_id %}
+            <div class="matchup-slot-card {% if status == 'live' %}live{% elif status == 'finished' %}finished{% endif %}">
+              <div class="matchup-slot-meta">
+                <div class="matchup-slot-label">
+                  {{ spot.get_slot_type_display }} {{ spot.slot_index }}
+                </div>
 
-            <div class="matchup-slot-player" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-              <span>{{ spot.player.name|default:"—" }}</span>
+                <div class="matchup-slot-player">
+                  <span class="matchup-slot-player-name">{{ spot.player.name }}</span>
 
-              {% if spot.player %}
-                {% with status=away_status_map|get_item:spot.player_id %}
                   {% if status == "live" %}
-                    <span class="badge badge-success">Ao vivo</span>
+                    <span class="matchup-slot-status">🔥</span>
                   {% elif status == "finished" %}
-                    <span class="badge badge-info">Finalizado</span>
-                  {% else %}
-                    <span class="badge badge-warning">Pendente</span>
+                    <span class="matchup-slot-status">✅</span>
                   {% endif %}
-                {% endwith %}
-              {% endif %}
-            </div>
-          </div>
+                </div>
+              </div>
 
-          <div class="matchup-slot-points">
-            {% if spot.player %}
-              {{ away_points_map|get_item:spot.player_id|default:0|floatformat:2 }}
-            {% else %}
-              0
-            {% endif %}
+              <div class="matchup-slot-points">
+                {{ away_points_map|get_item:spot.player_id|default:0|floatformat:2 }}
+              </div>
+            </div>
+          {% endwith %}
+        {% else %}
+          <div class="matchup-slot-card">
+            <div class="matchup-slot-meta">
+              <div class="matchup-slot-label">
+                {{ spot.get_slot_type_display }} {{ spot.slot_index }}
+              </div>
+
+              <div class="matchup-slot-player">
+                <span class="matchup-slot-player-name">—</span>
+              </div>
+            </div>
+
+            <div class="matchup-slot-points">0</div>
           </div>
-        </div>
+        {% endif %}
       {% endfor %}
     </div>
   </div>
