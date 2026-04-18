@@ -14,38 +14,68 @@
 
 <div class="card" style="margin-bottom: 24px;">
   <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+
+    <!-- HOME -->
     <div style="flex:1; min-width:220px;">
       <div class="section-subtitle">Mandante</div>
       <div style="font-size:24px; font-weight:800;">{{ home_team.name }}</div>
-      <div style="margin-top:6px;">
-        <span class="badge {% if home_total >= away_total %}badge-success{% else %}badge-info{% endif %}">
-          Formação: {{ home_lineup.get_formation_display }}
-        </span>
-      </div>
+
+      {% if home_total > away_total %}
+        <div class="badge badge-success" style="margin-top:6px;">Liderando</div>
+      {% endif %}
     </div>
 
-    <div style="text-align:center; min-width:220px;">
+    <!-- SCORE -->
+    <div style="text-align:center; min-width:240px;">
       <div class="section-subtitle">Placar da semana</div>
+
       <div style="display:flex; align-items:center; justify-content:center; gap:18px; margin-top:8px;">
-        <div style="font-size:34px; font-weight:800; {% if home_total > away_total %}color: #22c55e;{% endif %}">
+        <div style="font-size:36px; font-weight:900; {% if home_total > away_total %}color:#22c55e;{% endif %}">
           {{ home_total|floatformat:2 }}
         </div>
+
         <div style="font-size:18px; color: var(--text-muted); font-weight:700;">x</div>
-        <div style="font-size:34px; font-weight:800; {% if away_total > home_total %}color: #22c55e;{% endif %}">
+
+        <div style="font-size:36px; font-weight:900; {% if away_total > home_total %}color:#22c55e;{% endif %}">
           {{ away_total|floatformat:2 }}
         </div>
       </div>
+
+      <!-- BARRA DE VANTAGEM -->
+      {% if home_total != away_total %}
+        <div style="margin-top:12px; height:8px; background:#1e293b; border-radius:999px; overflow:hidden;">
+          {% with total=home_total|add:away_total %}
+            <div style="
+              height:100%;
+              width:{% widthratio home_total total 100 %}%;
+              background:#22c55e;
+            "></div>
+          {% endwith %}
+        </div>
+      {% endif %}
+
+      <!-- TEXTO DE LIDERANÇA -->
+      <div style="margin-top:8px;">
+        {% if home_total > away_total %}
+          <span class="badge badge-success">{{ home_team.name }} lidera</span>
+        {% elif away_total > home_total %}
+          <span class="badge badge-success">{{ away_team.name }} lidera</span>
+        {% else %}
+          <span class="badge badge-warning">Empate</span>
+        {% endif %}
+      </div>
     </div>
 
+    <!-- AWAY -->
     <div style="flex:1; min-width:220px; text-align:right;">
       <div class="section-subtitle">Visitante</div>
       <div style="font-size:24px; font-weight:800;">{{ away_team.name }}</div>
-      <div style="margin-top:6px;">
-        <span class="badge {% if away_total >= home_total %}badge-success{% else %}badge-info{% endif %}">
-          Formação: {{ away_lineup.get_formation_display }}
-        </span>
-      </div>
+
+      {% if away_total > home_total %}
+        <div class="badge badge-success" style="margin-top:6px;">Liderando</div>
+      {% endif %}
     </div>
+
   </div>
 </div>
 
@@ -82,15 +112,11 @@
             </div>
 
             <div style="margin-top:4px; font-weight:700;">
-              {% if spot.player %}
-                {{ spot.player.name }}
-              {% else %}
-                —
-              {% endif %}
+              {{ spot.player.name|default:"—" }}
             </div>
           </div>
 
-          <div style="font-size:18px; font-weight:800; color:{% if spot.player %}var(--text){% else %}var(--text-muted){% endif %};">
+          <div style="font-size:18px; font-weight:800;">
             {% if spot.player %}
               {{ home_points_map|get_item:spot.player_id|default:0|floatformat:2 }}
             {% else %}
@@ -133,15 +159,11 @@
             </div>
 
             <div style="margin-top:4px; font-weight:700;">
-              {% if spot.player %}
-                {{ spot.player.name }}
-              {% else %}
-                —
-              {% endif %}
+              {{ spot.player.name|default:"—" }}
             </div>
           </div>
 
-          <div style="font-size:18px; font-weight:800; color:{% if spot.player %}var(--text){% else %}var(--text-muted){% endif %};">
+          <div style="font-size:18px; font-weight:800;">
             {% if spot.player %}
               {{ away_points_map|get_item:spot.player_id|default:0|floatformat:2 }}
             {% else %}
