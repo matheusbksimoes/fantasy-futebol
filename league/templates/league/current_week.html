@@ -2,51 +2,131 @@
 {% block title %}Rodada atual{% endblock %}
 
 {% block content %}
-<h1>Rodada atual</h1>
 
-{% if error %}
-<div style="color:#b00020; margin:12px 0;">{{ error }}</div>
-{% endif %}
+<style>
+  .current-week-page {
+    max-width: 100%;
+  }
 
-{% if current_week %}
-<p><b>Week {{ current_week.number }}</b></p>
+  .current-week-title {
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 16px;
+  }
 
-{% if matchups %}
-<table style="border-collapse:collapse; width:100%;">
-    <thead>
-        <tr>
-            <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Mandante</th>
-            <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5; text-align:center;">Placar</th>
-            <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5;">Visitante</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for m in matchups %}
-        <tr
-            style="cursor:pointer;"
-            onclick="window.location='{% url 'matchup_detail' draft.id current_week.number m.id %}'"
-        >
-            <td style="border:1px solid #ddd; padding:8px;">
-                {{ m.home_team.name }}
-            </td>
-            <td style="border:1px solid #ddd; padding:8px; text-align:center;">
-                <b>{{ m.home_score|floatformat:2 }}</b>
-                x
-                <b>{{ m.away_score|floatformat:2 }}</b>
-            </td>
-            <td style="border:1px solid #ddd; padding:8px;">
-                {{ m.away_team.name }}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% else %}
-<p>Não há confrontos cadastrados para esta rodada.</p>
-{% endif %}
+  .current-week-error {
+    color: #f87171;
+    margin: 12px 0;
+  }
 
-{% else %}
-<p>Nenhuma rodada atual definida.</p>
-{% endif %}
+  .current-week-label {
+    margin-bottom: 16px;
+    color: #f8fafc;
+  }
+
+  .current-week-table-wrap {
+    overflow-x: auto;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 14px;
+    background: rgba(15, 23, 42, 0.5);
+  }
+
+  .current-week-table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  .current-week-table thead th {
+    border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+    padding: 12px 14px;
+    background: rgba(15, 23, 42, 0.92);
+    color: #cbd5e1;
+    font-weight: 700;
+  }
+
+  .current-week-table tbody td {
+    border-top: 1px solid rgba(148, 163, 184, 0.12);
+    padding: 12px 14px;
+    color: #f8fafc;
+  }
+
+  .current-week-row {
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .current-week-row:hover {
+    background: rgba(30, 41, 59, 0.55);
+  }
+
+  .current-week-score {
+    text-align: center;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .current-week-empty {
+    color: #94a3b8;
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .current-week-title {
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+
+    .current-week-table thead th,
+    .current-week-table tbody td {
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+  }
+</style>
+
+<div class="current-week-page">
+  <h1 class="current-week-title">Rodada atual</h1>
+
+  {% if error %}
+    <div class="current-week-error">{{ error }}</div>
+  {% endif %}
+
+  {% if current_week %}
+    <p class="current-week-label"><b>Week {{ current_week.number }}</b></p>
+
+    {% if matchups %}
+      <div class="current-week-table-wrap">
+        <table class="current-week-table">
+          <thead>
+            <tr>
+              <th>Mandante</th>
+              <th style="text-align:center;">Placar</th>
+              <th>Visitante</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in matchups %}
+              <tr
+                class="current-week-row"
+                onclick="window.location='{% url 'matchup_detail' draft.id current_week.number m.id %}'"
+              >
+                <td>{{ m.home_team.name }}</td>
+                <td class="current-week-score">
+                  {{ m.home_score|floatformat:2 }} x {{ m.away_score|floatformat:2 }}
+                </td>
+                <td>{{ m.away_team.name }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="current-week-empty">Não há confrontos cadastrados para esta rodada.</p>
+    {% endif %}
+
+  {% else %}
+    <p class="current-week-empty">Nenhuma rodada atual definida.</p>
+  {% endif %}
+</div>
 
 {% endblock %}

@@ -1863,3 +1863,66 @@ def dashboard(request):
         "roster_count": roster_count,
         "active_tab": "dashboard",
     })
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect
+
+@login_required
+def delete_notification(request, notification_id: int):
+    notification = get_object_or_404(
+        Notification,
+        id=notification_id,
+        team__user=request.user,
+    )
+
+    if request.method == "POST":
+        notification.delete()
+
+    return redirect("notifications")
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect
+
+@login_required
+def delete_notification(request, notification_id: int):
+    notification = get_object_or_404(
+        Notification,
+        id=notification_id,
+        team__user=request.user,
+    )
+
+    if request.method == "POST":
+        if not (notification.trade and notification.type == "trade_received" and notification.trade.status == "pending"):
+            notification.delete()
+
+    return redirect("notifications")
+
+
+from django.utils import timezone
+from datetime import timedelta
+
+@login_required
+def clear_old_notifications(request):
+    if request.method == "POST":
+        limit_date = timezone.now() - timedelta(days=7)
+
+        Notification.objects.filter(
+            team__user=request.user,
+            created_at__lt=limit_date,
+        ).exclude(
+            trade__status="pending",
+            type="trade_received",
+        ).delete()
+
+    return redirect("notifications")
+
+
+@login_required
+def clear_all_notifications(request):
+    if request.method == "POST":
+        Notification.objects.filter(team__user=request.user).exclude(
+            trade__status="pending",
+            type="trade_received",
+        ).delete()
+
+    return redirect("notifications")

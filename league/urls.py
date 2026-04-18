@@ -142,4 +142,8 @@ urlpatterns = [
         name="player_detail",
     ),
     path("dashboard/", views.dashboard, name="dashboard"),
+    path("notifications/<int:notification_id>/delete/", views.delete_notification, name="delete_notification"),
+    path("notifications/<int:notification_id>/delete/", views.delete_notification, name="delete_notification"),
+path("notifications/clear-old/", views.clear_old_notifications, name="clear_old_notifications"),
+path("notifications/clear-all/", views.clear_all_notifications, name="clear_all_notifications"),
 ]

@@ -2,17 +2,134 @@
 {% block title %}Escalação{% endblock %}
 
 {% block content %}
-  <h1>Escalação — {{ team.name }}</h1>
 
+<style>
+  .lineup-page {
+    max-width: 100%;
+  }
 
-  <form method="get" style="border:1px solid #ddd; border-radius:10px; padding:12px; margin:12px 0;">
-    <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;">
-      <div style="min-width:260px;">
-        <label style="font-weight:600; display:block; margin-bottom:6px;">Formação</label>
+  .lineup-title {
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 16px;
+  }
+
+  .lineup-card {
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 14px;
+    padding: 16px;
+    margin: 12px 0;
+    background: rgba(15, 23, 42, 0.55);
+  }
+
+  .lineup-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+
+  .lineup-grid {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .lineup-field {
+    min-width: 260px;
+  }
+
+  .lineup-label {
+    font-weight: 700;
+    display: block;
+    margin-bottom: 6px;
+    color: #f8fafc;
+  }
+
+  .lineup-help {
+    color: var(--text-muted);
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+  }
+
+  .lineup-lock {
+    color: var(--text-muted);
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+  }
+
+  .lineup-select,
+  .lineup-button {
+    padding: 10px 12px;
+    font-size: 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    background: #0f172a;
+    color: #f8fafc;
+  }
+
+  .lineup-select {
+    min-width: 180px;
+  }
+
+  .lineup-select:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  .lineup-select option {
+    background: #0f172a;
+    color: #f8fafc;
+  }
+
+  .lineup-button {
+    cursor: pointer;
+    font-weight: 700;
+  }
+
+  .lineup-button:hover {
+    border-color: rgba(148, 163, 184, 0.35);
+    background: #172036;
+  }
+
+  @media (max-width: 768px) {
+    .lineup-title {
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+
+    .lineup-card {
+      padding: 12px;
+      border-radius: 12px;
+    }
+
+    .lineup-field {
+      min-width: 100%;
+    }
+
+    .lineup-select {
+      width: 100%;
+    }
+
+    .lineup-button {
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="lineup-page">
+  <h1 class="lineup-title">Escalação — {{ team.name }}</h1>
+
+  <form method="get" class="lineup-card">
+    <div class="lineup-row">
+      <div class="lineup-field">
+        <label class="lineup-label">Formação</label>
 
         <select
           name="formation"
-          style="padding:8px; font-size:14px;"
+          class="lineup-select"
           onchange="this.form.submit()"
         >
           {% for value,label in formation_choices %}
@@ -22,31 +139,28 @@
           {% endfor %}
         </select>
 
-        <small style="color:#666; display:block; margin-top:6px;">
+        <small class="lineup-help">
           A formação controla quantos slots existem (anti-fraude).
         </small>
       </div>
     </div>
   </form>
 
- 
-  <form method="post" style="border:1px solid #ddd; border-radius:10px; padding:12px; margin:12px 0;">
+  <form method="post" class="lineup-card">
     {% csrf_token %}
 
-    {# ✅ Formação que será salva ao clicar em "Salvar escalação" #}
     <input type="hidden" name="formation" value="{{ selected_formation }}">
 
-    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+    <div class="lineup-grid">
       {% for s in slots %}
-        <div style="min-width:260px;">
-          <label style="font-weight:600; display:block; margin-bottom:6px;">
+        <div class="lineup-field">
+          <label class="lineup-label">
             {{ s.get_slot_type_display }}
             {% if s.slot_index %} {{ s.slot_index }}{% endif %}
           </label>
 
           {% if s.player and s.player.id in locked_player_ids %}
-            <select name="slot_{{ s.slot_type }}_{{ s.slot_index }}" disabled style="padding:8px; font-size:14px;">
-              {# sem placeholder quando travado #}
+            <select name="slot_{{ s.slot_type }}_{{ s.slot_index }}" class="lineup-select" disabled>
               {% if s.slot_type == "GOL" %}
                 {% for p in gols %}
                   <option value="{{ p.id }}" {% if s.player and s.player.id == p.id %}selected{% endif %}>{{ p.name }} ({{ p.position }})</option>
@@ -75,7 +189,7 @@
             </select>
 
           {% else %}
-            <select name="slot_{{ s.slot_type }}_{{ s.slot_index }}" style="padding:8px; font-size:14px;">
+            <select name="slot_{{ s.slot_type }}_{{ s.slot_index }}" class="lineup-select">
               <option value="">-- escolher --</option>
 
               {% if s.slot_type == "GOL" %}
@@ -108,14 +222,15 @@
 
           {% if s.player and s.player.id in locked_player_ids %}
             <input type="hidden" name="slot_{{ s.slot_type }}_{{ s.slot_index }}" value="{{ s.player.id }}">
-            <small style="color:#666; display:block; margin-top:6px;">Travado (jogo em andamento)</small>
+            <small class="lineup-lock">Travado (jogo em andamento)</small>
           {% endif %}
         </div>
       {% endfor %}
     </div>
 
     <div style="margin-top:12px;">
-      <button type="submit" style="padding:8px; font-size:14px;">Salvar escalação</button>
+      <button type="submit" class="lineup-button">Salvar escalação</button>
     </div>
   </form>
+</div>
 {% endblock %}

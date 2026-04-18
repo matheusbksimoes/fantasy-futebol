@@ -2,13 +2,131 @@
 {% block title %}Propor troca{% endblock %}
 
 {% block content %}
-  <h1>Propor troca</h1>
 
-  <div style="margin-bottom:16px; padding:12px; border:1px solid #ddd; border-radius:8px; background:#fafafa;">
-    <p style="margin:0 0 8px 0;">
+<style>
+  .trade-page {
+    max-width: 900px;
+  }
+
+  .trade-title {
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 16px;
+  }
+
+  .trade-target-card,
+  .trade-form-card {
+    margin-bottom: 16px;
+    padding: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 14px;
+    background: rgba(15, 23, 42, 0.58);
+  }
+
+  .trade-muted {
+    color: #94a3b8;
+  }
+
+  .trade-target-label {
+    margin: 0 0 8px 0;
+    color: #94a3b8;
+  }
+
+  .trade-target-player {
+    margin: 0;
+    font-size: 18px;
+    color: #f8fafc;
+  }
+
+  .trade-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+    color: #f8fafc;
+  }
+
+  .trade-select {
+    min-width: 320px;
+    width: 100%;
+    max-width: 520px;
+    padding: 10px 12px;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 10px;
+    background: #0f172a;
+    color: #f8fafc;
+  }
+
+  .trade-select option {
+    background: #0f172a;
+    color: #f8fafc;
+  }
+
+  .trade-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 14px;
+  }
+
+  .trade-btn {
+    border-radius: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .trade-btn-submit {
+    border: 1px solid #0b57d0;
+    color: #fff;
+    background: #0b57d0;
+  }
+
+  .trade-btn-cancel {
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    color: #e2e8f0;
+    background: #0f172a;
+  }
+
+  @media (max-width: 768px) {
+    .trade-title {
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+
+    .trade-target-card,
+    .trade-form-card {
+      padding: 12px;
+      border-radius: 12px;
+    }
+
+    .trade-select {
+      min-width: 100%;
+      max-width: 100%;
+    }
+
+    .trade-actions {
+      gap: 8px;
+    }
+
+    .trade-btn {
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="trade-page">
+  <h1 class="trade-title">Propor troca</h1>
+
+  <div class="trade-target-card">
+    <p class="trade-target-label">
       Você está tentando receber:
     </p>
-    <p style="margin:0; font-size:18px;">
+    <p class="trade-target-player">
       <b>{{ target_player.name }}</b>
       {% if target_player.get_position_display %}
         ({{ target_player.get_position_display }})
@@ -17,17 +135,19 @@
     </p>
   </div>
 
-  <form method="post">
+  <form method="post" class="trade-form-card">
     {% csrf_token %}
 
-    <div style="margin-bottom:16px;">
-      <label for="offered_player_id"><b>Escolha o jogador que você vai oferecer:</b></label>
-      <br><br>
+    <div>
+      <label for="offered_player_id" class="trade-label">
+        Escolha o jogador que você vai oferecer:
+      </label>
+
       <select
         name="offered_player_id"
         id="offered_player_id"
         required
-        style="min-width:320px; padding:8px; border:1px solid #ccc; border-radius:6px;"
+        class="trade-select"
       >
         <option value="">-- selecione um jogador --</option>
         {% for spot in my_roster %}
@@ -38,20 +158,19 @@
       </select>
     </div>
 
-    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-      <button
-        type="submit"
-        style="border:1px solid #0b57d0; color:#fff; background:#0b57d0; padding:8px 14px; cursor:pointer; border-radius:6px;"
-      >
+    <div class="trade-actions">
+      <button type="submit" class="trade-btn trade-btn-submit">
         Enviar proposta de troca
       </button>
 
       <a
         href="{% url 'team_roster' draft.id target_team.id %}"
-        style="border:1px solid #999; color:#333; background:#fff; padding:8px 14px; border-radius:6px; text-decoration:none;"
+        class="trade-btn trade-btn-cancel"
       >
         Cancelar
       </a>
     </div>
   </form>
+</div>
+
 {% endblock %}

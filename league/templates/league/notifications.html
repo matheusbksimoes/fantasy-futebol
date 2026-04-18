@@ -2,53 +2,244 @@
 {% block title %}Notificações{% endblock %}
 
 {% block content %}
-  <h1>Notificações</h1>
+
+<style>
+  .notifications-page {
+    max-width: 1000px;
+  }
+
+  .notifications-title {
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 16px;
+  }
+
+  .notifications-toolbar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .notifications-list {
+    display: grid;
+    gap: 12px;
+  }
+
+  .notification-card {
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 14px;
+    padding: 14px;
+    background: rgba(15, 23, 42, 0.58);
+  }
+
+  .notification-date {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-bottom: 8px;
+  }
+
+  .notification-message {
+    margin-bottom: 10px;
+    color: #f8fafc;
+    line-height: 1.4;
+  }
+
+  .notification-trade-box {
+    margin-bottom: 12px;
+    padding: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    border-radius: 12px;
+    background: rgba(15, 23, 42, 0.72);
+  }
+
+  .notification-trade-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .notification-trade-side-title {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-bottom: 6px;
+  }
+
+  .notification-trade-team {
+    font-weight: 800;
+    color: #f8fafc;
+    margin-bottom: 6px;
+  }
+
+  .notification-trade-list {
+    margin: 0;
+    padding-left: 18px;
+    color: #e2e8f0;
+  }
+
+  .notification-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .notification-btn {
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .notification-btn-accept {
+    border: 1px solid #198754;
+    background: #198754;
+    color: #fff;
+  }
+
+  .notification-btn-reject {
+    border: 1px solid #dc3545;
+    background: #dc3545;
+    color: #fff;
+  }
+
+  .notification-btn-delete {
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    background: #0f172a;
+    color: #e2e8f0;
+  }
+
+  .notification-btn-bulk {
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    background: #0f172a;
+    color: #e2e8f0;
+  }
+
+  .notifications-empty {
+    color: #94a3b8;
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .notifications-title {
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+
+    .notification-card {
+      padding: 12px;
+      border-radius: 12px;
+    }
+
+    .notification-trade-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .notification-actions {
+      gap: 6px;
+    }
+
+    .notification-btn {
+      width: 100%;
+    }
+
+    .notifications-toolbar form {
+      width: 100%;
+    }
+
+    .notification-btn-bulk {
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="notifications-page">
+  <h1 class="notifications-title">Notificações</h1>
 
   {% if notifications %}
-    <div style="display:grid; gap:12px;">
+    <div class="notifications-toolbar">
+      <form method="post" action="{% url 'clear_old_notifications' %}">
+        {% csrf_token %}
+        <button type="submit" class="notification-btn notification-btn-bulk">
+          Limpar antigas
+        </button>
+      </form>
+
+      <form method="post" action="{% url 'clear_all_notifications' %}">
+        {% csrf_token %}
+        <button type="submit" class="notification-btn notification-btn-bulk">
+          Limpar todas
+        </button>
+      </form>
+    </div>
+
+    <div class="notifications-list">
       {% for n in notifications %}
-        <div style="border:1px solid #ddd; border-radius:8px; padding:12px; background:#fafafa;">
-          <div style="font-size:14px; color:#666; margin-bottom:6px;">
+        <div class="notification-card">
+          <div class="notification-date">
             {{ n.created_at|date:"d/m/Y H:i" }}
           </div>
 
-          <div style="margin-bottom:8px;">
+          <div class="notification-message">
             <b>{{ n.message }}</b>
           </div>
 
           {% if n.trade and n.type == "trade_received" and n.trade.status == "pending" %}
-            <div style="margin-bottom:8px;">
-              <b>{{ n.trade.from_team.name }}</b> oferece:
-              <ul>
-                {% for item in n.trade.items.all %}
-                  {% if item.from_team_id == n.trade.from_team_id %}
-                    <li>{{ item.player.name }}</li>
-                  {% endif %}
-                {% endfor %}
-              </ul>
+            <div class="notification-trade-box">
+              <div class="notification-trade-grid">
+                <div>
+                  <div class="notification-trade-side-title">Oferta</div>
+                  <div class="notification-trade-team">{{ n.trade.from_team.name }}</div>
+                  <ul class="notification-trade-list">
+                    {% for item in n.trade.items.all %}
+                      {% if item.from_team_id == n.trade.from_team_id %}
+                        <li>{{ item.player.name }}</li>
+                      {% endif %}
+                    {% endfor %}
+                  </ul>
+                </div>
 
-              <b>{{ n.trade.to_team.name }}</b> entrega:
-              <ul>
-                {% for item in n.trade.items.all %}
-                  {% if item.from_team_id == n.trade.to_team_id %}
-                    <li>{{ item.player.name }}</li>
-                  {% endif %}
-                {% endfor %}
-              </ul>
+                <div>
+                  <div class="notification-trade-side-title">Em troca de</div>
+                  <div class="notification-trade-team">{{ n.trade.to_team.name }}</div>
+                  <ul class="notification-trade-list">
+                    {% for item in n.trade.items.all %}
+                      {% if item.from_team_id == n.trade.to_team_id %}
+                        <li>{{ item.player.name }}</li>
+                      {% endif %}
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
             </div>
 
-            <div style="display:flex; gap:8px;">
+            <div class="notification-actions">
               <form method="post" action="{% url 'accept_trade' n.trade.id %}">
                 {% csrf_token %}
-                <button type="submit" style="border:1px solid #198754; background:#198754; color:#fff; padding:8px 12px; border-radius:6px; cursor:pointer;">
+                <button type="submit" class="notification-btn notification-btn-accept">
                   Aceitar
                 </button>
               </form>
 
               <form method="post" action="{% url 'reject_trade' n.trade.id %}">
                 {% csrf_token %}
-                <button type="submit" style="border:1px solid #dc3545; background:#dc3545; color:#fff; padding:8px 12px; border-radius:6px; cursor:pointer;">
+                <button type="submit" class="notification-btn notification-btn-reject">
                   Rejeitar
+                </button>
+              </form>
+            </div>
+
+          {% else %}
+            <div class="notification-actions">
+              <form method="post" action="{% url 'delete_notification' n.id %}">
+                {% csrf_token %}
+                <button type="submit" class="notification-btn notification-btn-delete">
+                  Remover
                 </button>
               </form>
             </div>
@@ -57,6 +248,8 @@
       {% endfor %}
     </div>
   {% else %}
-    <p>Você não tem notificações.</p>
+    <p class="notifications-empty">Você não tem notificações.</p>
   {% endif %}
+</div>
+
 {% endblock %}
