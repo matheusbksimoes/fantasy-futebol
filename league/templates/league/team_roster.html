@@ -11,106 +11,296 @@
 
 {% block content %}
 
-<div class="grid grid--3" style="margin-bottom: 24px;">
+<style>
+  .roster-summary h3 {
+    margin: 6px 0 0;
+  }
+
+  .roster-list {
+    gap: 14px;
+  }
+
+  .roster-card {
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(30, 41, 59, 0.42) 0%, rgba(15, 23, 42, 0.58) 100%);
+    border: 1px solid rgba(148, 163, 184, 0.14);
+  }
+
+  .roster-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .roster-name {
+    font-weight: 800;
+    font-size: 18px;
+    line-height: 1.15;
+    color: #f8fafc;
+  }
+
+  .roster-subtitle {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-top: 3px;
+  }
+
+  .roster-header-right {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .roster-drag {
+    cursor: grab;
+    color: #cbd5e1;
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  .roster-metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 10px;
+  }
+
+  .roster-metric {
+    font-size: 13px;
+    color: #94a3b8;
+  }
+
+  .roster-metric strong {
+    color: #f8fafc;
+    font-size: 18px;
+    font-weight: 800;
+    margin-left: 4px;
+  }
+
+  .roster-history {
+    margin-bottom: 10px;
+  }
+
+  .roster-history-label {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 6px;
+  }
+
+  .roster-history-list {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .roster-chip {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: rgba(37, 99, 235, 0.14);
+    border: 1px solid rgba(59, 130, 246, 0.18);
+    color: #bfdbfe;
+    line-height: 1;
+  }
+
+  .roster-history-empty {
+    font-size: 12px;
+    color: #64748b;
+  }
+
+  .roster-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .roster-acquired {
+    font-size: 12px;
+    color: #94a3b8;
+  }
+
+  .roster-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .roster-actions .btn {
+    padding: 8px 12px;
+  }
+
+  .roster-mobile-section {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    .roster-summary {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .roster-list {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .roster-card {
+      padding: 12px;
+      border-radius: 12px;
+    }
+
+    .roster-name {
+      font-size: 16px;
+    }
+
+    .roster-subtitle {
+      font-size: 12px;
+    }
+
+    .roster-header {
+      margin-bottom: 6px;
+    }
+
+    .roster-metrics {
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .roster-metric {
+      font-size: 12px;
+    }
+
+    .roster-metric strong {
+      font-size: 15px;
+    }
+
+    .roster-history-label {
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+
+    .roster-chip {
+      font-size: 10px;
+      padding: 4px 7px;
+    }
+
+    .roster-footer {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+
+    .roster-actions {
+      width: 100%;
+    }
+
+    .roster-actions form,
+    .roster-actions a {
+      flex: 1;
+    }
+
+    .roster-actions .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>
+
+<div class="grid grid--3 roster-summary" style="margin-bottom: 24px;">
   <div class="card">
     <div class="section-subtitle">Jogadores</div>
-    <h3 style="margin:6px 0 0;">{{ roster_items|length }}</h3>
+    <h3>{{ roster_items|length }}</h3>
   </div>
 
   <div class="card">
     <div class="section-subtitle">FAAB</div>
-    <h3 style="margin:6px 0 0;">${{ faab_balance }}</h3>
+    <h3>${{ faab_balance }}</h3>
   </div>
 
   <div class="card">
     <div class="section-subtitle">Time</div>
-    <h3 style="margin:6px 0 0;">{{ draft.league }}</h3>
+    <h3>{{ draft.league }}</h3>
   </div>
 </div>
 
 {% if roster_items %}
 
-<div id="roster-body" class="grid grid--2">
+<div id="roster-body" class="grid grid--2 roster-list">
   {% for item in roster_items %}
-    <div class="card" data-spot-id="{{ item.spot.id }}">
+    <div class="card roster-card" data-spot-id="{{ item.spot.id }}">
 
-      <!-- HEADER -->
-      <div class="section-header">
+      <div class="roster-header">
         <div>
-          <div style="font-weight:800; font-size:18px;">
+          <div class="roster-name">
             {{ item.player.name }}
           </div>
 
-          <div class="section-subtitle">
+          <div class="roster-subtitle">
             {{ item.player.get_position_display }} • {{ item.player.real_team|default:"—" }}
           </div>
         </div>
 
-        <div style="display:flex; gap:8px; align-items:center;">
+        <div class="roster-header-right">
           {% if item.stats.is_hot %}
             <span class="badge badge-success">🔥 Em alta</span>
           {% endif %}
 
           {% if can_manage_team %}
-            <span class="drag-handle" style="cursor:grab;">☰</span>
+            <span class="drag-handle roster-drag">☰</span>
           {% endif %}
         </div>
       </div>
 
-      <!-- STATS -->
-      <div class="grid grid--3" style="margin-bottom:12px;">
-        <div>
-          <div class="section-subtitle">Média</div>
-          <div style="font-weight:800;">
-            {{ item.stats.avg|default:"0"|floatformat:2 }}
-          </div>
+      <div class="roster-metrics">
+        <div class="roster-metric">
+          Média <strong>{{ item.stats.avg|default:"0"|floatformat:2 }}</strong>
         </div>
 
-        <div>
-          <div class="section-subtitle">Total</div>
-          <div style="font-weight:800;">
-            {{ item.stats.total|default:"0"|floatformat:2 }}
-          </div>
+        <div class="roster-metric">
+          Total <strong>{{ item.stats.total|default:"0"|floatformat:2 }}</strong>
         </div>
 
-        <div>
-          <div class="section-subtitle">Últ. 3</div>
-          <div style="font-weight:800;">
+        <div class="roster-metric">
+          Últ. 3
+          <strong>
             {% if item.stats.last_3_avg is not None %}
               {{ item.stats.last_3_avg|floatformat:2 }}
             {% else %}
               -
             {% endif %}
-          </div>
+          </strong>
         </div>
       </div>
 
-      <!-- HISTÓRICO -->
-      <div style="margin-bottom:12px;">
-        <div class="section-subtitle">Últimos jogos</div>
+      <div class="roster-history">
+        <div class="roster-history-label">Últimos jogos</div>
 
-        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;">
+        <div class="roster-history-list">
           {% if item.stats.last_3_games %}
             {% for game in item.stats.last_3_games %}
-              <span class="badge badge-info">
+              <span class="roster-chip">
                 W{{ game.week.number }}: {{ game.points|floatformat:1 }}
               </span>
             {% endfor %}
           {% else %}
-            <span class="section-subtitle">Sem jogos recentes</span>
+            <span class="roster-history-empty">Sem jogos recentes</span>
           {% endif %}
         </div>
       </div>
 
-      <!-- FOOTER -->
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
-
-        <div class="section-subtitle">
+      <div class="roster-footer">
+        <div class="roster-acquired">
           {{ item.spot.get_acquired_via_display }}
         </div>
 
-        <div style="display:flex; gap:8px;">
-
+        <div class="roster-actions">
           {% if can_manage_team %}
             <form method="post" action="{% url 'drop_player' team.id item.player.id %}">
               {% csrf_token %}
@@ -124,7 +314,6 @@
             >
               Troca
             </a>
-
           {% endif %}
 
           <a
@@ -134,7 +323,6 @@
             Ver
           </a>
         </div>
-
       </div>
     </div>
   {% endfor %}
@@ -146,7 +334,6 @@
   </div>
 {% endif %}
 
-<!-- DRAG AND DROP -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
