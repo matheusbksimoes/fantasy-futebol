@@ -15,6 +15,7 @@
           <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5; text-align:center;">PF</th>
           <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5; text-align:center;">PA</th>
           <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5; text-align:center;">Jogos</th>
+          <th style="border:1px solid #ddd; padding:8px; background:#f5f5f5; text-align:center;">Saldo</th>
         </tr>
       </thead>
       <tbody>
@@ -33,6 +34,9 @@
             <td style="border:1px solid #ddd; padding:8px; text-align:center;">{{ row.points_for|floatformat:2 }}</td>
             <td style="border:1px solid #ddd; padding:8px; text-align:center;">{{ row.points_against|floatformat:2 }}</td>
             <td style="border:1px solid #ddd; padding:8px; text-align:center;">{{ row.games }}</td>
+            <td style="border:1px solid #ddd; padding:8px; text-align:center;">
+              <b>${{ row.team.budget }}</b>
+            </td>
           </tr>
         {% endfor %}
       </tbody>
