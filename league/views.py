@@ -285,7 +285,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, Avg
 from django.shortcuts import get_object_or_404, render
 
-from .models import Draft, Team, Week, RosterSpot, PlayerWeekScore
+from .models import Draft, Team, Week, RosterSpot, PlayerWeekScore, TeamBudget
 
 
 @login_required
@@ -310,6 +310,13 @@ def team_roster(request, draft_id: int, team_id: int):
     )
 
     my_matchup = get_team_matchup_for_week(week, my_team) if week and my_team else None
+
+    budget_obj, _ = TeamBudget.objects.get_or_create(team=viewed_team)
+    if budget_obj.faab_balance is None:
+        budget_obj.faab_balance = viewed_team.budget
+        budget_obj.save(update_fields=["faab_balance"])
+
+    faab_balance = budget_obj.faab_balance
 
     roster_items = []
 
@@ -377,6 +384,7 @@ def team_roster(request, draft_id: int, team_id: int):
         "active_tab": "roster",
         "can_manage_team": can_manage_team,
         "my_matchup": my_matchup,
+        "faab_balance": faab_balance,
     })
 
 @login_required
@@ -440,7 +448,7 @@ def free_agents_list(request, team_id: int):
 
     budget, _ = TeamBudget.objects.get_or_create(team=team)
     if budget.faab_balance is None:
-        budget.faab_balance = 100
+        budget.faab_balance = team.budget
         budget.save(update_fields=["faab_balance"])
 
     pending_claims_count = {
@@ -1370,6 +1378,7 @@ def build_standings(draft):
 
     return standings
 
+from .models import Draft, Team, Week, TeamBudget
 
 @login_required
 def standings_view(request, draft_id: int):
@@ -1385,6 +1394,25 @@ def standings_view(request, draft_id: int):
     my_matchup = get_team_matchup_for_week(week, team) if week and team else None
     standings = build_standings(draft)
 
+    team_ids = [row["team"].id if isinstance(row, dict) else row.team.id for row in standings]
+
+    budget_map = {
+        tb.team_id: tb.faab_balance
+        for tb in TeamBudget.objects.filter(team_id__in=team_ids)
+    }
+
+    for row in standings:
+        row_team = row["team"] if isinstance(row, dict) else row.team
+        current_faab = budget_map.get(row_team.id)
+
+        if current_faab is None:
+            current_faab = row_team.budget
+
+        if isinstance(row, dict):
+            row["faab_balance"] = current_faab
+        else:
+            row.faab_balance = current_faab
+
     return render(request, "league/standings.html", {
         "draft": draft,
         "week": week,
@@ -1393,6 +1421,7 @@ def standings_view(request, draft_id: int):
         "standings": standings,
         "active_tab": "standings",
     })
+
 @login_required
 def propose_trade_player(request, draft_id: int, target_team_id: int, target_player_id: int):
     draft = get_object_or_404(Draft, id=draft_id)
