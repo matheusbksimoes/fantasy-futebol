@@ -1844,7 +1844,7 @@ def dashboard(request):
     faab_balance = 0
     if team:
         budget, _ = TeamBudget.objects.get_or_create(team=team)
-        faab_balance = budget.balance
+        faab_balance = budget.faab_balance
 
     roster_count = 0
     if team:
