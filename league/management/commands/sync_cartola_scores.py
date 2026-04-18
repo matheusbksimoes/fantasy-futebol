@@ -32,24 +32,9 @@ class Command(BaseCommand):
     help = "Sincroniza pontuações do Cartola para a Week atual (ou Week informada)."
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "--draft-id",
-            type=int,
-            default=None,
-            help="ID do Draft (default: último draft)",
-        )
-        parser.add_argument(
-            "--week",
-            type=int,
-            default=None,
-            help="Número da Week (default: week marcada como current)",
-        )
-        parser.add_argument(
-            "--timeout",
-            type=int,
-            default=15,
-            help="Timeout HTTP em segundos",
-        )
+        parser.add_argument("--draft-id", type=int, default=None)
+        parser.add_argument("--week", type=int, default=None)
+        parser.add_argument("--timeout", type=int, default=15)
 
     def _get_json_or_none(self, url: str, timeout: int):
         r = requests.get(url, timeout=timeout)
@@ -71,16 +56,6 @@ class Command(BaseCommand):
             raise Exception(f"Resposta 200 não-JSON em {url}. Body: {snippet}")
 
     def _build_match_map(self, rodada: int, timeout: int):
-        """
-        Retorna um mapa por clube_id com:
-        {
-            clube_id: {
-                "opponent": "FLU",
-                "is_home": True,
-                "match_display": "SAN x FLU",
-            }
-        }
-        """
         try:
             partidas_payload = self._get_json_or_none(
                 f"{CARTOLA_BASE}/partidas/{rodada}",
@@ -169,25 +144,18 @@ class Command(BaseCommand):
 
         if not week:
             self.stderr.write(
-                self.style.ERROR(
-                    "Nenhuma Week encontrada (crie uma Week e marque is_current=True)."
-                )
+                self.style.ERROR("Nenhuma Week encontrada (crie uma Week e marque is_current=True).")
             )
             return
 
         try:
-            status = self._get_json_or_none(
-                f"{CARTOLA_BASE}/mercado/status",
-                timeout=timeout,
-            )
+            status = self._get_json_or_none(f"{CARTOLA_BASE}/mercado/status", timeout=timeout)
         except Exception as e:
             self.stderr.write(self.style.ERROR(f"Erro ao buscar mercado/status: {e}"))
             return
 
         if not status:
-            self.stderr.write(
-                self.style.ERROR("mercado/status retornou vazio (inesperado).")
-            )
+            self.stderr.write(self.style.ERROR("mercado/status retornou vazio (inesperado)."))
             return
 
         rodada_atual = status.get("rodada_atual")
@@ -208,19 +176,56 @@ class Command(BaseCommand):
         match_map = self._build_match_map(week.number, timeout=timeout)
 
         try:
-            payload = self._get_json_or_none(
-                f"{CARTOLA_BASE}/atletas/pontuados",
-                timeout=timeout,
-            )
+            payload = self._get_json_or_none(f"{CARTOLA_BASE}/atletas/pontuados", timeout=timeout)
         except Exception as e:
             self.stderr.write(self.style.ERROR(f"Erro ao buscar atletas/pontuados: {e}"))
             return
 
+        players = Player.objects.exclude(cartola_id__isnull=True)
+        players_by_cartola_id = {
+            str(p.cartola_id): p for p in players if p.cartola_id is not None
+        }
+
+        club_updates = 0
+        upserts = 0
+        missing = 0
+
+        # Fallback: se não há pontuados, usa atletas/mercado para preencher cartola_club_id
         if payload is None:
             self.stdout.write(
                 self.style.WARNING(
-                    "atletas/pontuados retornou 204 (sem pontuação disponível agora). "
-                    "Isso é normal fora de rodada/parciais."
+                    "atletas/pontuados retornou 204. Buscando atletas/mercado para atualizar cartola_club_id."
+                )
+            )
+
+            try:
+                mercado_payload = self._get_json_or_none(f"{CARTOLA_BASE}/atletas/mercado", timeout=timeout)
+            except Exception as e:
+                self.stderr.write(self.style.ERROR(f"Erro ao buscar atletas/mercado: {e}"))
+                return
+
+            atletas_mercado = mercado_payload.get("atletas") if mercado_payload else []
+            if not atletas_mercado:
+                self.stdout.write(self.style.WARNING("atletas/mercado sem atletas; nada a atualizar."))
+                return
+
+            with transaction.atomic():
+                for atleta in atletas_mercado:
+                    atleta_id = atleta.get("atleta_id")
+                    clube_id = atleta.get("clube_id")
+
+                    player = players_by_cartola_id.get(str(atleta_id))
+                    if not player:
+                        continue
+
+                    if clube_id and player.cartola_club_id != clube_id:
+                        player.cartola_club_id = clube_id
+                        player.save(update_fields=["cartola_club_id"])
+                        club_updates += 1
+
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f"Atualização de clubes concluída: {club_updates} players com cartola_club_id atualizado."
                 )
             )
             return
@@ -234,30 +239,7 @@ class Command(BaseCommand):
             )
             return
 
-        self.stdout.write(
-            self.style.SUCCESS(f"Cartola retornou {len(atletas)} atletas pontuados.")
-        )
-
-        players = Player.objects.exclude(cartola_id__isnull=True)
-
-        try:
-            sample_atleta_id = next(iter(atletas.keys()))
-            sample_data = atletas.get(sample_atleta_id) or {}
-            sample_points = sample_data.get("pontuacao")
-            sample_clube_id = sample_data.get("clube_id")
-            self.stdout.write(
-                f"Amostra retorno: atleta_id={sample_atleta_id} clube_id={sample_clube_id} pontuacao={sample_points}"
-            )
-        except StopIteration:
-            pass
-
-        upserts = 0
-        missing = 0
-        club_updates = 0
-
-        players_by_cartola_id = {
-            str(p.cartola_id): p for p in players if p.cartola_id is not None
-        }
+        self.stdout.write(self.style.SUCCESS(f"Cartola retornou {len(atletas)} atletas pontuados."))
 
         with transaction.atomic():
             for atleta_id, data in atletas.items():
@@ -268,11 +250,9 @@ class Command(BaseCommand):
 
                 points = (data or {}).get("pontuacao", 0) or 0
                 scouts = (data or {}).get("scout", {}) or {}
-
                 clube_id = (data or {}).get("clube_id")
                 confronto = match_map.get(clube_id, {})
 
-                # 🔥 NOVO: salva o clube do Cartola no Player
                 if clube_id and player.cartola_club_id != clube_id:
                     player.cartola_club_id = clube_id
                     player.save(update_fields=["cartola_club_id"])
