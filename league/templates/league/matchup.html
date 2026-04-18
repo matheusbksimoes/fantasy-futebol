@@ -187,17 +187,28 @@
       gap: 8px;
     }
 
-    .matchup-mobile-score {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-weight: 800;
-      font-size: 16px;
-    }
+    /* MOBILE HEADER AJUSTES */
+.matchup-mobile-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 16px;
+  text-align: center;
+}
 
-    .matchup-mobile-score .score {
-      font-size: 18px;
-    }
+.matchup-mobile-score .team-name {
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.matchup-mobile-score .score {
+  font-size: 18px;
+  font-weight: 900;
+}
 
     .matchup-mobile-summary {
       display: flex;
@@ -261,11 +272,11 @@
       <div class="matchup-mobile-score">
         <span class="team-name">{{ home_team.name }}</span>
 
-        <span class="score">
-          {{ home_total|floatformat:2 }} x {{ away_total|floatformat:2 }}
-        </span>
+<span class="score">
+  {{ home_total|floatformat:2 }} <span style="opacity:0.6;">x</span> {{ away_total|floatformat:2 }}
+</span>
 
-        <span class="team-name">{{ away_team.name }}</span>
+<span class="team-name">{{ away_team.name }}</span>
       </div>
 
       <div class="matchup-mobile-status">
