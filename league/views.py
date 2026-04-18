@@ -281,19 +281,19 @@ def make_pick(request, draft_id: int):
 # ============================================================
 # Roster / Free agents / Transactions
 # ============================================================
+from django.contrib.auth.decorators import login_required
+from django.db.models import Sum, Avg
+from django.shortcuts import get_object_or_404, render
+
+from .models import Draft, Team, Week, RosterSpot, PlayerWeekScore
+
+
 @login_required
 def team_roster(request, draft_id: int, team_id: int):
     draft = get_object_or_404(Draft, id=draft_id)
     viewed_team = get_object_or_404(Team, id=team_id)
 
     week = Week.objects.filter(draft=draft, is_current=True).first()
-
-    roster_spots = (
-        RosterSpot.objects
-        .select_related("player")
-        .filter(draft=draft, team=viewed_team, dropped_at__isnull=True)
-        .order_by("player__position", "player__name")
-    )
 
     my_team = Team.objects.filter(
         league=draft.league,
@@ -302,18 +302,70 @@ def team_roster(request, draft_id: int, team_id: int):
 
     can_manage_team = bool(my_team and my_team.id == viewed_team.id)
 
+    roster_spots = list(
+        RosterSpot.objects
+        .select_related("player")
+        .filter(draft=draft, team=viewed_team, dropped_at__isnull=True)
+        .order_by("manual_order", "id")
+    )
+
     my_matchup = get_team_matchup_for_week(week, my_team) if week and my_team else None
 
-    player_stats = {
-        spot.player.id: PlayerWeekScore.objects.filter(
-            player=spot.player,
+    roster_items = []
+
+    for spot in roster_spots:
+        player = spot.player
+
+        stats = PlayerWeekScore.objects.filter(
+            player=player,
             week__draft=draft,
-        ).aggregate(
+        )
+
+        aggregate_stats = stats.aggregate(
             total=Sum("points"),
             avg=Avg("points"),
         )
-        for spot in roster_spots
-    }
+
+        last_3_games = list(
+            stats.select_related("week")
+            .order_by("-week__number")[:3]
+        )
+
+        last_3_points = [
+            game.points for game in last_3_games
+            if game.points is not None
+        ]
+
+        last_3_avg = None
+        if last_3_points:
+            last_3_avg = round(sum(last_3_points) / len(last_3_points), 2)
+
+        season_avg = aggregate_stats["avg"]
+        if season_avg is not None:
+            season_avg = round(season_avg, 2)
+
+        total_points = aggregate_stats["total"]
+        if total_points is not None:
+            total_points = round(total_points, 2)
+
+        last_game_points = last_3_points[0] if last_3_points else None
+
+        is_hot = False
+        if last_3_avg is not None and season_avg is not None:
+            is_hot = last_3_avg > season_avg
+
+        roster_items.append({
+            "spot": spot,
+            "player": player,
+            "stats": {
+                "total": total_points,
+                "avg": season_avg,
+                "last_3_avg": last_3_avg,
+                "last_game_points": last_game_points,
+                "is_hot": is_hot,
+                "last_3_games": last_3_games,
+            }
+        })
 
     return render(request, "league/team_roster.html", {
         "team": viewed_team,
@@ -321,10 +373,10 @@ def team_roster(request, draft_id: int, team_id: int):
         "draft": draft,
         "week": week,
         "roster_spots": roster_spots,
+        "roster_items": roster_items,
         "active_tab": "roster",
         "can_manage_team": can_manage_team,
         "my_matchup": my_matchup,
-        "player_stats": player_stats,
     })
 
 @login_required
@@ -1672,3 +1724,54 @@ def player_detail(request, player_id: int):
         "chart_labels": chart_labels,
         "chart_points": chart_points,
     })
+
+import json
+
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse, HttpResponseForbidden
+from django.views.decorators.http import require_POST
+
+
+@login_required
+@require_POST
+def reorder_roster(request, draft_id: int, team_id: int):
+    draft = get_object_or_404(Draft, id=draft_id)
+    viewed_team = get_object_or_404(Team, id=team_id)
+
+    my_team = Team.objects.filter(
+        league=draft.league,
+        user=request.user,
+    ).first()
+
+    if not my_team or my_team.id != viewed_team.id:
+        return HttpResponseForbidden("Você não pode reorganizar este roster.")
+
+    try:
+        payload = json.loads(request.body)
+        spot_ids = payload.get("spot_ids", [])
+    except Exception:
+        return JsonResponse({"ok": False, "error": "JSON inválido."}, status=400)
+
+    current_spot_ids = list(
+        RosterSpot.objects
+        .filter(draft=draft, team=viewed_team, dropped_at__isnull=True)
+        .values_list("id", flat=True)
+    )
+
+    if sorted(spot_ids) != sorted(current_spot_ids):
+        return JsonResponse({"ok": False, "error": "Lista inválida."}, status=400)
+
+    spots = {
+        spot.id: spot
+        for spot in RosterSpot.objects.filter(id__in=spot_ids)
+    }
+
+    to_update = []
+    for index, spot_id in enumerate(spot_ids):
+        spot = spots[spot_id]
+        spot.manual_order = index
+        to_update.append(spot)
+
+    RosterSpot.objects.bulk_update(to_update, ["manual_order"])
+
+    return JsonResponse({"ok": True})

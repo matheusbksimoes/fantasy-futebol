@@ -1,5 +1,4 @@
 {% extends "league/base.html" %}
-{% load league_extras %}
 {% block title %}Roster{% endblock %}
 
 {% block content %}
@@ -9,48 +8,88 @@
     Draft: <b>{{ draft.id }}</b> • Liga: <b>{{ draft.league }}</b>
   </div>
 
-  {% if roster_spots %}
+  {% if roster_items %}
     <div style="overflow-x:auto;">
       <table style="width:100%; border-collapse:separate; border-spacing:0; font-size:14px;">
         <thead>
           <tr>
+            <th style="text-align:left; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb; width:44px;"></th>
             <th style="text-align:left; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb;">Posição</th>
             <th style="text-align:left; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb;">Jogador</th>
             <th style="text-align:left; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb;">Time real</th>
             <th style="text-align:center; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb; width:90px;">Média</th>
             <th style="text-align:center; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb; width:90px;">Total</th>
+            <th style="text-align:center; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb; width:110px;">Últ. 3</th>
             <th style="text-align:left; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb; min-width:180px;">Ações</th>
             <th style="text-align:center; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb; width:90px;">Ver</th>
           </tr>
         </thead>
 
-        <tbody>
-          {% for spot in roster_spots %}
-            <tr style="background:#fff;">
+        <tbody id="roster-body">
+          {% for item in roster_items %}
+            <tr
+              data-spot-id="{{ item.spot.id }}"
+              style="background:#fff;"
+            >
+              <td style="padding:12px 10px; border-bottom:1px solid #eee; text-align:center;">
+                {% if can_manage_team %}
+                  <span
+                    class="drag-handle"
+                    title="Arrastar para reordenar"
+                    style="cursor:grab; font-size:18px; color:#6b7280; user-select:none;"
+                  >
+                    ☰
+                  </span>
+                {% endif %}
+              </td>
+
               <td style="padding:12px 10px; border-bottom:1px solid #eee; color:#374151;">
-                {{ spot.player.get_position_display }}
+                {{ item.player.get_position_display }}
               </td>
 
               <td style="padding:12px 10px; border-bottom:1px solid #eee;">
-                <div style="font-weight:700; color:#111827;">{{ spot.player.name }}</div>
+                <div style="font-weight:700; color:#111827; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                  <span>{{ item.player.name }}</span>
+
+                  {% if item.stats.is_hot %}
+                    <span style="
+                      background:#16a34a;
+                      color:#fff;
+                      padding:3px 8px;
+                      border-radius:999px;
+                      font-size:11px;
+                      font-weight:700;
+                      line-height:1;
+                    ">
+                      🔥 Em alta
+                    </span>
+                  {% endif %}
+                </div>
+
+                <div style="font-size:12px; color:#6b7280; margin-top:4px;">
+                  Adquirido via <b>{{ item.spot.get_acquired_via_display }}</b>
+                </div>
               </td>
 
               <td style="padding:12px 10px; border-bottom:1px solid #eee; color:#374151;">
-                {{ spot.player.real_team }}
+                {{ item.player.real_team|default:"—" }}
               </td>
 
-              {% with stats=player_stats|get_item:spot.player.id %}
-                <td style="padding:12px 10px; border-bottom:1px solid #eee; text-align:center; font-weight:600;">
-                  {{ stats.avg|default:"0"|floatformat:2 }}
-                </td>
-                <td style="padding:12px 10px; border-bottom:1px solid #eee; text-align:center; font-weight:600;">
-                  {{ stats.total|default:"0"|floatformat:2 }}
-                </td>
-              {% endwith %}
+              <td style="padding:12px 10px; border-bottom:1px solid #eee; text-align:center; font-weight:600;">
+                {{ item.stats.avg|default:"0"|floatformat:2 }}
+              </td>
+
+              <td style="padding:12px 10px; border-bottom:1px solid #eee; text-align:center; font-weight:600;">
+                {{ item.stats.total|default:"0"|floatformat:2 }}
+              </td>
+
+              <td style="padding:12px 10px; border-bottom:1px solid #eee; text-align:center; font-weight:600;">
+                {{ item.stats.last_3_avg|default:"-"|floatformat:2 }}
+              </td>
 
               <td style="padding:12px 10px; border-bottom:1px solid #eee; white-space:nowrap;">
                 {% if can_manage_team %}
-                  <form method="post" action="{% url 'drop_player' team.id spot.player.id %}" style="display:inline;">
+                  <form method="post" action="{% url 'drop_player' team.id item.player.id %}" style="display:inline;">
                     {% csrf_token %}
                     <button
                       type="submit"
@@ -69,7 +108,7 @@
                   </form>
                 {% elif my_team and my_team.id != team.id %}
                   <a
-                    href="{% url 'propose_trade_player' draft.id team.id spot.player.id %}"
+                    href="{% url 'propose_trade_player' draft.id team.id item.player.id %}"
                     style="
                       display:inline-block;
                       border:1px solid #0b57d0;
@@ -91,7 +130,7 @@
 
               <td style="padding:12px 10px; border-bottom:1px solid #eee; text-align:center;">
                 <a
-                  href="{% url 'player_detail' spot.player.id %}"
+                  href="{% url 'player_detail' item.player.id %}"
                   style="
                     display:inline-block;
                     border:1px solid #d1d5db;
@@ -108,6 +147,32 @@
                 </a>
               </td>
             </tr>
+
+            <tr style="background:#fafafa;">
+              <td></td>
+              <td colspan="8" style="padding:8px 10px; border-bottom:1px solid #eee;">
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:12px; color:#6b7280;">
+                  <span style="font-weight:700; color:#374151;">Últimos 3 jogos:</span>
+
+                  {% if item.stats.last_3_games %}
+                    {% for game in item.stats.last_3_games %}
+                      <span style="
+                        border:1px solid #d1d5db;
+                        background:#fff;
+                        padding:4px 8px;
+                        border-radius:999px;
+                        font-weight:600;
+                        color:#374151;
+                      ">
+                        W{{ game.week.number }}: {{ game.points|floatformat:2 }}
+                      </span>
+                    {% endfor %}
+                  {% else %}
+                    <span>Sem jogos recentes.</span>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
           {% endfor %}
         </tbody>
       </table>
@@ -115,4 +180,58 @@
   {% else %}
     <p>Nenhum jogador no roster ativo desse time.</p>
   {% endif %}
+
+  <style>
+    #roster-body tr.sortable-ghost td {
+      opacity: 0.45;
+    }
+
+    #roster-body tr.sortable-chosen td {
+      background: #f3f4f6 !important;
+    }
+
+    .drag-handle:active {
+      cursor: grabbing;
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const rosterBody = document.getElementById("roster-body");
+      const canManage = {{ can_manage_team|yesno:"true,false" }};
+
+      if (!rosterBody || !canManage) return;
+
+      new Sortable(rosterBody, {
+        animation: 150,
+        handle: ".drag-handle",
+        draggable: "tr[data-spot-id]",
+        onEnd: function () {
+          const rows = rosterBody.querySelectorAll("tr[data-spot-id]");
+          const spotIds = Array.from(rows).map(row => Number(row.dataset.spotId));
+
+          fetch("{% url 'reorder_roster' draft.id team.id %}", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": "{{ csrf_token }}",
+            },
+            body: JSON.stringify({
+              spot_ids: spotIds
+            })
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (!data.ok) {
+              alert(data.error || "Erro ao salvar a ordem do roster.");
+            }
+          })
+          .catch(() => {
+            alert("Erro ao salvar a ordem do roster.");
+          });
+        }
+      });
+    });
+  </script>
 {% endblock %}

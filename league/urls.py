@@ -128,4 +128,9 @@ urlpatterns = [
         name="reject_trade",
     ),
     path("players/<int:player_id>/", views.player_detail, name="player_detail")
+    path(
+    "draft/<int:draft_id>/team/<int:team_id>/reorder-roster/",
+    views.reorder_roster,
+    name="reorder_roster",
+),
 ]

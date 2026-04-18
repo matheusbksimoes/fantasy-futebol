@@ -213,15 +213,16 @@ class RosterSpot(models.Model):
 
     dropped_at = models.DateTimeField(null=True, blank=True)
 
+    manual_order = models.PositiveIntegerField(default=0, db_index=True)
+
     class Meta:
+        ordering = ["manual_order", "id"]
         constraints = [
-            # 1 player ativo globalmente (não pode estar em 2 times)
             models.UniqueConstraint(
                 fields=["player"],
                 condition=Q(dropped_at__isnull=True),
                 name="uniq_active_player_global",
             ),
-            # histórico: não duplica player dentro do mesmo draft
             models.UniqueConstraint(fields=["draft", "player"], name="uniq_player_per_draft_roster"),
         ]
 
