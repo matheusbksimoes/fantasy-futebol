@@ -20,7 +20,7 @@
     background: rgba(15, 23, 42, 0.72);
     border: 1px solid rgba(148, 163, 184, 0.12);
     border-radius: 12px;
-    padding: 10px 12px;
+    padding: 12px 14px;
     margin-bottom: 8px;
   }
 
@@ -33,17 +33,20 @@
   }
 
   .transaction-line-1 {
-    margin-bottom: 3px;
+    margin-bottom: 4px;
   }
 
-  .transaction-team {
+  .transaction-player-main {
     font-weight: 800;
+    font-size: 18px;
+    line-height: 1.2;
     color: #f8fafc;
     min-width: 0;
   }
 
-  .transaction-player {
-    color: #cbd5e1;
+  .transaction-team-sub {
+    font-size: 13px;
+    color: #94a3b8;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -84,12 +87,77 @@
     border: 1px solid rgba(148, 163, 184, 0.2);
   }
 
+  .waiver-mobile {
+    display: none;
+  }
+
+  .waiver-card {
+    background: rgba(15, 23, 42, 0.72);
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+
+  .waiver-line-1,
+  .waiver-line-2,
+  .waiver-line-3 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .waiver-line-1 {
+    margin-bottom: 4px;
+  }
+
+  .waiver-line-2,
+  .waiver-line-3 {
+    margin-top: 4px;
+  }
+
+  .waiver-team {
+    font-weight: 800;
+    color: #f8fafc;
+    min-width: 0;
+  }
+
+  .waiver-date {
+    font-size: 12px;
+    color: #94a3b8;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .waiver-meta,
+  .waiver-drop {
+    font-size: 13px;
+    color: #cbd5e1;
+    min-width: 0;
+  }
+
+  .waiver-detail {
+    font-size: 12px;
+    color: #fca5a5;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
   @media (max-width: 768px) {
     .transactions-desktop {
       display: none;
     }
 
     .transactions-mobile {
+      display: block;
+    }
+
+    .waiver-desktop {
+      display: none;
+    }
+
+    .waiver-mobile {
       display: block;
     }
   }
@@ -138,21 +206,19 @@
       {% for t in transactions %}
         <div class="transaction-card">
           <div class="transaction-line-1">
-            <div class="transaction-team">{{ t.team.name }}</div>
+            <div class="transaction-player-main">{{ t.player.name }}</div>
 
-            {% with action=t.get_type_display|lower %}
-              {% if "add" in action %}
-                <div class="transaction-action add">{{ t.get_type_display }}</div>
-              {% elif "drop" in action %}
-                <div class="transaction-action drop">{{ t.get_type_display }}</div>
-              {% else %}
-                <div class="transaction-action default">{{ t.get_type_display }}</div>
-              {% endif %}
-            {% endwith %}
+            {% if t.get_type_display == "Add (FA)" %}
+              <div class="transaction-action add">{{ t.get_type_display }}</div>
+            {% elif t.get_type_display == "Drop" %}
+              <div class="transaction-action drop">{{ t.get_type_display }}</div>
+            {% else %}
+              <div class="transaction-action default">{{ t.get_type_display }}</div>
+            {% endif %}
           </div>
 
           <div class="transaction-line-2">
-            <div class="transaction-player">{{ t.player.name }}</div>
+            <div class="transaction-team-sub">{{ t.team.name }}</div>
             <div class="transaction-date">{{ t.created_at|date:"d/m/Y" }}</div>
           </div>
         </div>
@@ -185,7 +251,8 @@
             {{ g.player.name }}
           </div>
 
-          <div class="table-wrap">
+          <!-- Desktop -->
+          <div class="table-wrap waiver-desktop">
             <table class="table">
               <thead>
                 <tr>
@@ -241,6 +308,52 @@
                 {% endfor %}
               </tbody>
             </table>
+          </div>
+
+          <!-- Mobile -->
+          <div class="waiver-mobile">
+            {% for r in g.rows %}
+              <div class="waiver-card">
+                <div class="waiver-line-1">
+                  <div class="waiver-team">{{ r.team.name }}</div>
+                  <div class="waiver-date">{{ r.when|date:"d/m/Y" }}</div>
+                </div>
+
+                <div class="waiver-line-2">
+                  <div>
+                    {% if r.status == "WON" %}
+                      <span class="badge badge-success">WON</span>
+                    {% elif r.status == "LOST" %}
+                      <span class="badge badge-info">LOST</span>
+                    {% elif r.status == "INVALID" %}
+                      <span class="badge badge-danger">INVALID</span>
+                    {% elif r.status == "CANCELLED" %}
+                      <span class="badge badge-warning">CANCELLED</span>
+                    {% else %}
+                      <span class="badge badge-info">{{ r.status }}</span>
+                    {% endif %}
+                  </div>
+
+                  <div class="waiver-meta"><b>${{ r.bid }}</b></div>
+                </div>
+
+                <div class="waiver-line-3">
+                  <div class="waiver-drop">
+                    {% if r.drop_player %}
+                      Drop: {{ r.drop_player.name }}
+                    {% else %}
+                      Sem drop
+                    {% endif %}
+                  </div>
+
+                  <div class="waiver-detail">
+                    {% if r.invalid_reason %}
+                      {{ r.invalid_reason }}
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
           </div>
         </div>
       {% endfor %}
