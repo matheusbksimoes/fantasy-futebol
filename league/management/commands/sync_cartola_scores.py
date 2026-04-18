@@ -191,10 +191,11 @@ class Command(BaseCommand):
         missing = 0
 
         # Fallback: se não há pontuados, usa atletas/mercado para preencher cartola_club_id
+        # e já salva o confronto da rodada atual para aparecer no roster
         if payload is None:
             self.stdout.write(
                 self.style.WARNING(
-                    "atletas/pontuados retornou 204. Buscando atletas/mercado para atualizar cartola_club_id."
+                    "atletas/pontuados retornou 204. Buscando atletas/mercado para atualizar clubes e salvar confronto da rodada."
                 )
             )
 
@@ -223,9 +224,46 @@ class Command(BaseCommand):
                         player.save(update_fields=["cartola_club_id"])
                         club_updates += 1
 
+                    confronto = match_map.get(clube_id, {})
+
+                    PlayerWeekScore.objects.update_or_create(
+                        week=week,
+                        player=player,
+                        defaults={
+                            "points": 0,
+                            "scouts": {},
+                            "source": "CARTOLA",
+                            "fetched_at": timezone.now(),
+                            "opponent": confronto.get("opponent", ""),
+                            "is_home": confronto.get("is_home"),
+                            "match_display": confronto.get("match_display", ""),
+                        },
+                    )
+                    upserts += 1
+
             self.stdout.write(
                 self.style.SUCCESS(
-                    f"Atualização de clubes concluída: {club_updates} players com cartola_club_id atualizado."
+                    f"Fallback concluído: {upserts} PlayerWeekScore salvos | "
+                    f"{club_updates} players com cartola_club_id atualizado."
+                )
+            )
+
+            matchups = Matchup.objects.filter(week=week).select_related("home_team", "away_team")
+
+            updated_matchups = 0
+            for m in matchups:
+                home_pts = compute_team_points(week, m.home_team)
+                away_pts = compute_team_points(week, m.away_team)
+
+                if m.home_score != home_pts or m.away_score != away_pts:
+                    m.home_score = home_pts
+                    m.away_score = away_pts
+                    m.save(update_fields=["home_score", "away_score"])
+                    updated_matchups += 1
+
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f"Placar atualizado: {updated_matchups}/{matchups.count()} matchups na Week {week.number}"
                 )
             )
             return
