@@ -106,13 +106,15 @@
         <thead>
           <tr>
             <th style="text-align:left; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb;">Posição</th>
-            <th style="text-align:left; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb;">Jogador</th>
-            <th style="text-align:left; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb;">Time real</th>
-            <th style="text-align:center; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb; width:90px;">Média</th>
-            <th style="text-align:center; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb; width:90px;">Total</th>
-            <th style="text-align:center; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb; width:150px;">Status</th>
-            <th style="text-align:left; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb; min-width:320px;">Ações</th>
-            <th style="text-align:center; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb; width:90px;">Ver</th>
+<th style="text-align:left; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb;">Jogador</th>
+<th style="text-align:left; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb;">Time real</th>
+<th style="text-align:center; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb; width:90px;">Média</th>
+<th style="text-align:center; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb; width:90px;">Total</th>
+<th style="text-align:center; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb; width:90px;">Últ.3</th>
+<th style="text-align:center; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb; width:130px;">Momento</th>
+<th style="text-align:center; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb; width:150px;">Status</th>
+<th style="text-align:left; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb; min-width:320px;">Ações</th>
+<th style="text-align:center; padding:12px 10px; background:#f8fafc; border-bottom:2px solid #e5e7eb; width:90px;">Ver</th>
           </tr>
         </thead>
 
@@ -132,45 +134,58 @@
               </td>
 
               {% with stats=player_stats|get_item:p.id %}
-                <td style="padding:12px 10px; border-bottom:1px solid #eee; text-align:center; font-weight:600;">
-                  {{ stats.avg|default:"0"|floatformat:2 }}
-                </td>
-                <td style="padding:12px 10px; border-bottom:1px solid #eee; text-align:center; font-weight:600;">
-                  {{ stats.total|default:"0"|floatformat:2 }}
-                </td>
-              {% endwith %}
-
-              <td style="padding:12px 10px; border-bottom:1px solid #eee; text-align:center;">
-                {% with cnt=pending_claims_count|get_item:p.id %}
-                  {% if cnt %}
-                    <span style="
-                      display:inline-block;
-                      padding:5px 10px;
-                      border-radius:999px;
-                      border:1px solid #bfdbfe;
-                      background:#eff6ff;
-                      color:#1d4ed8;
-                      font-size:12px;
-                      font-weight:600;
-                    ">
-                      Claim pendente ({{ cnt }})
-                    </span>
-                  {% else %}
-                    <span style="
-                      display:inline-block;
-                      padding:5px 10px;
-                      border-radius:999px;
-                      border:1px solid #e5e7eb;
-                      background:#f9fafb;
-                      color:#6b7280;
-                      font-size:12px;
-                      font-weight:600;
-                    ">
-                      Livre
-                    </span>
-                  {% endif %}
-                {% endwith %}
-              </td>
+  <td style="padding:12px 10px; border-bottom:1px solid #eee; text-align:center; font-weight:600;">
+    {{ stats.avg|default:"0"|floatformat:2 }}
+  </td>
+  <td style="padding:12px 10px; border-bottom:1px solid #eee; text-align:center; font-weight:600;">
+    {{ stats.total|default:"0"|floatformat:2 }}
+  </td>
+  <td style="padding:12px 10px; border-bottom:1px solid #eee; text-align:center; font-weight:600;">
+    {{ stats.recent_avg|default:"0"|floatformat:2 }}
+  </td>
+  <td style="padding:12px 10px; border-bottom:1px solid #eee; text-align:center;">
+    {% if stats.trend == "alta" %}
+      <span style="
+        display:inline-block;
+        padding:5px 10px;
+        border-radius:999px;
+        border:1px solid #fdba74;
+        background:#fff7ed;
+        color:#c2410c;
+        font-size:12px;
+        font-weight:700;
+      ">
+        🔥 Em alta
+      </span>
+    {% elif stats.trend == "baixa" %}
+      <span style="
+        display:inline-block;
+        padding:5px 10px;
+        border-radius:999px;
+        border:1px solid #bfdbfe;
+        background:#eff6ff;
+        color:#1d4ed8;
+        font-size:12px;
+        font-weight:700;
+      ">
+        ❄️ Em baixa
+      </span>
+    {% else %}
+      <span style="
+        display:inline-block;
+        padding:5px 10px;
+        border-radius:999px;
+        border:1px solid #e5e7eb;
+        background:#f9fafb;
+        color:#6b7280;
+        font-size:12px;
+        font-weight:700;
+      ">
+        ➖ Estável
+      </span>
+    {% endif %}
+  </td>
+{% endwith %}
 
               <td style="padding:12px 10px; border-bottom:1px solid #eee;">
                 <form method="post" action="{% url 'add_free_agent' team.id p.id %}" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">

@@ -410,16 +410,46 @@ def free_agents_list(request, team_id: int):
         .order_by("player__position", "player__name")
     )
 
-    player_stats = {
-        p.id: PlayerWeekScore.objects.filter(
-            player=p,
-            week__draft=draft
-        ).aggregate(
+    player_stats = {}
+
+    for p in free_agents:
+        scores_qs = (
+            PlayerWeekScore.objects
+            .filter(player=p, week__draft=draft)
+            .select_related("week")
+            .order_by("week__number")
+        )
+
+        aggregate_stats = scores_qs.aggregate(
             total=Sum("points"),
             avg=Avg("points"),
         )
-        for p in free_agents
-    }
+
+        recent_scores = list(scores_qs.order_by("-week__number")[:3])
+        recent_scores.reverse()
+
+        if recent_scores:
+            recent_avg = sum(float(s.points) for s in recent_scores) / len(recent_scores)
+        else:
+            recent_avg = 0.0
+
+        season_avg = float(aggregate_stats["avg"] or 0)
+        trend_delta = recent_avg - season_avg
+
+        if recent_scores and trend_delta >= 0.75:
+            trend = "alta"
+        elif recent_scores and trend_delta <= -0.75:
+            trend = "baixa"
+        else:
+            trend = "estavel"
+
+        player_stats[p.id] = {
+            "avg": aggregate_stats["avg"] or 0,
+            "total": aggregate_stats["total"] or 0,
+            "recent_avg": recent_avg,
+            "trend": trend,
+            "trend_delta": trend_delta,
+        }
 
     return render(request, "league/free_agents.html", {
         "team": team,
