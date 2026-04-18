@@ -433,6 +433,12 @@ class PlayerWeekScore(models.Model):
         ("MANUAL", "Manual"),
     ]
 
+    LIVE_STATUS_CHOICES = [
+        ("pending", "Pendente"),
+        ("live", "Ao vivo"),
+        ("finished", "Encerrado"),
+    ]
+
     week = models.ForeignKey("Week", on_delete=models.CASCADE, related_name="player_scores")
     player = models.ForeignKey("Player", on_delete=models.CASCADE, related_name="week_scores")
 
@@ -446,6 +452,14 @@ class PlayerWeekScore(models.Model):
     is_home = models.BooleanField(null=True, blank=True)
     match_display = models.CharField(max_length=100, blank=True, default="")
 
+    live_status = models.CharField(
+        max_length=20,
+        choices=LIVE_STATUS_CHOICES,
+        default="pending",
+    )
+    last_points = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    unchanged_polls_count = models.PositiveSmallIntegerField(default=0)
+
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=["week", "player"], name="uniq_player_score_per_week"),
@@ -453,6 +467,7 @@ class PlayerWeekScore(models.Model):
 
     def __str__(self):
         return f"Week {self.week.number} — {self.player.name}: {self.points}"
+    
 # league/models.py
 from django.db import models
 from django.core.validators import MinValueValidator
