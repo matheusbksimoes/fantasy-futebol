@@ -189,76 +189,86 @@
 
     /* MOBILE HEADER AJUSTES */
 .matchup-mobile-score {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
+  gap: 4px;
   font-weight: 800;
   font-size: 16px;
-  text-align: center;
 }
 
 .matchup-mobile-score .team-name {
-  max-width: 80px;
+  max-width: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.matchup-mobile-score .team-name:first-child {
+  text-align: right;
+  padding-right: 6px;
+}
+
+.matchup-mobile-score .team-name:last-child {
+  text-align: left;
+  padding-left: 6px;
+}
+
 .matchup-mobile-score .score {
+  text-align: center;
   font-size: 18px;
   font-weight: 900;
 }
 
-    .matchup-mobile-summary {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
+.matchup-mobile-summary {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
 
-    .matchup-mobile-summary .badge {
-      font-size: 11px;
-      padding: 4px 8px;
-    }
+.matchup-mobile-summary .badge {
+  font-size: 11px;
+  padding: 4px 8px;
+}
 
-    /* ajustes que você já tinha */
-    .matchup-score-card {
-      margin-bottom: 12px;
-      padding: 12px !important;
-    }
+/* ajustes que você já tinha */
+.matchup-score-card {
+  margin-bottom: 12px;
+  padding: 12px !important;
+}
 
-    .matchup-score-top {
-      gap: 8px;
-    }
+.matchup-score-top {
+  gap: 8px;
+}
 
-    .matchup-team-name {
-      font-size: 16px;
-    }
+.matchup-team-name {
+  font-size: 16px;
+}
 
-    .matchup-score-number {
-      font-size: 20px;
-    }
+.matchup-score-number {
+  font-size: 20px;
+}
 
-    .matchup-score-x {
-      font-size: 12px;
-    }
+.matchup-score-x {
+  font-size: 12px;
+}
 
-    .matchup-lineup-list {
-      gap: 6px;
-    }
+.matchup-lineup-list {
+  gap: 6px;
+}
 
-    .matchup-slot-card {
-      padding: 8px 10px;
-      border-radius: 10px;
-    }
+.matchup-slot-card {
+  padding: 8px 10px;
+  border-radius: 10px;
+}
 
-    .matchup-slot-player {
-      font-size: 13px;
-    }
+.matchup-slot-player {
+  font-size: 13px;
+}
 
-    .matchup-slot-points {
-      font-size: 14px;
-    }
+.matchup-slot-points {
+  font-size: 14px;
+}
   }
 </style>
 
