@@ -122,6 +122,72 @@ class Command(BaseCommand):
         )
         return match_map
 
+    def _upsert_player_week_score(self, *, week, player, points, scouts, confronto):
+        """
+        Atualiza/salva PlayerWeekScore e infere live_status com base em mudanças recentes:
+        - live: pontuação mudou nesta coleta OU já pontuou e ainda não ficou parada 3 coletas
+        - finished: pontuação > 0 e ficou 3 coletas seguidas sem mudar
+        - pending: ainda sem pontuar
+        """
+        now = timezone.now()
+        new_points = Decimal(str(points or 0))
+
+        score_obj, created = PlayerWeekScore.objects.get_or_create(
+            week=week,
+            player=player,
+            defaults={
+                "points": new_points,
+                "last_points": Decimal("0"),
+                "unchanged_polls_count": 0,
+                "live_status": "pending" if new_points == 0 else "live",
+                "scouts": scouts or {},
+                "source": "CARTOLA",
+                "fetched_at": now,
+                "opponent": confronto.get("opponent", ""),
+                "is_home": confronto.get("is_home"),
+                "match_display": confronto.get("match_display", ""),
+            },
+        )
+
+        if created:
+            return
+
+        old_points = score_obj.points or Decimal("0")
+
+        if new_points != old_points:
+            score_obj.unchanged_polls_count = 0
+            score_obj.live_status = "live"
+        else:
+            score_obj.unchanged_polls_count = (score_obj.unchanged_polls_count or 0) + 1
+
+            if new_points > 0 and score_obj.unchanged_polls_count >= 3:
+                score_obj.live_status = "finished"
+            elif new_points > 0:
+                score_obj.live_status = "live"
+            else:
+                score_obj.live_status = "pending"
+
+        score_obj.last_points = old_points
+        score_obj.points = new_points
+        score_obj.scouts = scouts or {}
+        score_obj.source = "CARTOLA"
+        score_obj.fetched_at = now
+        score_obj.opponent = confronto.get("opponent", "")
+        score_obj.is_home = confronto.get("is_home")
+        score_obj.match_display = confronto.get("match_display", "")
+        score_obj.save(update_fields=[
+            "last_points",
+            "points",
+            "unchanged_polls_count",
+            "live_status",
+            "scouts",
+            "source",
+            "fetched_at",
+            "opponent",
+            "is_home",
+            "match_display",
+        ])
+
     def handle(self, *args, **options):
         draft_id = options["draft_id"]
         week_number = options["week"]
@@ -226,18 +292,12 @@ class Command(BaseCommand):
 
                     confronto = match_map.get(clube_id, {})
 
-                    PlayerWeekScore.objects.update_or_create(
+                    self._upsert_player_week_score(
                         week=week,
                         player=player,
-                        defaults={
-                            "points": 0,
-                            "scouts": {},
-                            "source": "CARTOLA",
-                            "fetched_at": timezone.now(),
-                            "opponent": confronto.get("opponent", ""),
-                            "is_home": confronto.get("is_home"),
-                            "match_display": confronto.get("match_display", ""),
-                        },
+                        points=0,
+                        scouts={},
+                        confronto=confronto,
                     )
                     upserts += 1
 
@@ -296,18 +356,12 @@ class Command(BaseCommand):
                     player.save(update_fields=["cartola_club_id"])
                     club_updates += 1
 
-                PlayerWeekScore.objects.update_or_create(
+                self._upsert_player_week_score(
                     week=week,
                     player=player,
-                    defaults={
-                        "points": points,
-                        "scouts": scouts,
-                        "source": "CARTOLA",
-                        "fetched_at": timezone.now(),
-                        "opponent": confronto.get("opponent", ""),
-                        "is_home": confronto.get("is_home"),
-                        "match_display": confronto.get("match_display", ""),
-                    },
+                    points=points,
+                    scouts=scouts,
+                    confronto=confronto,
                 )
                 upserts += 1
 

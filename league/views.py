@@ -1303,6 +1303,7 @@ def matchup_detail(request, draft_id: int, week_number: int, matchup_id: int):
         week, matchup.away_team
     )
 
+    # time do usuário logado, se ele estiver neste matchup
     team = None
     if matchup.home_team.user_id == request.user.id:
         team = matchup.home_team
@@ -1310,6 +1311,49 @@ def matchup_detail(request, draft_id: int, week_number: int, matchup_id: int):
         team = matchup.away_team
 
     my_matchup = get_team_matchup_for_week(week, team) if team else None
+
+    # =========================
+    # LIVE STATUS DOS JOGADORES
+    # =========================
+    player_ids = []
+
+    for spot in home_spots:
+        if spot.player_id:
+            player_ids.append(spot.player_id)
+
+    for spot in away_spots:
+        if spot.player_id:
+            player_ids.append(spot.player_id)
+
+    week_scores = (
+        PlayerWeekScore.objects
+        .filter(week=week, player_id__in=player_ids)
+        .only("player_id", "live_status")
+    )
+
+    status_map = {
+        s.player_id: s.live_status
+        for s in week_scores
+    }
+
+    home_status_map = {}
+    away_status_map = {}
+
+    for spot in home_spots:
+        if spot.player_id:
+            home_status_map[spot.player_id] = status_map.get(spot.player_id, "pending")
+
+    for spot in away_spots:
+        if spot.player_id:
+            away_status_map[spot.player_id] = status_map.get(spot.player_id, "pending")
+
+    home_live_count = sum(1 for v in home_status_map.values() if v == "live")
+    home_pending_count = sum(1 for v in home_status_map.values() if v == "pending")
+    home_finished_count = sum(1 for v in home_status_map.values() if v == "finished")
+
+    away_live_count = sum(1 for v in away_status_map.values() if v == "live")
+    away_pending_count = sum(1 for v in away_status_map.values() if v == "pending")
+    away_finished_count = sum(1 for v in away_status_map.values() if v == "finished")
 
     return render(request, "league/matchup.html", {
         "draft": draft,
@@ -1327,6 +1371,14 @@ def matchup_detail(request, draft_id: int, week_number: int, matchup_id: int):
         "away_total": away_total,
         "home_points_map": home_points_map,
         "away_points_map": away_points_map,
+        "home_status_map": home_status_map,
+        "away_status_map": away_status_map,
+        "home_live_count": home_live_count,
+        "home_pending_count": home_pending_count,
+        "home_finished_count": home_finished_count,
+        "away_live_count": away_live_count,
+        "away_pending_count": away_pending_count,
+        "away_finished_count": away_finished_count,
         "my_matchup": my_matchup,
     })
 

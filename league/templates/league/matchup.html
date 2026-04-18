@@ -80,6 +80,14 @@
     margin-top: 8px;
   }
 
+  .matchup-live-summary {
+    margin-top: 8px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
   .matchup-team-card {
     display: flex;
     flex-direction: column;
@@ -127,108 +135,113 @@
   }
 
   @media (max-width: 768px) {
-  .matchup-score-card {
-    margin-bottom: 12px;
-  }
+    .matchup-score-card {
+      margin-bottom: 12px;
+    }
 
-  .matchup-score-top {
-    gap: 8px;
-  }
+    .matchup-score-top {
+      gap: 8px;
+    }
 
-  .matchup-side,
-  .matchup-score-center {
-    min-width: 100%;
-    text-align: left;
-  }
+    .matchup-side,
+    .matchup-score-center {
+      min-width: 100%;
+      text-align: left;
+    }
 
-  .matchup-side.matchup-side--away {
-    text-align: left;
-  }
+    .matchup-side.matchup-side--away {
+      text-align: left;
+    }
 
-  .matchup-team-name {
-    font-size: 16px;
-    line-height: 1.1;
-  }
+    .matchup-team-name {
+      font-size: 16px;
+      line-height: 1.1;
+    }
 
-  .matchup-score-center {
-    padding-top: 2px;
-    padding-bottom: 2px;
-  }
+    .matchup-score-center {
+      padding-top: 2px;
+      padding-bottom: 2px;
+    }
 
-  .matchup-score-row {
-    justify-content: flex-start;
-    gap: 8px;
-    margin-top: 4px;
-  }
+    .matchup-score-row {
+      justify-content: flex-start;
+      gap: 8px;
+      margin-top: 4px;
+    }
 
-  .matchup-score-number {
-    font-size: 20px;
-  }
+    .matchup-score-number {
+      font-size: 20px;
+    }
 
-  .matchup-score-x {
-    font-size: 12px;
-  }
+    .matchup-score-x {
+      font-size: 12px;
+    }
 
-  .matchup-advantage-bar {
-    margin-top: 6px;
-    height: 5px;
-  }
+    .matchup-advantage-bar {
+      margin-top: 6px;
+      height: 5px;
+    }
 
-  .matchup-leader-text {
-    margin-top: 5px;
-  }
+    .matchup-leader-text {
+      margin-top: 5px;
+    }
 
-  .matchup-team-card {
-    padding: 12px 10px !important;
-  }
+    .matchup-live-summary {
+      justify-content: flex-start;
+      margin-top: 6px;
+    }
 
-  .matchup-team-card .section-header {
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
-  }
+    .matchup-team-card {
+      padding: 12px 10px !important;
+    }
 
-  .matchup-team-card .section-title {
-    font-size: 15px;
-    line-height: 1.1;
-  }
+    .matchup-team-card .section-header {
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
 
-  .matchup-team-card .section-subtitle {
-    font-size: 11px;
-  }
+    .matchup-team-card .section-title {
+      font-size: 15px;
+      line-height: 1.1;
+    }
 
-  .matchup-team-card .badge {
-    font-size: 11px;
-    padding: 5px 8px;
-  }
+    .matchup-team-card .section-subtitle {
+      font-size: 11px;
+    }
 
-  .matchup-lineup-list {
-    gap: 6px;
-  }
+    .matchup-team-card .badge {
+      font-size: 11px;
+      padding: 5px 8px;
+    }
 
-  .matchup-slot-card {
-    gap: 8px;
-    padding: 8px 10px;
-    border-radius: 10px;
-  }
+    .matchup-lineup-list {
+      gap: 6px;
+    }
 
-  .matchup-slot-label {
-    font-size: 10px;
-    line-height: 1.05;
-    margin-bottom: 1px;
-  }
+    .matchup-slot-card {
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+    }
 
-  .matchup-slot-player {
-    margin-top: 2px;
-    font-size: 13px;
-    line-height: 1.1;
-  }
+    .matchup-slot-label {
+      font-size: 10px;
+      line-height: 1.05;
+      margin-bottom: 1px;
+    }
 
-  .matchup-slot-points {
-    font-size: 14px;
-    font-weight: 800;
+    .matchup-slot-player {
+      margin-top: 2px;
+      font-size: 13px;
+      line-height: 1.1;
+    }
+
+    .matchup-slot-points {
+      font-size: 14px;
+      font-weight: 800;
+    }
   }
-}
 </style>
 
 <div class="card matchup-score-card">
@@ -265,8 +278,7 @@
           {% with total=home_total|add:away_total %}
             <div
               class="matchup-advantage-fill"
-              style="width:{% widthratio home_total total 100 %}%;">
-            </div>
+              style="width:{% widthratio home_total total 100 %}%;"></div>
           {% endwith %}
         </div>
       {% endif %}
@@ -279,6 +291,16 @@
         {% else %}
           <span class="badge badge-warning">Empate</span>
         {% endif %}
+      </div>
+
+      <div class="matchup-live-summary">
+        <span class="badge badge-success">{{ home_live_count }} ao vivo</span>
+        <span class="badge badge-warning">{{ home_pending_count }} pendentes</span>
+        <span class="badge badge-info">{{ home_finished_count }} finalizados</span>
+
+        <span class="badge badge-success">{{ away_live_count }} ao vivo</span>
+        <span class="badge badge-warning">{{ away_pending_count }} pendentes</span>
+        <span class="badge badge-info">{{ away_finished_count }} finalizados</span>
       </div>
     </div>
 
@@ -318,8 +340,20 @@
               {{ spot.get_slot_type_display }} {{ spot.slot_index }}
             </div>
 
-            <div class="matchup-slot-player">
-              {{ spot.player.name|default:"—" }}
+            <div class="matchup-slot-player" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+              <span>{{ spot.player.name|default:"—" }}</span>
+
+              {% if spot.player %}
+                {% with status=home_status_map|get_item:spot.player_id %}
+                  {% if status == "live" %}
+                    <span class="badge badge-success">Ao vivo</span>
+                  {% elif status == "finished" %}
+                    <span class="badge badge-info">Finalizado</span>
+                  {% else %}
+                    <span class="badge badge-warning">Pendente</span>
+                  {% endif %}
+                {% endwith %}
+              {% endif %}
             </div>
           </div>
 
@@ -356,8 +390,20 @@
               {{ spot.get_slot_type_display }} {{ spot.slot_index }}
             </div>
 
-            <div class="matchup-slot-player">
-              {{ spot.player.name|default:"—" }}
+            <div class="matchup-slot-player" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+              <span>{{ spot.player.name|default:"—" }}</span>
+
+              {% if spot.player %}
+                {% with status=away_status_map|get_item:spot.player_id %}
+                  {% if status == "live" %}
+                    <span class="badge badge-success">Ao vivo</span>
+                  {% elif status == "finished" %}
+                    <span class="badge badge-info">Finalizado</span>
+                  {% else %}
+                    <span class="badge badge-warning">Pendente</span>
+                  {% endif %}
+                {% endwith %}
+              {% endif %}
             </div>
           </div>
 
