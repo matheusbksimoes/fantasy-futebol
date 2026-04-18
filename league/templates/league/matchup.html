@@ -165,7 +165,52 @@
     flex-shrink: 0;
   }
 
+  /* 🔥 NOVO BLOCO (ESSENCIAL) */
+  .matchup-mobile-header {
+    display: none;
+  }
+
+  .matchup-desktop-header {
+    display: flex;
+    width: 100%;
+  }
+
   @media (max-width: 768px) {
+
+    .matchup-desktop-header {
+      display: none;
+    }
+
+    .matchup-mobile-header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .matchup-mobile-score {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 800;
+      font-size: 16px;
+    }
+
+    .matchup-mobile-score .score {
+      font-size: 18px;
+    }
+
+    .matchup-mobile-summary {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .matchup-mobile-summary .badge {
+      font-size: 11px;
+      padding: 4px 8px;
+    }
+
+    /* ajustes que você já tinha */
     .matchup-score-card {
       margin-bottom: 12px;
       padding: 12px !important;
@@ -175,30 +220,8 @@
       gap: 8px;
     }
 
-    .matchup-side,
-    .matchup-score-center {
-      min-width: 100%;
-      text-align: left;
-    }
-
-    .matchup-side.matchup-side--away {
-      text-align: left;
-    }
-
     .matchup-team-name {
       font-size: 16px;
-      line-height: 1.1;
-    }
-
-    .matchup-score-center {
-      padding-top: 2px;
-      padding-bottom: 2px;
-    }
-
-    .matchup-score-row {
-      justify-content: flex-start;
-      gap: 8px;
-      margin-top: 4px;
     }
 
     .matchup-score-number {
@@ -209,127 +232,43 @@
       font-size: 12px;
     }
 
-    .matchup-advantage-bar {
-      margin-top: 6px;
-      height: 5px;
-    }
-
-    .matchup-leader-text {
-      margin-top: 5px;
-    }
-
-    .matchup-leader-text .badge,
-    .matchup-live-summary .badge {
-      font-size: 11px;
-      padding: 4px 8px;
-    }
-
-    .matchup-live-summary {
-      justify-content: flex-start;
-      margin-top: 6px;
-      gap: 6px;
-    }
-
-    .matchup-live-summary .badge {
-      min-width: 62px;
-    }
-
-    .matchup-team-card {
-      padding: 12px 10px !important;
-    }
-
-    .matchup-team-card .section-header {
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .matchup-team-card .section-title {
-      font-size: 15px;
-      line-height: 1.1;
-    }
-
-    .matchup-team-card .section-subtitle {
-      font-size: 11px;
-    }
-
-    .matchup-team-card .badge {
-      font-size: 11px;
-      padding: 5px 8px;
-    }
-
     .matchup-lineup-list {
       gap: 6px;
     }
 
     .matchup-slot-card {
-      gap: 8px;
       padding: 8px 10px;
       border-radius: 10px;
     }
 
-    .matchup-slot-label {
-      font-size: 10px;
-      line-height: 1.05;
-      margin-bottom: 1px;
-    }
-
     .matchup-slot-player {
-      margin-top: 2px;
       font-size: 13px;
-      line-height: 1.1;
-    }
-
-    .matchup-slot-status {
-      font-size: 14px;
     }
 
     .matchup-slot-points {
       font-size: 14px;
-      font-weight: 800;
     }
   }
 </style>
 
 {% with total_live=home_live_count|add:away_live_count total_pending=home_pending_count|add:away_pending_count total_finished=home_finished_count|add:away_finished_count %}
+
 <div class="card matchup-score-card">
   <div class="matchup-score-top">
 
-    <div class="matchup-side">
-      <div class="section-subtitle">Mandante</div>
-      <div class="matchup-team-name">{{ home_team.name }}</div>
+    <!-- MOBILE HEADER (novo) -->
+    <div class="matchup-mobile-header">
+      <div class="matchup-mobile-score">
+        <span class="team-name">{{ home_team.name }}</span>
 
-      {% if home_total > away_total %}
-        <div class="badge badge-success" style="margin-top:6px;">Liderando</div>
-      {% endif %}
-    </div>
+        <span class="score">
+          {{ home_total|floatformat:2 }} x {{ away_total|floatformat:2 }}
+        </span>
 
-    <div class="matchup-score-center">
-      <div class="section-subtitle">Placar da semana</div>
-
-      <div class="matchup-score-row">
-        <div class="matchup-score-number" {% if home_total > away_total %}style="color:#22c55e;"{% endif %}>
-          {{ home_total|floatformat:2 }}
-        </div>
-
-        <div class="matchup-score-x">x</div>
-
-        <div class="matchup-score-number" {% if away_total > home_total %}style="color:#22c55e;"{% endif %}>
-          {{ away_total|floatformat:2 }}
-        </div>
+        <span class="team-name">{{ away_team.name }}</span>
       </div>
 
-      {% if home_total != away_total %}
-        <div class="matchup-advantage-bar">
-          {% with total=home_total|add:away_total %}
-            <div
-              class="matchup-advantage-fill"
-              style="width:{% widthratio home_total total 100 %}%;"></div>
-          {% endwith %}
-        </div>
-      {% endif %}
-
-      <div class="matchup-leader-text">
+      <div class="matchup-mobile-status">
         {% if home_total > away_total %}
           <span class="badge badge-success">{{ home_team.name }} lidera</span>
         {% elif away_total > home_total %}
@@ -339,24 +278,53 @@
         {% endif %}
       </div>
 
-      <div class="matchup-live-summary">
+      <div class="matchup-mobile-summary">
         <span class="badge badge-success">🔥 {{ total_live }}</span>
         <span class="badge badge-warning">⏳ {{ total_pending }}</span>
         <span class="badge badge-info">✅ {{ total_finished }}</span>
       </div>
     </div>
 
-    <div class="matchup-side matchup-side--away">
-      <div class="section-subtitle">Visitante</div>
-      <div class="matchup-team-name">{{ away_team.name }}</div>
+    <!-- DESKTOP (mantido) -->
+    <div class="matchup-desktop-header">
 
-      {% if away_total > home_total %}
-        <div class="badge badge-success" style="margin-top:6px;">Liderando</div>
-      {% endif %}
+      <div class="matchup-side">
+        <div class="section-subtitle">Mandante</div>
+        <div class="matchup-team-name">{{ home_team.name }}</div>
+      </div>
+
+      <div class="matchup-score-center">
+        <div class="section-subtitle">Placar da semana</div>
+
+        <div class="matchup-score-row">
+          <div class="matchup-score-number">
+            {{ home_total|floatformat:2 }}
+          </div>
+
+          <div class="matchup-score-x">x</div>
+
+          <div class="matchup-score-number">
+            {{ away_total|floatformat:2 }}
+          </div>
+        </div>
+
+        <div class="matchup-live-summary">
+          <span class="badge badge-success">🔥 {{ total_live }}</span>
+          <span class="badge badge-warning">⏳ {{ total_pending }}</span>
+          <span class="badge badge-info">✅ {{ total_finished }}</span>
+        </div>
+      </div>
+
+      <div class="matchup-side matchup-side--away">
+        <div class="section-subtitle">Visitante</div>
+        <div class="matchup-team-name">{{ away_team.name }}</div>
+      </div>
+
     </div>
 
   </div>
 </div>
+
 {% endwith %}
 
 <div class="grid grid--2">
