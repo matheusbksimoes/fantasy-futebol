@@ -2,78 +2,165 @@
 {% load league_extras %}
 {% block title %}Matchup{% endblock %}
 
+{% block page_title %}
+  Week {{ week.number }}
+{% endblock %}
+
+{% block page_subtitle %}
+  {{ home_team.name }} x {{ away_team.name }}
+{% endblock %}
+
 {% block content %}
-  <h1>Week {{ week.number }} — {{ home_team.name }} x {{ away_team.name }}</h1>
 
-  <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:12px;">
-    <div style="flex:1; min-width:320px; border:1px solid #ddd; border-radius:10px; padding:12px;">
-      <h2 style="margin-top:0;">
-        {{ home_team.name }} — <span style="font-weight:700;">{{ home_total|floatformat:2 }}</span>
-      </h2>
-      <small style="color:#666;">Formação: {{ home_lineup.get_formation_display }}</small>
-
-      <hr>
-
-      <div>
-        {% for spot in home_spots %}
-          <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed #eee;">
-            <div>
-              <strong>{{ spot.get_slot_type_display }} {{ spot.slot_index }}</strong><br>
-              {% if spot.player %}
-                {{ spot.player.name }}
-              {% else %}
-                —
-              {% endif %}
-            </div>
-            <div style="font-weight:700;">
-              {% if spot.player %}
-                {{ home_points_map|get_item:spot.player_id|default:0|floatformat:2 }}
-              {% else %}
-                0
-              {% endif %}
-            </div>
-          </div>
-        {% endfor %}
+<div class="card" style="margin-bottom: 24px;">
+  <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+    <div style="flex:1; min-width:220px;">
+      <div class="section-subtitle">Mandante</div>
+      <div style="font-size:24px; font-weight:800;">{{ home_team.name }}</div>
+      <div style="margin-top:6px;">
+        <span class="badge {% if home_total >= away_total %}badge-success{% else %}badge-info{% endif %}">
+          Formação: {{ home_lineup.get_formation_display }}
+        </span>
       </div>
     </div>
 
-    <div style="flex:1; min-width:320px; border:1px solid #ddd; border-radius:10px; padding:12px;">
-      <h2 style="margin-top:0;">
-        {{ away_team.name }} — <span style="font-weight:700;">{{ away_total|floatformat:2 }}</span>
-      </h2>
-      <small style="color:#666;">Formação: {{ away_lineup.get_formation_display }}</small>
+    <div style="text-align:center; min-width:220px;">
+      <div class="section-subtitle">Placar da semana</div>
+      <div style="display:flex; align-items:center; justify-content:center; gap:18px; margin-top:8px;">
+        <div style="font-size:34px; font-weight:800; {% if home_total > away_total %}color: #22c55e;{% endif %}">
+          {{ home_total|floatformat:2 }}
+        </div>
+        <div style="font-size:18px; color: var(--text-muted); font-weight:700;">x</div>
+        <div style="font-size:34px; font-weight:800; {% if away_total > home_total %}color: #22c55e;{% endif %}">
+          {{ away_total|floatformat:2 }}
+        </div>
+      </div>
+    </div>
 
-      <hr>
-
-      <div>
-        {% for spot in away_spots %}
-          <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed #eee;">
-            <div>
-              <strong>{{ spot.get_slot_type_display }} {{ spot.slot_index }}</strong><br>
-              {% if spot.player %}
-                {{ spot.player.name }}
-              {% else %}
-                —
-              {% endif %}
-            </div>
-            <div style="font-weight:700;">
-              {% if spot.player %}
-                {{ away_points_map|get_item:spot.player_id|default:0|floatformat:2 }}
-              {% else %}
-                0
-              {% endif %}
-            </div>
-          </div>
-        {% endfor %}
+    <div style="flex:1; min-width:220px; text-align:right;">
+      <div class="section-subtitle">Visitante</div>
+      <div style="font-size:24px; font-weight:800;">{{ away_team.name }}</div>
+      <div style="margin-top:6px;">
+        <span class="badge {% if away_total >= home_total %}badge-success{% else %}badge-info{% endif %}">
+          Formação: {{ away_lineup.get_formation_display }}
+        </span>
       </div>
     </div>
   </div>
+</div>
 
-  {% if team %}
-    <div style="margin-top:16px;">
-      <a href="{% url 'set_lineup_week' draft.id team.id week.number %}">
-        Voltar para editar minha escalação
-      </a>
+<div class="grid grid--2">
+
+  <!-- HOME TEAM -->
+  <div class="card">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">{{ home_team.name }}</h2>
+        <div class="section-subtitle">Escalação da semana</div>
+      </div>
+
+      <span class="badge {% if home_total > away_total %}badge-success{% else %}badge-info{% endif %}">
+        {{ home_total|floatformat:2 }} pts
+      </span>
     </div>
-  {% endif %}
+
+    <div style="display:grid; gap:10px;">
+      {% for spot in home_spots %}
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          gap:12px;
+          padding:12px 14px;
+          border:1px solid rgba(51, 65, 85, 0.85);
+          border-radius:14px;
+          background: rgba(15, 23, 42, 0.55);
+        ">
+          <div>
+            <div style="font-size:12px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">
+              {{ spot.get_slot_type_display }} {{ spot.slot_index }}
+            </div>
+
+            <div style="margin-top:4px; font-weight:700;">
+              {% if spot.player %}
+                {{ spot.player.name }}
+              {% else %}
+                —
+              {% endif %}
+            </div>
+          </div>
+
+          <div style="font-size:18px; font-weight:800; color:{% if spot.player %}var(--text){% else %}var(--text-muted){% endif %};">
+            {% if spot.player %}
+              {{ home_points_map|get_item:spot.player_id|default:0|floatformat:2 }}
+            {% else %}
+              0
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- AWAY TEAM -->
+  <div class="card">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">{{ away_team.name }}</h2>
+        <div class="section-subtitle">Escalação da semana</div>
+      </div>
+
+      <span class="badge {% if away_total > home_total %}badge-success{% else %}badge-info{% endif %}">
+        {{ away_total|floatformat:2 }} pts
+      </span>
+    </div>
+
+    <div style="display:grid; gap:10px;">
+      {% for spot in away_spots %}
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          gap:12px;
+          padding:12px 14px;
+          border:1px solid rgba(51, 65, 85, 0.85);
+          border-radius:14px;
+          background: rgba(15, 23, 42, 0.55);
+        ">
+          <div>
+            <div style="font-size:12px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">
+              {{ spot.get_slot_type_display }} {{ spot.slot_index }}
+            </div>
+
+            <div style="margin-top:4px; font-weight:700;">
+              {% if spot.player %}
+                {{ spot.player.name }}
+              {% else %}
+                —
+              {% endif %}
+            </div>
+          </div>
+
+          <div style="font-size:18px; font-weight:800; color:{% if spot.player %}var(--text){% else %}var(--text-muted){% endif %};">
+            {% if spot.player %}
+              {{ away_points_map|get_item:spot.player_id|default:0|floatformat:2 }}
+            {% else %}
+              0
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+
+{% if team %}
+  <div style="margin-top: 20px;">
+    <a href="{% url 'set_lineup_week' draft.id team.id week.number %}" class="btn btn-secondary">
+      Voltar para editar minha escalação
+    </a>
+  </div>
+{% endif %}
+
 {% endblock %}
