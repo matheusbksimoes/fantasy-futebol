@@ -361,6 +361,24 @@ def team_roster(request, draft_id: int, team_id: int):
         if last_3_avg is not None and season_avg is not None:
             is_hot = last_3_avg > season_avg
 
+        current_game = None
+        fixture_label = None
+
+        if week:
+            current_game = stats.filter(week=week).first()
+
+        if current_game and current_game.match_display:
+            if current_game.is_home is True:
+                mando = "Casa"
+            elif current_game.is_home is False:
+                mando = "Fora"
+            else:
+                mando = None
+
+            fixture_label = current_game.match_display
+            if mando:
+                fixture_label = f"{fixture_label} • {mando}"
+
         roster_items.append({
             "spot": spot,
             "player": player,
@@ -371,7 +389,8 @@ def team_roster(request, draft_id: int, team_id: int):
                 "last_game_points": last_game_points,
                 "is_hot": is_hot,
                 "last_3_games": last_3_games,
-            }
+            },
+            "current_fixture": fixture_label,
         })
 
     return render(request, "league/team_roster.html", {

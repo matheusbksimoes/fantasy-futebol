@@ -61,6 +61,13 @@
     margin-top: 3px;
   }
 
+  .roster-fixture {
+    font-size: 12px;
+    color: #60a5fa;
+    margin-top: 2px;
+    font-weight: 600;
+  }
+
   .roster-header-right {
     display: flex;
     gap: 8px;
@@ -192,6 +199,11 @@
       font-size: 12px;
     }
 
+    .roster-fixture {
+      font-size: 11px;
+      margin-top: 3px;
+    }
+
     .roster-toggle {
       display: inline-block;
     }
@@ -286,6 +298,11 @@
                 <div class="roster-subtitle">
                   {{ item.player.get_position_display }} • {{ item.player.real_team|default:"—" }}
                 </div>
+                {% if item.current_fixture %}
+                  <div class="roster-fixture">
+                    {{ item.current_fixture }}
+                  </div>
+                {% endif %}
               </div>
 
               <div class="roster-header-right">
@@ -359,6 +376,11 @@
                 <div class="roster-subtitle">
                   {{ item.player.get_position_display }} • {{ item.player.real_team|default:"—" }}
                 </div>
+                {% if item.current_fixture %}
+                  <div class="roster-fixture">
+                    {{ item.current_fixture }}
+                  </div>
+                {% endif %}
               </div>
 
               <div class="roster-header-right">
@@ -432,6 +454,11 @@
                 <div class="roster-subtitle">
                   {{ item.player.get_position_display }} • {{ item.player.real_team|default:"—" }}
                 </div>
+                {% if item.current_fixture %}
+                  <div class="roster-fixture">
+                    {{ item.current_fixture }}
+                  </div>
+                {% endif %}
               </div>
 
               <div class="roster-header-right">
@@ -505,6 +532,11 @@
                 <div class="roster-subtitle">
                   {{ item.player.get_position_display }} • {{ item.player.real_team|default:"—" }}
                 </div>
+                {% if item.current_fixture %}
+                  <div class="roster-fixture">
+                    {{ item.current_fixture }}
+                  </div>
+                {% endif %}
               </div>
 
               <div class="roster-header-right">
@@ -578,6 +610,11 @@
                 <div class="roster-subtitle">
                   {{ item.player.get_position_display }} • {{ item.player.real_team|default:"—" }}
                 </div>
+                {% if item.current_fixture %}
+                  <div class="roster-fixture">
+                    {{ item.current_fixture }}
+                  </div>
+                {% endif %}
               </div>
 
               <div class="roster-header-right">
@@ -651,6 +688,11 @@
                 <div class="roster-subtitle">
                   {{ item.player.get_position_display }} • {{ item.player.real_team|default:"—" }}
                 </div>
+                {% if item.current_fixture %}
+                  <div class="roster-fixture">
+                    {{ item.current_fixture }}
+                  </div>
+                {% endif %}
               </div>
 
               <div class="roster-header-right">
