@@ -16,6 +16,19 @@
     margin: 6px 0 0;
   }
 
+  .roster-position-section {
+    margin-bottom: 18px;
+  }
+
+  .roster-position-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #cbd5e1;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
   .roster-list {
     gap: 14px;
   }
@@ -55,11 +68,16 @@
     flex-shrink: 0;
   }
 
-  .roster-drag {
-    cursor: grab;
-    color: #cbd5e1;
+  .roster-toggle {
+    display: none;
     font-size: 18px;
+    color: #94a3b8;
     line-height: 1;
+    transition: transform 0.18s ease;
+  }
+
+  .roster-card.open .roster-toggle {
+    transform: rotate(180deg);
   }
 
   .roster-metrics {
@@ -135,10 +153,6 @@
     padding: 8px 12px;
   }
 
-  .roster-mobile-section {
-    display: none;
-  }
-
   @media (max-width: 768px) {
     .roster-summary {
       grid-template-columns: 1fr;
@@ -148,12 +162,26 @@
 
     .roster-list {
       grid-template-columns: 1fr;
-      gap: 10px;
+      gap: 8px;
+    }
+
+    .roster-position-section {
+      margin-bottom: 14px;
+    }
+
+    .roster-position-title {
+      font-size: 14px;
+      margin-bottom: 8px;
     }
 
     .roster-card {
-      padding: 12px;
+      padding: 10px 12px;
       border-radius: 12px;
+    }
+
+    .roster-header {
+      margin-bottom: 0;
+      cursor: pointer;
     }
 
     .roster-name {
@@ -164,12 +192,31 @@
       font-size: 12px;
     }
 
-    .roster-header {
-      margin-bottom: 6px;
+    .roster-toggle {
+      display: inline-block;
+    }
+
+    .roster-metrics,
+    .roster-history,
+    .roster-footer {
+      display: none;
+    }
+
+    .roster-card.open .roster-metrics,
+    .roster-card.open .roster-history {
+      display: block;
+    }
+
+    .roster-card.open .roster-footer {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
     }
 
     .roster-metrics {
       gap: 10px;
+      margin-top: 8px;
       margin-bottom: 8px;
     }
 
@@ -189,12 +236,6 @@
     .roster-chip {
       font-size: 10px;
       padding: 4px 7px;
-    }
-
-    .roster-footer {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 8px;
     }
 
     .roster-actions {
@@ -232,101 +273,443 @@
 
 {% if roster_items %}
 
-<div id="roster-body" class="grid grid--2 roster-list">
-  {% for item in roster_items %}
-    <div class="card roster-card" data-spot-id="{{ item.spot.id }}">
+  <!-- GOLEIRO -->
+  <div class="roster-position-section">
+    <div class="roster-position-title">Goleiro</div>
+    <div class="grid grid--2 roster-list">
+      {% for item in roster_items %}
+        {% if item.player.get_position_display == "Goleiro" %}
+          <div class="card roster-card">
+            <div class="roster-header">
+              <div>
+                <div class="roster-name">{{ item.player.name }}</div>
+                <div class="roster-subtitle">
+                  {{ item.player.get_position_display }} • {{ item.player.real_team|default:"—" }}
+                </div>
+              </div>
 
-      <div class="roster-header">
-        <div>
-          <div class="roster-name">
-            {{ item.player.name }}
+              <div class="roster-header-right">
+                {% if item.stats.is_hot %}
+                  <span class="badge badge-success">🔥 Em alta</span>
+                {% endif %}
+                <span class="roster-toggle">⌄</span>
+              </div>
+            </div>
+
+            <div class="roster-metrics">
+              <div class="roster-metric">Média <strong>{{ item.stats.avg|default:"0"|floatformat:2 }}</strong></div>
+              <div class="roster-metric">Total <strong>{{ item.stats.total|default:"0"|floatformat:2 }}</strong></div>
+              <div class="roster-metric">
+                Últ. 3
+                <strong>
+                  {% if item.stats.last_3_avg is not None %}
+                    {{ item.stats.last_3_avg|floatformat:2 }}
+                  {% else %}
+                    -
+                  {% endif %}
+                </strong>
+              </div>
+            </div>
+
+            <div class="roster-history">
+              <div class="roster-history-label">Últimos jogos</div>
+              <div class="roster-history-list">
+                {% if item.stats.last_3_games %}
+                  {% for game in item.stats.last_3_games %}
+                    <span class="roster-chip">W{{ game.week.number }}: {{ game.points|floatformat:1 }}</span>
+                  {% endfor %}
+                {% else %}
+                  <span class="roster-history-empty">Sem jogos recentes</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="roster-footer">
+              <div class="roster-acquired">{{ item.spot.get_acquired_via_display }}</div>
+
+              <div class="roster-actions">
+                {% if can_manage_team %}
+                  <form method="post" action="{% url 'drop_player' team.id item.player.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-danger">Drop</button>
+                  </form>
+                {% elif my_team and my_team.id != team.id %}
+                  <a href="{% url 'propose_trade_player' draft.id team.id item.player.id %}" class="btn btn-secondary">Troca</a>
+                {% endif %}
+
+                <a href="{% url 'player_detail' item.player.id %}" class="btn btn-secondary">Ver</a>
+              </div>
+            </div>
           </div>
-
-          <div class="roster-subtitle">
-            {{ item.player.get_position_display }} • {{ item.player.real_team|default:"—" }}
-          </div>
-        </div>
-
-        <div class="roster-header-right">
-          {% if item.stats.is_hot %}
-            <span class="badge badge-success">🔥 Em alta</span>
-          {% endif %}
-
-          {% if can_manage_team %}
-            <span class="drag-handle roster-drag">☰</span>
-          {% endif %}
-        </div>
-      </div>
-
-      <div class="roster-metrics">
-        <div class="roster-metric">
-          Média <strong>{{ item.stats.avg|default:"0"|floatformat:2 }}</strong>
-        </div>
-
-        <div class="roster-metric">
-          Total <strong>{{ item.stats.total|default:"0"|floatformat:2 }}</strong>
-        </div>
-
-        <div class="roster-metric">
-          Últ. 3
-          <strong>
-            {% if item.stats.last_3_avg is not None %}
-              {{ item.stats.last_3_avg|floatformat:2 }}
-            {% else %}
-              -
-            {% endif %}
-          </strong>
-        </div>
-      </div>
-
-      <div class="roster-history">
-        <div class="roster-history-label">Últimos jogos</div>
-
-        <div class="roster-history-list">
-          {% if item.stats.last_3_games %}
-            {% for game in item.stats.last_3_games %}
-              <span class="roster-chip">
-                W{{ game.week.number }}: {{ game.points|floatformat:1 }}
-              </span>
-            {% endfor %}
-          {% else %}
-            <span class="roster-history-empty">Sem jogos recentes</span>
-          {% endif %}
-        </div>
-      </div>
-
-      <div class="roster-footer">
-        <div class="roster-acquired">
-          {{ item.spot.get_acquired_via_display }}
-        </div>
-
-        <div class="roster-actions">
-          {% if can_manage_team %}
-            <form method="post" action="{% url 'drop_player' team.id item.player.id %}">
-              {% csrf_token %}
-              <button class="btn btn-danger">Drop</button>
-            </form>
-
-          {% elif my_team and my_team.id != team.id %}
-            <a
-              href="{% url 'propose_trade_player' draft.id team.id item.player.id %}"
-              class="btn btn-secondary"
-            >
-              Troca
-            </a>
-          {% endif %}
-
-          <a
-            href="{% url 'player_detail' item.player.id %}"
-            class="btn btn-secondary"
-          >
-            Ver
-          </a>
-        </div>
-      </div>
+        {% endif %}
+      {% endfor %}
     </div>
-  {% endfor %}
-</div>
+  </div>
+
+  <!-- LATERAL -->
+  <div class="roster-position-section">
+    <div class="roster-position-title">Lateral</div>
+    <div class="grid grid--2 roster-list">
+      {% for item in roster_items %}
+        {% if item.player.get_position_display == "Lateral" %}
+          <div class="card roster-card">
+            <div class="roster-header">
+              <div>
+                <div class="roster-name">{{ item.player.name }}</div>
+                <div class="roster-subtitle">
+                  {{ item.player.get_position_display }} • {{ item.player.real_team|default:"—" }}
+                </div>
+              </div>
+
+              <div class="roster-header-right">
+                {% if item.stats.is_hot %}
+                  <span class="badge badge-success">🔥 Em alta</span>
+                {% endif %}
+                <span class="roster-toggle">⌄</span>
+              </div>
+            </div>
+
+            <div class="roster-metrics">
+              <div class="roster-metric">Média <strong>{{ item.stats.avg|default:"0"|floatformat:2 }}</strong></div>
+              <div class="roster-metric">Total <strong>{{ item.stats.total|default:"0"|floatformat:2 }}</strong></div>
+              <div class="roster-metric">
+                Últ. 3
+                <strong>
+                  {% if item.stats.last_3_avg is not None %}
+                    {{ item.stats.last_3_avg|floatformat:2 }}
+                  {% else %}
+                    -
+                  {% endif %}
+                </strong>
+              </div>
+            </div>
+
+            <div class="roster-history">
+              <div class="roster-history-label">Últimos jogos</div>
+              <div class="roster-history-list">
+                {% if item.stats.last_3_games %}
+                  {% for game in item.stats.last_3_games %}
+                    <span class="roster-chip">W{{ game.week.number }}: {{ game.points|floatformat:1 }}</span>
+                  {% endfor %}
+                {% else %}
+                  <span class="roster-history-empty">Sem jogos recentes</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="roster-footer">
+              <div class="roster-acquired">{{ item.spot.get_acquired_via_display }}</div>
+
+              <div class="roster-actions">
+                {% if can_manage_team %}
+                  <form method="post" action="{% url 'drop_player' team.id item.player.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-danger">Drop</button>
+                  </form>
+                {% elif my_team and my_team.id != team.id %}
+                  <a href="{% url 'propose_trade_player' draft.id team.id item.player.id %}" class="btn btn-secondary">Troca</a>
+                {% endif %}
+
+                <a href="{% url 'player_detail' item.player.id %}" class="btn btn-secondary">Ver</a>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- ZAGUEIRO -->
+  <div class="roster-position-section">
+    <div class="roster-position-title">Zagueiro</div>
+    <div class="grid grid--2 roster-list">
+      {% for item in roster_items %}
+        {% if item.player.get_position_display == "Zagueiro" %}
+          <div class="card roster-card">
+            <div class="roster-header">
+              <div>
+                <div class="roster-name">{{ item.player.name }}</div>
+                <div class="roster-subtitle">
+                  {{ item.player.get_position_display }} • {{ item.player.real_team|default:"—" }}
+                </div>
+              </div>
+
+              <div class="roster-header-right">
+                {% if item.stats.is_hot %}
+                  <span class="badge badge-success">🔥 Em alta</span>
+                {% endif %}
+                <span class="roster-toggle">⌄</span>
+              </div>
+            </div>
+
+            <div class="roster-metrics">
+              <div class="roster-metric">Média <strong>{{ item.stats.avg|default:"0"|floatformat:2 }}</strong></div>
+              <div class="roster-metric">Total <strong>{{ item.stats.total|default:"0"|floatformat:2 }}</strong></div>
+              <div class="roster-metric">
+                Últ. 3
+                <strong>
+                  {% if item.stats.last_3_avg is not None %}
+                    {{ item.stats.last_3_avg|floatformat:2 }}
+                  {% else %}
+                    -
+                  {% endif %}
+                </strong>
+              </div>
+            </div>
+
+            <div class="roster-history">
+              <div class="roster-history-label">Últimos jogos</div>
+              <div class="roster-history-list">
+                {% if item.stats.last_3_games %}
+                  {% for game in item.stats.last_3_games %}
+                    <span class="roster-chip">W{{ game.week.number }}: {{ game.points|floatformat:1 }}</span>
+                  {% endfor %}
+                {% else %}
+                  <span class="roster-history-empty">Sem jogos recentes</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="roster-footer">
+              <div class="roster-acquired">{{ item.spot.get_acquired_via_display }}</div>
+
+              <div class="roster-actions">
+                {% if can_manage_team %}
+                  <form method="post" action="{% url 'drop_player' team.id item.player.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-danger">Drop</button>
+                  </form>
+                {% elif my_team and my_team.id != team.id %}
+                  <a href="{% url 'propose_trade_player' draft.id team.id item.player.id %}" class="btn btn-secondary">Troca</a>
+                {% endif %}
+
+                <a href="{% url 'player_detail' item.player.id %}" class="btn btn-secondary">Ver</a>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- MEIA -->
+  <div class="roster-position-section">
+    <div class="roster-position-title">Meia</div>
+    <div class="grid grid--2 roster-list">
+      {% for item in roster_items %}
+        {% if item.player.get_position_display == "Meia" %}
+          <div class="card roster-card">
+            <div class="roster-header">
+              <div>
+                <div class="roster-name">{{ item.player.name }}</div>
+                <div class="roster-subtitle">
+                  {{ item.player.get_position_display }} • {{ item.player.real_team|default:"—" }}
+                </div>
+              </div>
+
+              <div class="roster-header-right">
+                {% if item.stats.is_hot %}
+                  <span class="badge badge-success">🔥 Em alta</span>
+                {% endif %}
+                <span class="roster-toggle">⌄</span>
+              </div>
+            </div>
+
+            <div class="roster-metrics">
+              <div class="roster-metric">Média <strong>{{ item.stats.avg|default:"0"|floatformat:2 }}</strong></div>
+              <div class="roster-metric">Total <strong>{{ item.stats.total|default:"0"|floatformat:2 }}</strong></div>
+              <div class="roster-metric">
+                Últ. 3
+                <strong>
+                  {% if item.stats.last_3_avg is not None %}
+                    {{ item.stats.last_3_avg|floatformat:2 }}
+                  {% else %}
+                    -
+                  {% endif %}
+                </strong>
+              </div>
+            </div>
+
+            <div class="roster-history">
+              <div class="roster-history-label">Últimos jogos</div>
+              <div class="roster-history-list">
+                {% if item.stats.last_3_games %}
+                  {% for game in item.stats.last_3_games %}
+                    <span class="roster-chip">W{{ game.week.number }}: {{ game.points|floatformat:1 }}</span>
+                  {% endfor %}
+                {% else %}
+                  <span class="roster-history-empty">Sem jogos recentes</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="roster-footer">
+              <div class="roster-acquired">{{ item.spot.get_acquired_via_display }}</div>
+
+              <div class="roster-actions">
+                {% if can_manage_team %}
+                  <form method="post" action="{% url 'drop_player' team.id item.player.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-danger">Drop</button>
+                  </form>
+                {% elif my_team and my_team.id != team.id %}
+                  <a href="{% url 'propose_trade_player' draft.id team.id item.player.id %}" class="btn btn-secondary">Troca</a>
+                {% endif %}
+
+                <a href="{% url 'player_detail' item.player.id %}" class="btn btn-secondary">Ver</a>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- ATACANTE -->
+  <div class="roster-position-section">
+    <div class="roster-position-title">Atacante</div>
+    <div class="grid grid--2 roster-list">
+      {% for item in roster_items %}
+        {% if item.player.get_position_display == "Atacante" %}
+          <div class="card roster-card">
+            <div class="roster-header">
+              <div>
+                <div class="roster-name">{{ item.player.name }}</div>
+                <div class="roster-subtitle">
+                  {{ item.player.get_position_display }} • {{ item.player.real_team|default:"—" }}
+                </div>
+              </div>
+
+              <div class="roster-header-right">
+                {% if item.stats.is_hot %}
+                  <span class="badge badge-success">🔥 Em alta</span>
+                {% endif %}
+                <span class="roster-toggle">⌄</span>
+              </div>
+            </div>
+
+            <div class="roster-metrics">
+              <div class="roster-metric">Média <strong>{{ item.stats.avg|default:"0"|floatformat:2 }}</strong></div>
+              <div class="roster-metric">Total <strong>{{ item.stats.total|default:"0"|floatformat:2 }}</strong></div>
+              <div class="roster-metric">
+                Últ. 3
+                <strong>
+                  {% if item.stats.last_3_avg is not None %}
+                    {{ item.stats.last_3_avg|floatformat:2 }}
+                  {% else %}
+                    -
+                  {% endif %}
+                </strong>
+              </div>
+            </div>
+
+            <div class="roster-history">
+              <div class="roster-history-label">Últimos jogos</div>
+              <div class="roster-history-list">
+                {% if item.stats.last_3_games %}
+                  {% for game in item.stats.last_3_games %}
+                    <span class="roster-chip">W{{ game.week.number }}: {{ game.points|floatformat:1 }}</span>
+                  {% endfor %}
+                {% else %}
+                  <span class="roster-history-empty">Sem jogos recentes</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="roster-footer">
+              <div class="roster-acquired">{{ item.spot.get_acquired_via_display }}</div>
+
+              <div class="roster-actions">
+                {% if can_manage_team %}
+                  <form method="post" action="{% url 'drop_player' team.id item.player.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-danger">Drop</button>
+                  </form>
+                {% elif my_team and my_team.id != team.id %}
+                  <a href="{% url 'propose_trade_player' draft.id team.id item.player.id %}" class="btn btn-secondary">Troca</a>
+                {% endif %}
+
+                <a href="{% url 'player_detail' item.player.id %}" class="btn btn-secondary">Ver</a>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- TÉCNICO -->
+  <div class="roster-position-section">
+    <div class="roster-position-title">Técnico</div>
+    <div class="grid grid--2 roster-list">
+      {% for item in roster_items %}
+        {% if item.player.get_position_display == "Técnico" %}
+          <div class="card roster-card">
+            <div class="roster-header">
+              <div>
+                <div class="roster-name">{{ item.player.name }}</div>
+                <div class="roster-subtitle">
+                  {{ item.player.get_position_display }} • {{ item.player.real_team|default:"—" }}
+                </div>
+              </div>
+
+              <div class="roster-header-right">
+                {% if item.stats.is_hot %}
+                  <span class="badge badge-success">🔥 Em alta</span>
+                {% endif %}
+                <span class="roster-toggle">⌄</span>
+              </div>
+            </div>
+
+            <div class="roster-metrics">
+              <div class="roster-metric">Média <strong>{{ item.stats.avg|default:"0"|floatformat:2 }}</strong></div>
+              <div class="roster-metric">Total <strong>{{ item.stats.total|default:"0"|floatformat:2 }}</strong></div>
+              <div class="roster-metric">
+                Últ. 3
+                <strong>
+                  {% if item.stats.last_3_avg is not None %}
+                    {{ item.stats.last_3_avg|floatformat:2 }}
+                  {% else %}
+                    -
+                  {% endif %}
+                </strong>
+              </div>
+            </div>
+
+            <div class="roster-history">
+              <div class="roster-history-label">Últimos jogos</div>
+              <div class="roster-history-list">
+                {% if item.stats.last_3_games %}
+                  {% for game in item.stats.last_3_games %}
+                    <span class="roster-chip">W{{ game.week.number }}: {{ game.points|floatformat:1 }}</span>
+                  {% endfor %}
+                {% else %}
+                  <span class="roster-history-empty">Sem jogos recentes</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="roster-footer">
+              <div class="roster-acquired">{{ item.spot.get_acquired_via_display }}</div>
+
+              <div class="roster-actions">
+                {% if can_manage_team %}
+                  <form method="post" action="{% url 'drop_player' team.id item.player.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-danger">Drop</button>
+                  </form>
+                {% elif my_team and my_team.id != team.id %}
+                  <a href="{% url 'propose_trade_player' draft.id team.id item.player.id %}" class="btn btn-secondary">Troca</a>
+                {% endif %}
+
+                <a href="{% url 'player_detail' item.player.id %}" class="btn btn-secondary">Ver</a>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
 
 {% else %}
   <div class="empty-state">
@@ -334,38 +717,22 @@
   </div>
 {% endif %}
 
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    const rosterBody = document.getElementById("roster-body");
-    const canManage = {{ can_manage_team|yesno:"true,false" }};
+    const isMobile = window.innerWidth <= 768;
 
-    if (!rosterBody || !canManage) return;
+    if (!isMobile) return;
 
-    new Sortable(rosterBody, {
-      animation: 150,
-      handle: ".drag-handle",
-      draggable: "[data-spot-id]",
-      onEnd: function () {
-        const items = rosterBody.querySelectorAll("[data-spot-id]");
-        const spotIds = Array.from(items).map(el => Number(el.dataset.spotId));
+    document.querySelectorAll(".roster-card").forEach(card => {
+      const header = card.querySelector(".roster-header");
 
-        fetch("{% url 'reorder_roster' draft.id team.id %}", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": "{{ csrf_token }}",
-          },
-          body: JSON.stringify({
-            spot_ids: spotIds
-          })
-        })
-        .then(r => r.json())
-        .then(data => {
-          if (!data.ok) alert("Erro ao salvar ordem");
-        })
-        .catch(() => alert("Erro ao salvar ordem"));
-      }
+      header.addEventListener("click", () => {
+        document.querySelectorAll(".roster-card").forEach(c => {
+          if (c !== card) c.classList.remove("open");
+        });
+
+        card.classList.toggle("open");
+      });
     });
   });
 </script>
