@@ -1804,3 +1804,62 @@ def reorder_roster(request, draft_id: int, team_id: int):
     RosterSpot.objects.bulk_update(to_update, ["manual_order"])
 
     return JsonResponse({"ok": True})
+
+    from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from .models import Draft, Week, Team, Matchup, TeamBudget, RosterSpot
+
+def get_team_matchup_for_week(week, team):
+    if not week or not team:
+        return None
+
+    return Matchup.objects.filter(week=week).filter(
+        models.Q(home_team=team) | models.Q(away_team=team)
+    ).first()
+
+
+@login_required
+def dashboard(request):
+    draft = Draft.objects.order_by("-id").first()
+    if not draft:
+        return render(request, "league/dashboard.html", {
+            "draft": None,
+            "week": None,
+            "team": None,
+            "my_matchup": None,
+            "faab_balance": 0,
+            "roster_count": 0,
+            "active_tab": "dashboard",
+        })
+
+    week = Week.objects.filter(draft=draft, is_current=True).first()
+
+    team = Team.objects.filter(
+        league=draft.league,
+        user=request.user,
+    ).first()
+
+    my_matchup = get_team_matchup_for_week(week, team) if week and team else None
+
+    faab_balance = 0
+    if team:
+        budget, _ = TeamBudget.objects.get_or_create(team=team)
+        faab_balance = budget.balance
+
+    roster_count = 0
+    if team:
+        roster_count = (
+            RosterSpot.objects
+            .filter(draft=draft, team=team, dropped_at__isnull=True)
+            .count()
+        )
+
+    return render(request, "league/dashboard.html", {
+        "draft": draft,
+        "week": week,
+        "team": team,
+        "my_matchup": my_matchup,
+        "faab_balance": faab_balance,
+        "roster_count": roster_count,
+        "active_tab": "dashboard",
+    })

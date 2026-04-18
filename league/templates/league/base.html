@@ -552,116 +552,123 @@
   <div class="app-shell">
     <aside class="sidebar" id="sidebar">
       <div class="sidebar__top">
-        <a href="/" class="brand">
-          <div class="brand__logo">SC</div>
-          <div class="brand__text">
-            <span class="brand__title">Sleeper do Cartola</span>
-            <span class="brand__subtitle">Painel da liga</span>
-          </div>
-        </a>
+  {% if draft %}
+    <a href="{% url 'dashboard' %}" class="brand">
+  {% else %}
+    <a href="/admin/" class="brand">
+  {% endif %}
+      <div class="brand__logo">SC</div>
+      <div class="brand__text">
+        <span class="brand__title">Sleeper do Cartola</span>
+        <span class="brand__subtitle">Painel da liga</span>
       </div>
+    </a>
+</div>
 
-      <nav class="sidebar__nav">
-        {% if draft %}
-          <div class="sidebar__section-label">Liga</div>
+<nav class="sidebar__nav">
 
-          <a
-            href="{% url 'draft_board' draft.id %}"
-            class="sidebar__link {% if active_tab == 'draft' %}is-active{% endif %}"
-          >
-            <span class="sidebar__icon">📝</span>
-            <span>Draft</span>
-          </a>
+  {% if draft %}
+    <div class="sidebar__section-label">Liga</div>
 
-          <a
-            href="{% url 'current_week_matchups' draft.id %}"
-            class="sidebar__link {% if active_tab == 'current_week' or active_tab == 'all_matchups' %}is-active{% endif %}"
-          >
-            <span class="sidebar__icon">⚔️</span>
-            <span>Rodada atual</span>
-          </a>
+    <!-- NOVO DASHBOARD -->
+    <a
+      href="{% url 'dashboard' %}"
+      class="sidebar__link {% if active_tab == 'dashboard' %}is-active{% endif %}"
+    >
+      <span class="sidebar__icon">🏠</span>
+      <span>Dashboard</span>
+    </a>
 
-          <a
-            href="{% url 'standings_view' draft.id %}"
-            class="sidebar__link {% if active_tab == 'standings' %}is-active{% endif %}"
-          >
-            <span class="sidebar__icon">📊</span>
-            <span>Classificação</span>
-          </a>
+    <a
+      href="{% url 'current_week_matchups' draft.id %}"
+      class="sidebar__link {% if active_tab == 'current_week' or active_tab == 'all_matchups' %}is-active{% endif %}"
+    >
+      <span class="sidebar__icon">⚔️</span>
+      <span>Rodada atual</span>
+    </a>
 
-          <a
-            href="{% url 'transactions_list' draft.id %}"
-            class="sidebar__link {% if active_tab == 'transactions' %}is-active{% endif %}"
-          >
-            <span class="sidebar__icon">🔄</span>
-            <span>Transações</span>
-          </a>
+    <a
+      href="{% url 'standings_view' draft.id %}"
+      class="sidebar__link {% if active_tab == 'standings' %}is-active{% endif %}"
+    >
+      <span class="sidebar__icon">📊</span>
+      <span>Classificação</span>
+    </a>
 
-          <a
-            href="{% url 'notifications_view' draft.id %}"
-            class="sidebar__link {% if active_tab == 'notifications' %}is-active{% endif %}"
-          >
-            <span class="sidebar__icon">🔔</span>
-            <span>Notificações</span>
-          </a>
+    <a
+      href="{% url 'transactions_list' draft.id %}"
+      class="sidebar__link {% if active_tab == 'transactions' %}is-active{% endif %}"
+    >
+      <span class="sidebar__icon">🔄</span>
+      <span>Transações</span>
+    </a>
 
-          {% if schedule_url %}
-            <a
-              href="{{ schedule_url }}"
-              class="sidebar__link {% if active_tab == 'schedule' %}is-active{% endif %}"
-            >
-              <span class="sidebar__icon">🗓️</span>
-              <span>Schedule</span>
-            </a>
-          {% endif %}
-        {% endif %}
+    <a
+      href="{% url 'notifications_view' draft.id %}"
+      class="sidebar__link {% if active_tab == 'notifications' %}is-active{% endif %}"
+    >
+      <span class="sidebar__icon">🔔</span>
+      <span>Notificações</span>
+    </a>
 
-        {% if draft and team %}
-          <div class="sidebar__section-label">Meu time</div>
+    <!-- Draft agora mais abaixo -->
+    <a
+      href="{% url 'draft_board' draft.id %}"
+      class="sidebar__link {% if active_tab == 'draft' %}is-active{% endif %}"
+    >
+      <span class="sidebar__icon">📝</span>
+      <span>Draft Board</span>
+    </a>
 
-          <a
-            href="{% url 'team_roster' draft.id team.id %}"
-            class="sidebar__link {% if active_tab == 'roster' %}is-active{% endif %}"
-          >
-            <span class="sidebar__icon">🛡️</span>
-            <span>Meu roster</span>
-          </a>
+  {% endif %}
 
-          <a
-            href="{% url 'set_lineup' draft.id team.id %}"
-            class="sidebar__link {% if active_tab == 'lineup' %}is-active{% endif %}"
-          >
-            <span class="sidebar__icon">✅</span>
-            <span>Escalação</span>
-          </a>
+  {% if draft and team %}
+    <div class="sidebar__section-label">Meu time</div>
 
-          <a
-            href="{% url 'free_agents_list' team.id %}"
-            class="sidebar__link {% if active_tab == 'free_agents' %}is-active{% endif %}"
-          >
-            <span class="sidebar__icon">➕</span>
-            <span>Free Agents</span>
-          </a>
+    <a
+      href="{% url 'team_roster' draft.id team.id %}"
+      class="sidebar__link {% if active_tab == 'roster' %}is-active{% endif %}"
+    >
+      <span class="sidebar__icon">🛡️</span>
+      <span>Meu roster</span>
+    </a>
 
-          <a
-            href="{% url 'my_claims' team.id %}"
-            class="sidebar__link {% if active_tab == 'my_claims' %}is-active{% endif %}"
-          >
-            <span class="sidebar__icon">📌</span>
-            <span>Meus claims</span>
-          </a>
+    <a
+      href="{% url 'set_lineup' draft.id team.id %}"
+      class="sidebar__link {% if active_tab == 'lineup' %}is-active{% endif %}"
+    >
+      <span class="sidebar__icon">✅</span>
+      <span>Escalação</span>
+    </a>
 
-          {% if week and my_matchup %}
-            <a
-              href="{% url 'matchup_detail' draft.id week.number my_matchup.id %}"
-              class="sidebar__link {% if active_tab == 'my_matchup' or active_tab == 'matchups' %}is-active{% endif %}"
-            >
-              <span class="sidebar__icon">🔥</span>
-              <span>Meu matchup</span>
-            </a>
-          {% endif %}
-        {% endif %}
-      </nav>
+    <a
+      href="{% url 'free_agents_list' team.id %}"
+      class="sidebar__link {% if active_tab == 'free_agents' %}is-active{% endif %}"
+    >
+      <span class="sidebar__icon">➕</span>
+      <span>Free Agents</span>
+    </a>
+
+    <a
+      href="{% url 'my_claims' team.id %}"
+      class="sidebar__link {% if active_tab == 'my_claims' %}is-active{% endif %}"
+    >
+      <span class="sidebar__icon">📌</span>
+      <span>Meus claims</span>
+    </a>
+
+    {% if week and my_matchup %}
+      <a
+        href="{% url 'matchup_detail' draft.id week.number my_matchup.id %}"
+        class="sidebar__link {% if active_tab == 'my_matchup' or active_tab == 'matchups' %}is-active{% endif %}"
+      >
+        <span class="sidebar__icon">🔥</span>
+        <span>Meu matchup</span>
+      </a>
+    {% endif %}
+  {% endif %}
+
+</nav>
 
       <div class="sidebar__bottom">
         <div class="sidebar-user">

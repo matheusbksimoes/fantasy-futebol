@@ -141,4 +141,5 @@ urlpatterns = [
         views.player_detail,
         name="player_detail",
     ),
+    path("dashboard/", views.dashboard, name="dashboard"),
 ]
