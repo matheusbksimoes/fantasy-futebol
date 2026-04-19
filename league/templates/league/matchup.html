@@ -165,6 +165,77 @@
     flex-shrink: 0;
   }
 
+  .matchup-win-probability-card {
+    margin-top: 14px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .matchup-win-probability-header {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .matchup-win-probability-header span:nth-child(1) {
+    text-align: left;
+  }
+
+  .matchup-win-probability-header span:nth-child(2) {
+    text-align: center;
+    opacity: 0.75;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .matchup-win-probability-header span:nth-child(3) {
+    text-align: right;
+  }
+
+  .matchup-win-probability-bar {
+    display: flex;
+    width: 100%;
+    height: 12px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+  }
+
+  .matchup-win-probability-home {
+    height: 100%;
+    background: linear-gradient(90deg, #22c55e, #16a34a);
+    transition: width 0.35s ease;
+  }
+
+  .matchup-win-probability-away {
+    height: 100%;
+    background: linear-gradient(90deg, #ef4444, #dc2626);
+    transition: width 0.35s ease;
+  }
+
+  .matchup-win-probability-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 10px;
+    font-size: 12px;
+    opacity: 0.8;
+  }
+
+  .matchup-win-probability-insight {
+    margin-top: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0.9;
+  }
+
   /* 🔥 NOVO BLOCO (ESSENCIAL) */
   .matchup-mobile-header {
     display: none;
@@ -188,87 +259,114 @@
     }
 
     /* MOBILE HEADER AJUSTES */
-.matchup-mobile-score {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 4px;
-  font-weight: 800;
-  font-size: 16px;
-}
+    .matchup-mobile-score {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 4px;
+      font-weight: 800;
+      font-size: 16px;
+    }
 
-.matchup-mobile-score .team-name {
-  max-width: 100px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+    .matchup-mobile-score .team-name {
+      max-width: 100px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
-.matchup-mobile-score .team-name:first-child {
-  text-align: right;
-  padding-right: 6px;
-}
+    .matchup-mobile-score .team-name:first-child {
+      text-align: right;
+      padding-right: 6px;
+    }
 
-.matchup-mobile-score .team-name:last-child {
-  text-align: left;
-  padding-left: 6px;
-}
+    .matchup-mobile-score .team-name:last-child {
+      text-align: left;
+      padding-left: 6px;
+    }
 
-.matchup-mobile-score .score {
-  text-align: center;
-  font-size: 18px;
-  font-weight: 900;
-}
+    .matchup-mobile-score .score {
+      text-align: center;
+      font-size: 18px;
+      font-weight: 900;
+    }
 
-.matchup-mobile-summary {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
+    .matchup-mobile-summary {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
 
-.matchup-mobile-summary .badge {
-  font-size: 11px;
-  padding: 4px 8px;
-}
+    .matchup-mobile-summary .badge {
+      font-size: 11px;
+      padding: 4px 8px;
+    }
 
-/* ajustes que você já tinha */
-.matchup-score-card {
-  margin-bottom: 12px;
-  padding: 12px !important;
-}
+    .matchup-score-card {
+      margin-bottom: 12px;
+      padding: 12px !important;
+    }
 
-.matchup-score-top {
-  gap: 8px;
-}
+    .matchup-score-top {
+      gap: 8px;
+    }
 
-.matchup-team-name {
-  font-size: 16px;
-}
+    .matchup-team-name {
+      font-size: 16px;
+    }
 
-.matchup-score-number {
-  font-size: 20px;
-}
+    .matchup-score-number {
+      font-size: 20px;
+    }
 
-.matchup-score-x {
-  font-size: 12px;
-}
+    .matchup-score-x {
+      font-size: 12px;
+    }
 
-.matchup-lineup-list {
-  gap: 6px;
-}
+    .matchup-lineup-list {
+      gap: 6px;
+    }
 
-.matchup-slot-card {
-  padding: 8px 10px;
-  border-radius: 10px;
-}
+    .matchup-slot-card {
+      padding: 8px 10px;
+      border-radius: 10px;
+    }
 
-.matchup-slot-player {
-  font-size: 13px;
-}
+    .matchup-slot-player {
+      font-size: 13px;
+    }
 
-.matchup-slot-points {
-  font-size: 14px;
-}
+    .matchup-slot-points {
+      font-size: 14px;
+    }
+
+    .matchup-win-probability-card {
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 12px;
+    }
+
+    .matchup-win-probability-header {
+      grid-template-columns: 1fr;
+      gap: 6px;
+      text-align: center;
+    }
+
+    .matchup-win-probability-header span:nth-child(1),
+    .matchup-win-probability-header span:nth-child(2),
+    .matchup-win-probability-header span:nth-child(3) {
+      text-align: center;
+    }
+
+    .matchup-win-probability-footer {
+      flex-direction: column;
+      gap: 4px;
+      text-align: center;
+    }
+
+    .matchup-win-probability-insight {
+      text-align: center;
+    }
   }
 </style>
 
@@ -277,16 +375,16 @@
 <div class="card matchup-score-card">
   <div class="matchup-score-top">
 
-    <!-- MOBILE HEADER (novo) -->
+    <!-- MOBILE HEADER -->
     <div class="matchup-mobile-header">
       <div class="matchup-mobile-score">
         <span class="team-name">{{ home_team.name }}</span>
 
-<span class="score">
-  {{ home_total|floatformat:2 }} <span style="opacity:0.6;">x</span> {{ away_total|floatformat:2 }}
-</span>
+        <span class="score">
+          {{ home_total|floatformat:2 }} <span style="opacity:0.6;">x</span> {{ away_total|floatformat:2 }}
+        </span>
 
-<span class="team-name">{{ away_team.name }}</span>
+        <span class="team-name">{{ away_team.name }}</span>
       </div>
 
       <div class="matchup-mobile-status">
@@ -304,9 +402,43 @@
         <span class="badge badge-warning">⏳ {{ total_pending }}</span>
         <span class="badge badge-info">✅ {{ total_finished }}</span>
       </div>
+
+      <div class="matchup-win-probability-card">
+        <div class="matchup-win-probability-header">
+          <span>{{ home_team.name }} {{ home_win_prob }}%</span>
+          <span>Win Probability</span>
+          <span>{{ away_win_prob }}% {{ away_team.name }}</span>
+        </div>
+
+        <div class="matchup-win-probability-bar">
+          <div
+            class="matchup-win-probability-home"
+            style="width: {{ home_win_prob }}%;"
+          ></div>
+          <div
+            class="matchup-win-probability-away"
+            style="width: {{ away_win_prob }}%;"
+          ></div>
+        </div>
+
+        <div class="matchup-win-probability-footer">
+          <span>Proj. restante: {{ home_projected_remaining|floatformat:2 }}</span>
+          <span>Proj. restante: {{ away_projected_remaining|floatformat:2 }}</span>
+        </div>
+
+        <div class="matchup-win-probability-insight">
+          {% if home_win_prob > away_win_prob %}
+            {{ home_team.name }} aparece como favorito no momento.
+          {% elif away_win_prob > home_win_prob %}
+            {{ away_team.name }} aparece como favorito no momento.
+          {% else %}
+            Confronto totalmente equilibrado.
+          {% endif %}
+        </div>
+      </div>
     </div>
 
-    <!-- DESKTOP (mantido) -->
+    <!-- DESKTOP -->
     <div class="matchup-desktop-header">
 
       <div class="matchup-side">
@@ -333,6 +465,40 @@
           <span class="badge badge-success">🔥 {{ total_live }}</span>
           <span class="badge badge-warning">⏳ {{ total_pending }}</span>
           <span class="badge badge-info">✅ {{ total_finished }}</span>
+        </div>
+
+        <div class="matchup-win-probability-card">
+          <div class="matchup-win-probability-header">
+            <span>{{ home_team.name }} {{ home_win_prob }}%</span>
+            <span>Win Probability</span>
+            <span>{{ away_win_prob }}% {{ away_team.name }}</span>
+          </div>
+
+          <div class="matchup-win-probability-bar">
+            <div
+              class="matchup-win-probability-home"
+              style="width: {{ home_win_prob }}%;"
+            ></div>
+            <div
+              class="matchup-win-probability-away"
+              style="width: {{ away_win_prob }}%;"
+            ></div>
+          </div>
+
+          <div class="matchup-win-probability-footer">
+            <span>Proj. restante: {{ home_projected_remaining|floatformat:2 }}</span>
+            <span>Proj. restante: {{ away_projected_remaining|floatformat:2 }}</span>
+          </div>
+
+          <div class="matchup-win-probability-insight">
+            {% if home_win_prob > away_win_prob %}
+              {{ home_team.name }} aparece como favorito no momento.
+            {% elif away_win_prob > home_win_prob %}
+              {{ away_team.name }} aparece como favorito no momento.
+            {% else %}
+              Confronto totalmente equilibrado.
+            {% endif %}
+          </div>
         </div>
       </div>
 

@@ -1280,6 +1280,89 @@ def lineup_display_data(week, team):
     return lineup, spots, total, points_map
 
 
+def calculate_win_probability(home_points, away_points, home_projected_remaining, away_projected_remaining):
+    home_expected = float(home_points or 0) + float(home_projected_remaining or 0)
+    away_expected = float(away_points or 0) + float(away_projected_remaining or 0)
+
+    total_expected = home_expected + away_expected
+    if total_expected <= 0:
+        return 50, 50
+
+    home_prob = round((home_expected / total_expected) * 100)
+    away_prob = 100 - home_prob
+
+    if home_prob == 0 and away_prob > 0:
+        home_prob = 1
+        away_prob = 99
+    elif away_prob == 0 and home_prob > 0:
+        away_prob = 1
+        home_prob = 99
+
+    return home_prob, away_prob
+
+
+def _get_item_player(item):
+    if isinstance(item, dict):
+        return item.get("player")
+    return getattr(item, "player", None)
+
+
+def _get_item_points(item):
+    if isinstance(item, dict):
+        value = item.get("points")
+    else:
+        value = getattr(item, "points", None)
+
+    try:
+        return float(value or 0)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def _get_item_projection(item):
+    if isinstance(item, dict):
+        for key in ("projected_points", "projection", "projected_score", "expected_points"):
+            value = item.get(key)
+            if value is not None:
+                try:
+                    return float(value)
+                except (TypeError, ValueError):
+                    return 0.0
+    else:
+        for attr in ("projected_points", "projection", "projected_score", "expected_points"):
+            value = getattr(item, attr, None)
+            if value is not None:
+                try:
+                    return float(value)
+                except (TypeError, ValueError):
+                    return 0.0
+
+    return 0.0
+
+
+def sum_remaining_projection(lineup, status_map):
+    total_remaining = 0.0
+
+    for item in lineup:
+        player = _get_item_player(item)
+        if not player:
+            continue
+
+        status = status_map.get(player.id, "pending")
+        current_points = _get_item_points(item)
+        projected_points = _get_item_projection(item)
+
+        if status == "finished":
+            continue
+
+        if status == "pending":
+            total_remaining += projected_points
+        elif status == "live":
+            total_remaining += max(projected_points - current_points, 0)
+
+    return round(total_remaining, 2)
+
+
 @login_required
 def matchup_detail(request, draft_id: int, week_number: int, matchup_id: int):
     draft = get_object_or_404(Draft, id=draft_id)
@@ -1355,6 +1438,19 @@ def matchup_detail(request, draft_id: int, week_number: int, matchup_id: int):
     away_pending_count = sum(1 for v in away_status_map.values() if v == "pending")
     away_finished_count = sum(1 for v in away_status_map.values() if v == "finished")
 
+    # =========================
+    # WIN PROBABILITY
+    # =========================
+    home_projected_remaining = sum_remaining_projection(home_lineup, home_status_map)
+    away_projected_remaining = sum_remaining_projection(away_lineup, away_status_map)
+
+    home_win_prob, away_win_prob = calculate_win_probability(
+        home_total,
+        away_total,
+        home_projected_remaining,
+        away_projected_remaining,
+    )
+
     return render(request, "league/matchup.html", {
         "draft": draft,
         "week": week,
@@ -1379,6 +1475,10 @@ def matchup_detail(request, draft_id: int, week_number: int, matchup_id: int):
         "away_live_count": away_live_count,
         "away_pending_count": away_pending_count,
         "away_finished_count": away_finished_count,
+        "home_projected_remaining": home_projected_remaining,
+        "away_projected_remaining": away_projected_remaining,
+        "home_win_prob": home_win_prob,
+        "away_win_prob": away_win_prob,
         "my_matchup": my_matchup,
     })
 
@@ -1997,3 +2097,4 @@ def clear_all_notifications(request):
         ).delete()
 
     return redirect(request.META.get("HTTP_REFERER", "/"))
+
