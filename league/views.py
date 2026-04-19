@@ -1340,23 +1340,25 @@ def _get_item_projection(item):
     return 0.0
 
 
-def sum_remaining_projection(lineup, status_map):
+def sum_remaining_projection(spots, status_map):
     total_remaining = 0.0
 
-    for item in lineup:
-        player = _get_item_player(item)
-        if not player:
+    for spot in spots:
+        if not spot.player:
             continue
 
-        status = status_map.get(player.id, "pending")
-        current_points = _get_item_points(item)
-        projected_points = _get_item_projection(item)
+        player_id = spot.player.id
+        status = status_map.get(player_id, "pending")
+
+        current_points = 0
+        projected_points = getattr(spot.player, "projected_points", 0) or 0
 
         if status == "finished":
             continue
 
         if status == "pending":
             total_remaining += projected_points
+
         elif status == "live":
             total_remaining += max(projected_points - current_points, 0)
 
@@ -1441,8 +1443,8 @@ def matchup_detail(request, draft_id: int, week_number: int, matchup_id: int):
     # =========================
     # WIN PROBABILITY
     # =========================
-    home_projected_remaining = sum_remaining_projection(home_lineup, home_status_map)
-    away_projected_remaining = sum_remaining_projection(away_lineup, away_status_map)
+    home_projected_remaining = sum_remaining_projection(home_spots, home_status_map)
+    away_projected_remaining = sum_remaining_projection(away_spots, away_status_map)
 
     home_win_prob, away_win_prob = calculate_win_probability(
         home_total,
