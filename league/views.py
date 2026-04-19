@@ -9,6 +9,7 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
+from collections import defaultdict
 
 from .models import (
     Draft,
@@ -1441,10 +1442,34 @@ def matchup_detail(request, draft_id: int, week_number: int, matchup_id: int):
     away_finished_count = sum(1 for v in away_status_map.values() if v == "finished")
 
     # =========================
+    # PROJEÇÃO REAL POR JOGADOR
+    # =========================
+    all_player_ids = list(
+        {
+            spot.player_id
+            for spot in (home_spots + away_spots)
+            if spot.player_id
+        }
+    )
+
+    player_projection_map = build_player_projection_map(week, all_player_ids)
+
+    # =========================
     # WIN PROBABILITY
     # =========================
-    home_projected_remaining = sum_remaining_projection(home_spots, home_status_map)
-    away_projected_remaining = sum_remaining_projection(away_spots, away_status_map)
+    home_projected_remaining = sum_remaining_projection(
+        home_spots,
+        home_status_map,
+        home_points_map,
+        player_projection_map,
+    )
+
+    away_projected_remaining = sum_remaining_projection(
+        away_spots,
+        away_status_map,
+        away_points_map,
+        player_projection_map,
+    )
 
     home_win_prob, away_win_prob = calculate_win_probability(
         home_total,
@@ -1453,36 +1478,50 @@ def matchup_detail(request, draft_id: int, week_number: int, matchup_id: int):
         away_projected_remaining,
     )
 
-    return render(request, "league/matchup.html", {
-        "draft": draft,
-        "week": week,
-        "team": team,
-        "active_tab": "matchups",
-        "matchup": matchup,
-        "home_team": matchup.home_team,
-        "away_team": matchup.away_team,
-        "home_lineup": home_lineup,
-        "away_lineup": away_lineup,
-        "home_spots": home_spots,
-        "away_spots": away_spots,
-        "home_total": home_total,
-        "away_total": away_total,
-        "home_points_map": home_points_map,
-        "away_points_map": away_points_map,
-        "home_status_map": home_status_map,
-        "away_status_map": away_status_map,
-        "home_live_count": home_live_count,
-        "home_pending_count": home_pending_count,
-        "home_finished_count": home_finished_count,
-        "away_live_count": away_live_count,
-        "away_pending_count": away_pending_count,
-        "away_finished_count": away_finished_count,
-        "home_projected_remaining": home_projected_remaining,
-        "away_projected_remaining": away_projected_remaining,
-        "home_win_prob": home_win_prob,
-        "away_win_prob": away_win_prob,
-        "my_matchup": my_matchup,
-    })
+    return render(
+        request,
+        "league/matchup.html",
+        {
+            "draft": draft,
+            "week": week,
+            "team": team,
+            "active_tab": "matchups",
+            "matchup": matchup,
+            "home_team": matchup.home_team,
+            "away_team": matchup.away_team,
+            "home_lineup": home_lineup,
+            "away_lineup": away_lineup,
+            "home_spots": home_spots,
+            "away_spots": away_spots,
+            "home_total": home_total,
+            "away_total": away_total,
+            "home_points_map": home_points_map,
+            "away_points_map": away_points_map,
+            "home_status_map": home_status_map,
+            "away_status_map": away_status_map,
+            "home_live_count": home_live_count,
+            "home_pending_count": home_pending_count,
+            "home_finished_count": home_finished_count,
+            "away_live_count": away_live_count,
+            "away_pending_count": away_pending_count,
+            "away_finished_count": away_finished_count,
+            "home_projected_remaining": home_projected_remaining,
+            "away_projected_remaining": away_projected_remaining,
+            "home_win_prob": home_win_prob,
+            "away_win_prob": away_win_prob,
+            "home_projection_map": {
+                spot.player_id: player_projection_map.get(spot.player_id, 0)
+                for spot in home_spots
+                if spot.player_id
+            },
+            "away_projection_map": {
+                spot.player_id: player_projection_map.get(spot.player_id, 0)
+                for spot in away_spots
+                if spot.player_id
+            },
+            "my_matchup": my_matchup,
+        },
+    )
 
 def build_standings(draft):
     teams = list(Team.objects.filter(league=draft.league).order_by("id"))
@@ -2099,4 +2138,89 @@ def clear_all_notifications(request):
         ).delete()
 
     return redirect(request.META.get("HTTP_REFERER", "/"))
+
+def get_player_week_score_value(score_obj):
+    """
+    Tenta encontrar o campo de pontuação do PlayerWeekScore
+    sem depender de um nome único.
+    """
+    for attr in ("points", "score", "fantasy_points", "total_points"):
+        value = getattr(score_obj, attr, None)
+        if value is not None:
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                return 0.0
+    return 0.0
+
+
+def build_player_projection_map(week, player_ids):
+    """
+    Projeção real baseada no histórico:
+    - 60% média ponderada das últimas até 4 rodadas
+    - 40% média geral da temporada anterior à rodada atual
+    """
+    projection_map = {player_id: 0.0 for player_id in player_ids}
+
+    if not player_ids:
+        return projection_map
+
+    historical_scores = (
+        PlayerWeekScore.objects
+        .filter(
+            week__draft=week.draft,
+            week__number__lt=week.number,
+            player_id__in=player_ids,
+            live_status="finished",
+        )
+        .select_related("week")
+        .order_by("player_id", "-week__number")
+    )
+
+    scores_by_player = defaultdict(list)
+
+    for score in historical_scores:
+        points = get_player_week_score_value(score)
+        scores_by_player[score.player_id].append(points)
+
+    for player_id in player_ids:
+        scores = scores_by_player.get(player_id, [])
+
+        if not scores:
+            projection_map[player_id] = 0.0
+            continue
+
+        season_avg = sum(scores) / len(scores)
+
+        recent_scores = scores[:4]
+        weights = [4, 3, 2, 1][:len(recent_scores)]
+        weighted_recent = sum(s * w for s, w in zip(recent_scores, weights)) / sum(weights)
+
+        projection = (weighted_recent * 0.60) + (season_avg * 0.40)
+        projection_map[player_id] = round(projection, 2)
+
+    return projection_map
+
+
+def sum_remaining_projection(spots, status_map, points_map, projection_map):
+    total_remaining = 0.0
+
+    for spot in spots:
+        if not spot.player_id:
+            continue
+
+        player_id = spot.player_id
+        status = status_map.get(player_id, "pending")
+        current_points = float(points_map.get(player_id, 0) or 0)
+        projected_total = float(projection_map.get(player_id, 0) or 0)
+
+        if status == "finished":
+            continue
+
+        if status == "pending":
+            total_remaining += projected_total
+        elif status == "live":
+            total_remaining += max(projected_total - current_points, 0)
+
+    return round(total_remaining, 2)
 

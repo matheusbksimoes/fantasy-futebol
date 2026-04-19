@@ -158,6 +158,13 @@
     line-height: 1;
   }
 
+  .matchup-slot-subline {
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--text-muted);
+    opacity: 0.8;
+  }
+
   .matchup-slot-points {
     font-size: 18px;
     font-weight: 800;
@@ -334,6 +341,10 @@
 
     .matchup-slot-player {
       font-size: 13px;
+    }
+
+    .matchup-slot-subline {
+      font-size: 10px;
     }
 
     .matchup-slot-points {
@@ -547,6 +558,10 @@
                     <span class="matchup-slot-status">✅</span>
                   {% endif %}
                 </div>
+
+                <div class="matchup-slot-subline">
+                  Proj.: {{ home_projection_map|get_item:spot.player_id|default:0|floatformat:2 }}
+                </div>
               </div>
 
               <div class="matchup-slot-points">
@@ -603,6 +618,10 @@
                   {% elif status == "finished" %}
                     <span class="matchup-slot-status">✅</span>
                   {% endif %}
+                </div>
+
+                <div class="matchup-slot-subline">
+                  Proj.: {{ away_projection_map|get_item:spot.player_id|default:0|floatformat:2 }}
                 </div>
               </div>
 
