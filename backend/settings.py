@@ -8,7 +8,6 @@ from pathlib import Path
 import os
 import dj_database_url
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -17,18 +16,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # -----------------------------
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-me")
 
-# Ambiente: "local" (default) | "production"
 DJANGO_ENV = os.environ.get("DJANGO_ENV", "local").strip().lower()
 
-# Debug: local = True, production = False (sem depender de envs frágeis)
 DEBUG = DJANGO_ENV != "production"
 
-# Accept comma-separated list: "127.0.0.1,localhost,myapp.onrender.com"
 _allowed_hosts_raw = os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost,.onrender.com")
 ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts_raw.split(",") if h.strip()]
 
-# CSRF trusted origins (recommended for Render/custom domains)
-# Example: "https://myapp.onrender.com,https://draft.meudominio.com"
 _csrf_trusted_raw = os.environ.get("CSRF_TRUSTED_ORIGINS", "")
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in _csrf_trusted_raw.split(",") if o.strip()]
 
@@ -63,7 +57,12 @@ ROOT_URLCONF = "backend.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],  # se você tiver templates fora dos apps, coloque aqui
+
+        # permite usar templates/registration/login.html
+        "DIRS": [
+            BASE_DIR / "templates",
+        ],
+
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -81,11 +80,9 @@ WSGI_APPLICATION = "backend.wsgi.application"
 # -----------------------------
 # Database
 # -----------------------------
-# Render Postgres provides DATABASE_URL. Local dev can fall back to sqlite.
 DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
 
 if DATABASE_URL:
-    # Render: normalmente usa SSL. Local pode não usar.
     ssl_require = os.environ.get("DB_SSL_REQUIRE", "1") == "1"
 
     DATABASES = {
@@ -125,12 +122,16 @@ USE_TZ = True
 
 
 # -----------------------------
-# Static files (CSS, JavaScript, Images)
+# Static files
 # -----------------------------
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# WhiteNoise storage (Render sem S3/CDN)
+# permite usar league/static/img/logo.png
+STATICFILES_DIRS = [
+    BASE_DIR / "league" / "static",
+]
+
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -150,14 +151,9 @@ LOGOUT_REDIRECT_URL = "/accounts/login/"
 
 
 # -----------------------------
-# Security (LOCAL vs PROD) — IMPORTANT
+# Security
 # -----------------------------
-# Regra simples:
-# - DJANGO_ENV=local  -> NÃO forçar HTTPS, NÃO confiar em proxy headers.
-# - DJANGO_ENV=production -> confiar no proxy (Render) e forçar HTTPS.
-
 if DJANGO_ENV == "production":
-    # Produção (Render)
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     USE_X_FORWARDED_HOST = True
 
@@ -165,13 +161,9 @@ if DJANGO_ENV == "production":
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 else:
-    # Local/dev
     SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
 
     SECURE_PROXY_SSL_HEADER = None
     USE_X_FORWARDED_HOST = False
-
-    # (opcional) evita 301 automáticos que confundem durante dev
-    # APPEND_SLASH = False

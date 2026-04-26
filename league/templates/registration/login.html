@@ -1,165 +1,432 @@
 {% extends "league/base.html" %}
+{% load static %}
 
 {% block content %}
 
 <style>
-.login-page {
-  min-height: 100vh;
+/* força o login a ignorar o espaçamento padrão do base */
+.login-app {
+  position: relative;
+  min-height: calc(100vh - 0px);
   margin: -24px;
-  padding: 24px;
+  padding: 48px 56px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 82% 22%, rgba(37, 99, 235, 0.22), transparent 28%),
+    radial-gradient(circle at 35% 18%, rgba(34, 197, 94, 0.12), transparent 26%),
+    linear-gradient(135deg, #03102b 0%, #020817 48%, #031636 100%);
+  color: #f8fafc;
+}
+
+/* textura/bola gigante da direita */
+.login-app::before {
+  content: "";
+  position: absolute;
+  right: -120px;
+  top: 80px;
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(14, 165, 233, 0.10), transparent 58%),
+    repeating-conic-gradient(
+      from 20deg,
+      rgba(59, 130, 246, 0.11) 0deg 14deg,
+      rgba(2, 6, 23, 0.18) 14deg 28deg
+    );
+  opacity: 0.55;
+  filter: blur(0.2px);
+}
+
+/* pinceladas diagonais */
+.login-app::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(145deg, transparent 0 53%, rgba(14,165,233,.11) 54%, transparent 62%),
+    linear-gradient(155deg, transparent 0 70%, rgba(34,197,94,.16) 71%, transparent 78%),
+    radial-gradient(circle at 0% 47%, rgba(132,204,22,.18) 0 2px, transparent 3px);
+  background-size: auto, auto, 24px 24px;
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+/* topo */
+.login-top {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.login-top-logo {
+  width: 122px;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 12px 20px rgba(0,0,0,.35));
+}
+
+.login-top-divider {
+  width: 1px;
+  height: 78px;
+  background: rgba(148, 163, 184, 0.35);
+}
+
+.login-top-copy h2 {
+  margin: 0 0 8px;
+  font-size: 24px;
+  font-weight: 950;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: #7cff35;
+}
+
+.login-top-copy p {
+  margin: 0;
+  font-size: 17px;
+  color: #e2e8f0;
+}
+
+/* área central */
+.login-center {
+  position: relative;
+  z-index: 2;
+  min-height: calc(100vh - 220px);
   display: flex;
   align-items: center;
   justify-content: center;
-  background:
-    radial-gradient(circle at top, rgba(34, 197, 94, 0.22), transparent 35%),
-    linear-gradient(135deg, #020617, #0f172a);
 }
 
+/* card principal */
 .login-card {
   width: 100%;
-  max-width: 390px;
-  padding: 32px 26px;
-  border-radius: 24px;
-  background: rgba(15, 23, 42, 0.88);
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
-}
-
-.login-brand {
+  max-width: 660px;
+  padding: 62px 58px 50px;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(14,165,233,.12), transparent 35%),
+    rgba(2, 10, 35, 0.86);
+  border: 1px solid rgba(56, 189, 248, 0.55);
+  box-shadow:
+    0 34px 100px rgba(0,0,0,.72),
+    inset 0 0 0 1px rgba(132,204,22,.14);
   text-align: center;
-  margin-bottom: 30px;
 }
 
-.login-logo {
-  width: 64px;
-  height: 64px;
-  margin: 0 auto 14px;
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #22c55e, #14b8a6);
-  color: #020617;
-  font-size: 30px;
-  font-weight: 900;
-  box-shadow: 0 12px 30px rgba(34, 197, 94, 0.35);
+.login-main-logo {
+  width: 310px;
+  max-width: 88%;
+  display: block;
+  margin: 0 auto 16px;
+  filter: drop-shadow(0 18px 28px rgba(14, 165, 233, .22));
 }
 
-.login-brand h1 {
+.login-subtitle {
   margin: 0;
+  font-size: 20px;
   color: #f8fafc;
-  font-size: 32px;
-  font-weight: 900;
-  letter-spacing: -0.04em;
 }
 
-.login-brand p {
-  margin: 8px 0 0;
-  color: #94a3b8;
-  font-size: 14px;
+.login-subtitle strong {
+  color: #a3e635;
+}
+
+.login-line {
+  width: 78px;
+  height: 3px;
+  border-radius: 999px;
+  margin: 28px auto 34px;
+  background: linear-gradient(90deg, #84cc16, #0ea5e9);
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 24px;
+  text-align: left;
 }
 
 .login-field label {
   display: block;
-  margin-bottom: 7px;
+  margin-bottom: 10px;
+  color: #f8fafc;
+  font-size: 16px;
+  font-weight: 950;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+
+.input-wrap {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #7cff35;
+  font-size: 23px;
+  opacity: .95;
+}
+
+.input-eye {
+  position: absolute;
+  right: 22px;
+  top: 50%;
+  transform: translateY(-50%);
   color: #cbd5e1;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 22px;
+  opacity: .75;
 }
 
 .login-field input {
   width: 100%;
   box-sizing: border-box;
-  padding: 13px 14px;
-  border-radius: 14px;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  background: rgba(2, 6, 23, 0.72);
+  height: 74px;
+  padding: 0 64px;
+  border-radius: 20px;
+  border: 1px solid rgba(148, 163, 184, .38);
+  background: rgba(1, 8, 30, .72);
   color: #f8fafc;
-  font-size: 15px;
+  font-size: 21px;
   outline: none;
 }
 
+.login-field input::placeholder {
+  color: rgba(203, 213, 225, .62);
+}
+
 .login-field input:focus {
-  border-color: #22c55e;
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.16);
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 4px rgba(14,165,233,.14);
 }
 
 .login-button {
-  margin-top: 8px;
+  margin-top: 14px;
+  height: 76px;
   width: 100%;
-  padding: 14px;
   border: 0;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #22c55e, #14b8a6);
-  color: #020617;
-  font-weight: 900;
-  font-size: 15px;
+  border-radius: 21px;
+  background: linear-gradient(90deg, #7cff35 0%, #32d583 48%, #16c6ff 100%);
+  color: #03102b;
+  font-size: 22px;
+  font-weight: 950;
+  letter-spacing: .04em;
+  text-transform: uppercase;
   cursor: pointer;
+  box-shadow: 0 18px 34px rgba(14,165,233,.18);
 }
 
 .login-button:hover {
+  filter: brightness(1.06);
   transform: translateY(-1px);
-  filter: brightness(1.05);
 }
 
 .login-help {
-  margin-top: 22px;
+  margin-top: 34px;
   text-align: center;
-  color: #64748b;
-  font-size: 12px;
+  color: #cbd5e1;
+  font-size: 17px;
 }
 
-@media (max-width: 480px) {
-  .login-page {
-    align-items: flex-start;
-    padding-top: 70px;
+/* usuário no canto inferior */
+.login-user {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.login-user-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #7cff35, #22c55e);
+  color: #03102b;
+  font-size: 22px;
+  font-weight: 950;
+}
+
+.login-user strong {
+  display: block;
+  font-size: 18px;
+  color: #f8fafc;
+}
+
+.login-user span {
+  display: block;
+  margin-top: 3px;
+  font-size: 15px;
+  color: #cbd5e1;
+}
+
+/* mobile */
+@media (max-width: 780px) {
+  .login-app {
+    margin: -16px;
+    padding: 28px 18px;
+  }
+
+  .login-top {
+    gap: 16px;
+  }
+
+  .login-top-logo {
+    width: 92px;
+  }
+
+  .login-top-divider {
+    height: 58px;
+  }
+
+  .login-top-copy h2 {
+    font-size: 17px;
+  }
+
+  .login-top-copy p {
+    font-size: 13px;
+  }
+
+  .login-center {
+    min-height: auto;
+    padding: 52px 0 24px;
   }
 
   .login-card {
-    padding: 28px 22px;
-    border-radius: 22px;
+    max-width: 100%;
+    padding: 38px 24px 32px;
+    border-radius: 24px;
+  }
+
+  .login-main-logo {
+    width: 230px;
+  }
+
+  .login-subtitle {
+    font-size: 16px;
+  }
+
+  .login-field label {
+    font-size: 13px;
+  }
+
+  .login-field input {
+    height: 58px;
+    font-size: 16px;
+    padding: 0 50px;
+    border-radius: 16px;
+  }
+
+  .input-icon,
+  .input-eye {
+    font-size: 18px;
+  }
+
+  .input-icon {
+    left: 17px;
+  }
+
+  .input-eye {
+    right: 17px;
+  }
+
+  .login-button {
+    height: 60px;
+    font-size: 17px;
+  }
+
+  .login-help {
+    font-size: 13px;
   }
 }
 </style>
 
-<div class="login-page">
-  <div class="login-card">
+<div class="login-app">
 
-    <div class="login-brand">
-      <div class="login-logo">F</div>
-      <h1>Finta</h1>
-      <p>Fantasy futebol com cara de resenha.</p>
+  <div class="login-top">
+    <img src="{% static 'img/logo.png' %}" class="login-top-logo" alt="Finta">
+
+    <div class="login-top-divider"></div>
+
+    <div class="login-top-copy">
+      <h2>Painel da liga</h2>
+      <p>Sua liga. Seu time. Sua resenha.</p>
     </div>
-
-    <form method="post" class="login-form">
-      {% csrf_token %}
-
-      <div class="login-field">
-        <label for="id_username">Usuário</label>
-        <input id="id_username" type="text" name="username" autocomplete="username" required>
-      </div>
-
-      <div class="login-field">
-        <label for="id_password">Senha</label>
-        <input id="id_password" type="password" name="password" autocomplete="current-password" required>
-      </div>
-
-      <button type="submit" class="login-button">
-        Entrar
-      </button>
-    </form>
-
-    <div class="login-help">
-      Use o mesmo usuário e senha do Django Admin.
-    </div>
-
   </div>
+
+  <div class="login-center">
+    <div class="login-card">
+
+      <img src="{% static 'img/logo.png' %}" class="login-main-logo" alt="Finta">
+
+      <p class="login-subtitle">
+        Fantasy futebol com cara de <strong>resenha.</strong>
+      </p>
+
+      <div class="login-line"></div>
+
+      <form method="post" class="login-form">
+        {% csrf_token %}
+
+        <div class="login-field">
+          <label for="id_username">Usuário</label>
+          <div class="input-wrap">
+            <span class="input-icon">♙</span>
+            <input
+              id="id_username"
+              type="text"
+              name="username"
+              placeholder="Digite seu usuário"
+              autocomplete="username"
+              required
+            >
+          </div>
+        </div>
+
+        <div class="login-field">
+          <label for="id_password">Senha</label>
+          <div class="input-wrap">
+            <span class="input-icon">▣</span>
+            <input
+              id="id_password"
+              type="password"
+              name="password"
+              placeholder="Digite sua senha"
+              autocomplete="current-password"
+              required
+            >
+            <span class="input-eye">◉</span>
+          </div>
+        </div>
+
+        <button type="submit" class="login-button">
+          Entrar
+        </button>
+      </form>
+
+      <div class="login-help">
+        Use o mesmo usuário e senha do Django Admin.
+      </div>
+
+    </div>
+  </div>
+
+  <div class="login-user">
+    <div class="login-user-avatar">Z</div>
+    <div>
+      <strong>zinho</strong>
+      <span>Sem draft ativo</span>
+    </div>
+  </div>
+
 </div>
 
 {% endblock %}
