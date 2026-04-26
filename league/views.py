@@ -1389,7 +1389,6 @@ def matchup_detail(request, draft_id: int, week_number: int, matchup_id: int):
         week, matchup.away_team
     )
 
-    # time do usuário logado, se ele estiver neste matchup
     team = None
     if matchup.home_team.user_id == request.user.id:
         team = matchup.home_team
@@ -1399,17 +1398,13 @@ def matchup_detail(request, draft_id: int, week_number: int, matchup_id: int):
     my_matchup = get_team_matchup_for_week(week, team) if team else None
 
     # =========================
-    # LIVE STATUS DOS JOGADORES
+    # STATUS DOS JOGADORES
     # =========================
-    player_ids = []
-
-    for spot in home_spots:
-        if spot.player_id:
-            player_ids.append(spot.player_id)
-
-    for spot in away_spots:
-        if spot.player_id:
-            player_ids.append(spot.player_id)
+    player_ids = [
+        spot.player_id
+        for spot in (home_spots + away_spots)
+        if spot.player_id
+    ]
 
     week_scores = (
         PlayerWeekScore.objects
@@ -1417,21 +1412,17 @@ def matchup_detail(request, draft_id: int, week_number: int, matchup_id: int):
         .only("player_id", "live_status")
     )
 
-    status_map = {
-        s.player_id: s.live_status
-        for s in week_scores
+    status_map = {s.player_id: s.live_status for s in week_scores}
+
+    home_status_map = {
+        spot.player_id: status_map.get(spot.player_id, "pending")
+        for spot in home_spots if spot.player_id
     }
 
-    home_status_map = {}
-    away_status_map = {}
-
-    for spot in home_spots:
-        if spot.player_id:
-            home_status_map[spot.player_id] = status_map.get(spot.player_id, "pending")
-
-    for spot in away_spots:
-        if spot.player_id:
-            away_status_map[spot.player_id] = status_map.get(spot.player_id, "pending")
+    away_status_map = {
+        spot.player_id: status_map.get(spot.player_id, "pending")
+        for spot in away_spots if spot.player_id
+    }
 
     home_live_count = sum(1 for v in home_status_map.values() if v == "live")
     home_pending_count = sum(1 for v in home_status_map.values() if v == "pending")
@@ -1442,42 +1433,32 @@ def matchup_detail(request, draft_id: int, week_number: int, matchup_id: int):
     away_finished_count = sum(1 for v in away_status_map.values() if v == "finished")
 
     # =========================
-    # PROJEÇÃO REAL POR JOGADOR
+    # PROJEÇÃO
     # =========================
-        # =========================
-    # PROJEÇÃO REAL POR JOGADOR
-    # =========================
-    all_player_ids = list(
-        {
-            spot.player_id
-            for spot in (home_spots + away_spots)
-            if spot.player_id
-        }
-    )
-
+    all_player_ids = list(set(player_ids))
     player_projection_map = build_player_projection_map(week, all_player_ids)
 
     # =========================
-    # TAGS EMOCIONAIS
+    # EMOÇÕES
     # =========================
     home_emotion_map = {}
     away_emotion_map = {}
 
     for spot in home_spots:
         if spot.player_id:
-            points = home_points_map.get(spot.player_id, 0)
-            proj = player_projection_map.get(spot.player_id, 0)
-            status = home_status_map.get(spot.player_id, "pending")
-
-            home_emotion_map[spot.player_id] = get_player_emotion(points, proj, status)
+            home_emotion_map[spot.player_id] = get_player_emotion(
+                home_points_map.get(spot.player_id, 0),
+                player_projection_map.get(spot.player_id, 0),
+                home_status_map.get(spot.player_id, "pending"),
+            )
 
     for spot in away_spots:
         if spot.player_id:
-            points = away_points_map.get(spot.player_id, 0)
-            proj = player_projection_map.get(spot.player_id, 0)
-            status = away_status_map.get(spot.player_id, "pending")
-
-            away_emotion_map[spot.player_id] = get_player_emotion(points, proj, status)
+            away_emotion_map[spot.player_id] = get_player_emotion(
+                away_points_map.get(spot.player_id, 0),
+                player_projection_map.get(spot.player_id, 0),
+                away_status_map.get(spot.player_id, "pending"),
+            )
 
     # =========================
     # WIN PROBABILITY
@@ -1501,6 +1482,21 @@ def matchup_detail(request, draft_id: int, week_number: int, matchup_id: int):
         away_total,
         home_projected_remaining,
         away_projected_remaining,
+    )
+
+    # =========================
+    # CLUTCH + MVP
+    # =========================
+    home_clutch = get_clutch_player(
+        home_spots, home_points_map, player_projection_map
+    )
+
+    away_clutch = get_clutch_player(
+        away_spots, away_points_map, player_projection_map
+    )
+
+    mvp_player = get_mvp_player(
+        home_spots, away_spots, home_points_map, away_points_map
     )
 
     return render(
@@ -1535,21 +1531,24 @@ def matchup_detail(request, draft_id: int, week_number: int, matchup_id: int):
             "home_win_prob": home_win_prob,
             "away_win_prob": away_win_prob,
 
-            # 🔥 PROJEÇÃO
+            # projeção
             "home_projection_map": {
                 spot.player_id: player_projection_map.get(spot.player_id, 0)
-                for spot in home_spots
-                if spot.player_id
+                for spot in home_spots if spot.player_id
             },
             "away_projection_map": {
                 spot.player_id: player_projection_map.get(spot.player_id, 0)
-                for spot in away_spots
-                if spot.player_id
+                for spot in away_spots if spot.player_id
             },
 
-            # 🔥 EMOÇÕES
+            # emoções
             "home_emotion_map": home_emotion_map,
             "away_emotion_map": away_emotion_map,
+
+            # destaques
+            "home_clutch": home_clutch,
+            "away_clutch": away_clutch,
+            "mvp_player": mvp_player,
 
             "my_matchup": my_matchup,
         },
@@ -2273,3 +2272,47 @@ def get_player_emotion(points, projection, status):
             return "🔥"
 
     return None
+
+# =========================
+# CLUTCH + MVP
+# =========================
+
+def get_clutch_player(spots, points_map, projection_map):
+    best_player = None
+    best_impact = float("-inf")
+
+    for spot in spots:
+        if not spot.player_id:
+            continue
+
+        pts = points_map.get(spot.player_id, 0)
+        proj = projection_map.get(spot.player_id, 0)
+
+        impact = pts - proj
+
+        if impact > best_impact:
+            best_impact = impact
+            best_player = spot.player
+
+    return best_player
+
+
+def get_mvp_player(home_spots, away_spots, home_points_map, away_points_map):
+    best_player = None
+    best_points = float("-inf")
+
+    for spot in home_spots + away_spots:
+        if not spot.player_id:
+            continue
+
+        pts = (
+            home_points_map.get(spot.player_id)
+            or away_points_map.get(spot.player_id)
+            or 0
+        )
+
+        if pts > best_points:
+            best_points = pts
+            best_player = spot.player
+
+    return best_player

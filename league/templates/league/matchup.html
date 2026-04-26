@@ -248,7 +248,32 @@
     opacity: 0.9;
   }
 
-  /* 🔥 NOVO BLOCO (ESSENCIAL) */
+  .matchup-highlights {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .highlight-card {
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+  }
+
+  .highlight-card.mvp {
+    background: linear-gradient(90deg, #facc15, #eab308);
+    color: #111;
+    font-weight: 700;
+  }
+
+  .highlight-card.clutch {
+    background: linear-gradient(90deg, #22c55e, #16a34a);
+    color: white;
+  }
+
   .matchup-mobile-header {
     display: none;
   }
@@ -270,7 +295,6 @@
       gap: 8px;
     }
 
-    /* MOBILE HEADER AJUSTES */
     .matchup-mobile-score {
       display: grid;
       grid-template-columns: 1fr auto 1fr;
@@ -391,7 +415,6 @@
 <div class="card matchup-score-card">
   <div class="matchup-score-top">
 
-    <!-- MOBILE HEADER -->
     <div class="matchup-mobile-header">
       <div class="matchup-mobile-score">
         <span class="team-name">{{ home_team.name }}</span>
@@ -452,9 +475,28 @@
           {% endif %}
         </div>
       </div>
+
+      <div class="matchup-highlights">
+        {% if mvp_player %}
+          <div class="highlight-card mvp">
+            🏆 MVP: {{ mvp_player.name }}
+          </div>
+        {% endif %}
+
+        {% if home_clutch %}
+          <div class="highlight-card clutch">
+            ⚡ Clutch {{ home_team.name }}: {{ home_clutch.name }}
+          </div>
+        {% endif %}
+
+        {% if away_clutch %}
+          <div class="highlight-card clutch">
+            ⚡ Clutch {{ away_team.name }}: {{ away_clutch.name }}
+          </div>
+        {% endif %}
+      </div>
     </div>
 
-    <!-- DESKTOP -->
     <div class="matchup-desktop-header">
 
       <div class="matchup-side">
@@ -515,6 +557,26 @@
               Confronto totalmente equilibrado.
             {% endif %}
           </div>
+        </div>
+
+        <div class="matchup-highlights">
+          {% if mvp_player %}
+            <div class="highlight-card mvp">
+              🏆 MVP: {{ mvp_player.name }}
+            </div>
+          {% endif %}
+
+          {% if home_clutch %}
+            <div class="highlight-card clutch">
+              ⚡ Clutch {{ home_team.name }}: {{ home_clutch.name }}
+            </div>
+          {% endif %}
+
+          {% if away_clutch %}
+            <div class="highlight-card clutch">
+              ⚡ Clutch {{ away_team.name }}: {{ away_clutch.name }}
+            </div>
+          {% endif %}
         </div>
       </div>
 
