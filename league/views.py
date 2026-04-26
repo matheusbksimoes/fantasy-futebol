@@ -2285,8 +2285,8 @@ def get_clutch_player(spots, points_map, projection_map):
         if not spot.player_id:
             continue
 
-        pts = points_map.get(spot.player_id, 0)
-        proj = projection_map.get(spot.player_id, 0)
+        pts = float(points_map.get(spot.player_id, 0) or 0)
+        proj = float(projection_map.get(spot.player_id, 0) or 0)
 
         impact = pts - proj
 
@@ -2305,7 +2305,7 @@ def get_mvp_player(home_spots, away_spots, home_points_map, away_points_map):
         if not spot.player_id:
             continue
 
-        pts = (
+        pts = float(
             home_points_map.get(spot.player_id)
             or away_points_map.get(spot.player_id)
             or 0
