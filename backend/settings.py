@@ -128,9 +128,7 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # permite usar league/static/img/logo.png
-STATICFILES_DIRS = [
-    BASE_DIR / "league" / "static",
-]
+STATICFILES_DIRS = []
 
 STORAGES = {
     "default": {
