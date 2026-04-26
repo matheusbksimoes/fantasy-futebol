@@ -152,6 +152,11 @@
     white-space: nowrap;
   }
 
+  .player-emotion {
+    margin-left: 6px;
+    font-size: 14px;
+  }
+
   .matchup-slot-status {
     flex-shrink: 0;
     font-size: 16px;
@@ -550,7 +555,14 @@
                 </div>
 
                 <div class="matchup-slot-player">
-                  <span class="matchup-slot-player-name">{{ spot.player.name }}</span>
+                  <span class="matchup-slot-player-name">
+                    {{ spot.player.name }}
+                    {% with emo=home_emotion_map|get_item:spot.player_id %}
+                      {% if emo %}
+                        <span class="player-emotion">{{ emo }}</span>
+                      {% endif %}
+                    {% endwith %}
+                  </span>
 
                   {% if status == "live" %}
                     <span class="matchup-slot-status">🔥</span>
@@ -611,7 +623,14 @@
                 </div>
 
                 <div class="matchup-slot-player">
-                  <span class="matchup-slot-player-name">{{ spot.player.name }}</span>
+                  <span class="matchup-slot-player-name">
+                    {{ spot.player.name }}
+                    {% with emo=away_emotion_map|get_item:spot.player_id %}
+                      {% if emo %}
+                        <span class="player-emotion">{{ emo }}</span>
+                      {% endif %}
+                    {% endwith %}
+                  </span>
 
                   {% if status == "live" %}
                     <span class="matchup-slot-status">🔥</span>

@@ -1444,6 +1444,9 @@ def matchup_detail(request, draft_id: int, week_number: int, matchup_id: int):
     # =========================
     # PROJEÇÃO REAL POR JOGADOR
     # =========================
+        # =========================
+    # PROJEÇÃO REAL POR JOGADOR
+    # =========================
     all_player_ids = list(
         {
             spot.player_id
@@ -1453,6 +1456,28 @@ def matchup_detail(request, draft_id: int, week_number: int, matchup_id: int):
     )
 
     player_projection_map = build_player_projection_map(week, all_player_ids)
+
+    # =========================
+    # TAGS EMOCIONAIS
+    # =========================
+    home_emotion_map = {}
+    away_emotion_map = {}
+
+    for spot in home_spots:
+        if spot.player_id:
+            points = home_points_map.get(spot.player_id, 0)
+            proj = player_projection_map.get(spot.player_id, 0)
+            status = home_status_map.get(spot.player_id, "pending")
+
+            home_emotion_map[spot.player_id] = get_player_emotion(points, proj, status)
+
+    for spot in away_spots:
+        if spot.player_id:
+            points = away_points_map.get(spot.player_id, 0)
+            proj = player_projection_map.get(spot.player_id, 0)
+            status = away_status_map.get(spot.player_id, "pending")
+
+            away_emotion_map[spot.player_id] = get_player_emotion(points, proj, status)
 
     # =========================
     # WIN PROBABILITY
@@ -1509,6 +1534,8 @@ def matchup_detail(request, draft_id: int, week_number: int, matchup_id: int):
             "away_projected_remaining": away_projected_remaining,
             "home_win_prob": home_win_prob,
             "away_win_prob": away_win_prob,
+
+            # 🔥 PROJEÇÃO
             "home_projection_map": {
                 spot.player_id: player_projection_map.get(spot.player_id, 0)
                 for spot in home_spots
@@ -1519,6 +1546,11 @@ def matchup_detail(request, draft_id: int, week_number: int, matchup_id: int):
                 for spot in away_spots
                 if spot.player_id
             },
+
+            # 🔥 EMOÇÕES
+            "home_emotion_map": home_emotion_map,
+            "away_emotion_map": away_emotion_map,
+
             "my_matchup": my_matchup,
         },
     )
@@ -2224,3 +2256,20 @@ def sum_remaining_projection(spots, status_map, points_map, projection_map):
 
     return round(total_remaining, 2)
 
+def get_player_emotion(points, projection, status):
+    if projection == 0:
+        return None
+
+    if status == "finished":
+        if points <= projection * 0.4:
+            return "💣"
+        if points >= projection * 1.3:
+            return "🔥"
+        if points <= 1:
+            return "🧊"
+
+    if status == "live":
+        if points >= projection * 1.2:
+            return "🔥"
+
+    return None
