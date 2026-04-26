@@ -1,50 +1,165 @@
+{% extends "league/base.html" %}
 
-<!doctype html>
-<html lang="pt-br">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Bem-vindo • Fantasy Futebol</title>
-</head>
+{% block content %}
 
-<body>
-  <h1>Bem-vindo ao Fantasy Futebol ⚽</h1>
-  <p>
-    Faça login para acessar o draft e gerenciar seu time.
-  </p>
+<style>
+.login-page {
+  min-height: 100vh;
+  margin: -24px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at top, rgba(34, 197, 94, 0.22), transparent 35%),
+    linear-gradient(135deg, #020617, #0f172a);
+}
 
-  {% if form.errors %}
-    <p style="color: red;">
-      Não foi possível entrar. Verifique usuário e senha e tente novamente.
-    </p>
-  {% endif %}
+.login-card {
+  width: 100%;
+  max-width: 390px;
+  padding: 32px 26px;
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+}
 
-  <h2>Login</h2>
+.login-brand {
+  text-align: center;
+  margin-bottom: 30px;
+}
 
-  <form method="post">
-    {% csrf_token %}
+.login-logo {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 14px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #22c55e, #14b8a6);
+  color: #020617;
+  font-size: 30px;
+  font-weight: 900;
+  box-shadow: 0 12px 30px rgba(34, 197, 94, 0.35);
+}
 
-    <div>
-      <label for="id_username">Usuário</label><br />
-      <input type="text" name="username" autofocus autocapitalize="none" autocomplete="username"
-             maxlength="150" required id="id_username">
+.login-brand h1 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.login-brand p {
+  margin: 8px 0 0;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.login-field label {
+  display: block;
+  margin-bottom: 7px;
+  color: #cbd5e1;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.login-field input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(2, 6, 23, 0.72);
+  color: #f8fafc;
+  font-size: 15px;
+  outline: none;
+}
+
+.login-field input:focus {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.16);
+}
+
+.login-button {
+  margin-top: 8px;
+  width: 100%;
+  padding: 14px;
+  border: 0;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #22c55e, #14b8a6);
+  color: #020617;
+  font-weight: 900;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.login-button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.login-help {
+  margin-top: 22px;
+  text-align: center;
+  color: #64748b;
+  font-size: 12px;
+}
+
+@media (max-width: 480px) {
+  .login-page {
+    align-items: flex-start;
+    padding-top: 70px;
+  }
+
+  .login-card {
+    padding: 28px 22px;
+    border-radius: 22px;
+  }
+}
+</style>
+
+<div class="login-page">
+  <div class="login-card">
+
+    <div class="login-brand">
+      <div class="login-logo">F</div>
+      <h1>Finta</h1>
+      <p>Fantasy futebol com cara de resenha.</p>
     </div>
 
-    <br />
+    <form method="post" class="login-form">
+      {% csrf_token %}
 
-    <div>
-      <label for="id_password">Senha</label><br />
-      <input type="password" name="password" autocomplete="current-password"
-             required id="id_password">
+      <div class="login-field">
+        <label for="id_username">Usuário</label>
+        <input id="id_username" type="text" name="username" autocomplete="username" required>
+      </div>
+
+      <div class="login-field">
+        <label for="id_password">Senha</label>
+        <input id="id_password" type="password" name="password" autocomplete="current-password" required>
+      </div>
+
+      <button type="submit" class="login-button">
+        Entrar
+      </button>
+    </form>
+
+    <div class="login-help">
+      Use o mesmo usuário e senha do Django Admin.
     </div>
 
-    <br />
+  </div>
+</div>
 
-    <button type="submit">Entrar</button>
-  </form>
-
-  <p style="margin-top: 16px; font-size: 0.9em;">
-    Dica: para testar com seu admin, use o mesmo usuário/senha do Django Admin.
-  </p>
-</body>
-</html>
+{% endblock %}
