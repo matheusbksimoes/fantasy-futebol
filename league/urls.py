@@ -89,12 +89,20 @@ urlpatterns = [
         name="cancel_claim",
     ),
 
-    # semanas
+        # semanas
     path(
         "draft/<int:draft_id>/weeks/postpone/",
         views.postpone_current_week,
         name="postpone_current_week",
     ),
+
+    # 🔥 NOVA PÁGINA DE RODADAS
+    path(
+        "draft/<int:draft_id>/rounds/",
+        views.rounds_view,
+        name="rounds_view",
+    ),
+
     path(
         "draft/<int:draft_id>/week/",
         views.current_week_view,
@@ -104,11 +112,6 @@ urlpatterns = [
         "draft/<int:draft_id>/week/current/",
         views.current_week_view,
         name="current_week",
-    ),
-    path(
-        "draft/<int:draft_id>/week/<int:week_number>/scores/",
-        views.edit_week_scores,
-        name="edit_week_scores",
     ),
 
     # matchup detalhado

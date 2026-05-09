@@ -1192,7 +1192,98 @@ def current_week_view(request, draft_id: int):
         "error": None,
     })
 
+@login_required
+def rounds_view(request, draft_id: int):
+    draft = get_object_or_404(Draft, id=draft_id)
 
+    current_week = Week.objects.filter(draft=draft, is_current=True).first()
+
+    team = Team.objects.filter(
+        league=draft.league,
+        user=request.user,
+    ).first()
+
+    if request.user.is_superuser and not team:
+        team = Team.objects.filter(league=draft.league).order_by("id").first()
+
+    my_matchup = get_team_matchup_for_week(current_week, team) if current_week and team else None
+
+    weeks = (
+        Week.objects
+        .filter(draft=draft)
+        .order_by("number")
+    )
+
+    rounds = []
+
+    for week_obj in weeks:
+        matchups_qs = (
+            Matchup.objects
+            .filter(week=week_obj)
+            .select_related("home_team", "away_team", "week")
+            .order_by("id")
+        )
+
+        if week_obj.is_current:
+            status = "current"
+            status_label = "Rodada atual"
+        elif current_week and week_obj.number < current_week.number:
+            status = "finished"
+            status_label = "Finalizada"
+        elif all(m.is_final for m in matchups_qs) and matchups_qs.exists():
+            status = "finished"
+            status_label = "Finalizada"
+        else:
+            status = "upcoming"
+            status_label = "Próxima"
+
+        matchup_items = []
+
+        for matchup in matchups_qs:
+            home_score = float(matchup.home_score or 0)
+            away_score = float(matchup.away_score or 0)
+
+            has_score = status != "upcoming" or home_score != 0 or away_score != 0
+
+            if has_score:
+                if home_score > away_score:
+                    result_label = f"Vitória de {matchup.home_team.name}"
+                    winner = "home"
+                elif away_score > home_score:
+                    result_label = f"Vitória de {matchup.away_team.name}"
+                    winner = "away"
+                else:
+                    result_label = "Empate"
+                    winner = "draw"
+            else:
+                result_label = "Confronto agendado"
+                winner = None
+
+            matchup_items.append({
+                "matchup": matchup,
+                "home_score": home_score,
+                "away_score": away_score,
+                "has_score": has_score,
+                "result_label": result_label,
+                "winner": winner,
+            })
+
+        rounds.append({
+            "week": week_obj,
+            "status": status,
+            "status_label": status_label,
+            "matchups": matchup_items,
+        })
+
+    return render(request, "league/rounds.html", {
+        "draft": draft,
+        "week": current_week,
+        "current_week": current_week,
+        "team": team,
+        "my_matchup": my_matchup,
+        "rounds": rounds,
+        "active_tab": "rounds",
+    })
 # ============================================================
 # Admin edit matchup scores (manual override)
 # ============================================================

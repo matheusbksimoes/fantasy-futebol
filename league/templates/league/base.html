@@ -587,6 +587,14 @@
       <span>Rodada atual</span>
     </a>
 
+        <a
+      href="{% url 'rounds_view' draft.id %}"
+      class="sidebar__link {% if active_tab == 'rounds' %}is-active{% endif %}"
+    >
+      <span class="sidebar__icon">🗓️</span>
+      <span>Rodadas</span>
+    </a>
+
     <a
       href="{% url 'standings_view' draft.id %}"
       class="sidebar__link {% if active_tab == 'standings' %}is-active{% endif %}"
