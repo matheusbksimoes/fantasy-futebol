@@ -3,12 +3,29 @@ from django.utils import timezone
 from league.models import PlayerWeekScore
 
 
-def player_locked(player, round_number: int) -> bool:
-    """
-    Retorna True se o jogador já estiver travado
-    (partida iniciada ou encerrada).
-    """
+def player_played(score: PlayerWeekScore) -> bool:
+    points = score.points or 0
 
+    try:
+        if float(points) != 0:
+            return True
+    except (TypeError, ValueError):
+        pass
+
+    scouts = score.scouts or {}
+
+    if isinstance(scouts, dict):
+        for value in scouts.values():
+            try:
+                if float(value or 0) != 0:
+                    return True
+            except (TypeError, ValueError):
+                continue
+
+    return False
+
+
+def player_locked(player, round_number: int) -> bool:
     score = (
         PlayerWeekScore.objects
         .filter(
@@ -21,12 +38,13 @@ def player_locked(player, round_number: int) -> bool:
     if not score:
         return False
 
-    # Lock imediato por status live/finished
-    if score.live_status in ["live", "finished"]:
+    if score.live_status == "finished":
+        return player_played(score)
+
+    if score.live_status == "live":
         return True
 
-    # Lock por horário real da partida
-    if score.match_started_at:
-        return score.match_started_at <= timezone.now()
+    if score.match_started_at and score.match_started_at <= timezone.now():
+        return True
 
     return False
