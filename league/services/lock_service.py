@@ -1,10 +1,24 @@
 # league/services/lock_service.py
 
+from league.models import PlayerWeekScore
+
+
 def player_locked(player, round_number: int) -> bool:
     """
-    Retorna True se o jogador estiver 'travado' (jogo já começou / em andamento) na rodada.
-    Por enquanto, default = False (ninguém travado), para destravar o desenvolvimento.
-
-    Depois você liga isso no que o sync_cartola_scores já salva (ex: PlayerRound/Score/Status).
+    Retorna True se o jogador já estiver com partida iniciada
+    ou finalizada na rodada atual.
     """
-    return False
+
+    score = (
+        PlayerWeekScore.objects
+        .filter(
+            week__number=round_number,
+            player=player,
+        )
+        .first()
+    )
+
+    if not score:
+        return False
+
+    return score.live_status in ["live", "finished"]
