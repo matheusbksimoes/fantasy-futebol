@@ -3,9 +3,9 @@ from decimal import Decimal
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
-from django.utils import timezone
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
+from django.utils import timezone
 
 from league.models import Draft, Week, Player, PlayerWeekScore, Matchup, LineupSpot
 
@@ -116,19 +116,41 @@ class Command(BaseCommand):
 
             match_display = f"{casa_abv} x {fora_abv}"
 
+            partida_data = partida.get("partida_data")
+            match_started_at = None
+
+            if partida_data:
+                try:
+                    match_started_at = timezone.datetime.fromisoformat(
+                        partida_data.replace("Z", "+00:00")
+                    )
+
+                    if timezone.is_naive(match_started_at):
+                        match_started_at = timezone.make_aware(
+                            match_started_at,
+                            timezone.get_current_timezone(),
+                        )
+                except (TypeError, ValueError):
+                    match_started_at = None
+
             match_map[casa_id] = {
                 "opponent": fora_abv,
                 "is_home": True,
                 "match_display": match_display,
+                "match_started_at": match_started_at,
             }
+
             match_map[fora_id] = {
                 "opponent": casa_abv,
                 "is_home": False,
                 "match_display": match_display,
+                "match_started_at": match_started_at,
             }
 
         self.stdout.write(
-            self.style.SUCCESS(f"Mapa de confrontos montado para {len(match_map)} clubes na rodada {rodada}.")
+            self.style.SUCCESS(
+                f"Mapa de confrontos montado para {len(match_map)} clubes na rodada {rodada}."
+            )
         )
         return match_map
 
@@ -139,7 +161,6 @@ class Command(BaseCommand):
         - live: pontuação mudou nesta coleta OU já pontuou e ainda não ficou parada 3 coletas
         - finished: pontuação > 0 e ficou 3 coletas seguidas sem mudar
         """
-        now = timezone.now()
         new_points = Decimal(str(points or 0))
 
         score_obj, created = PlayerWeekScore.objects.get_or_create(
@@ -155,6 +176,7 @@ class Command(BaseCommand):
                 "opponent": confronto.get("opponent", ""),
                 "is_home": confronto.get("is_home"),
                 "match_display": confronto.get("match_display", ""),
+                "match_started_at": confronto.get("match_started_at"),
             },
         )
 
@@ -185,6 +207,8 @@ class Command(BaseCommand):
         score_obj.opponent = confronto.get("opponent", "")
         score_obj.is_home = confronto.get("is_home")
         score_obj.match_display = confronto.get("match_display", "")
+        score_obj.match_started_at = confronto.get("match_started_at")
+
         score_obj.save(update_fields=[
             "last_points",
             "points",
@@ -196,6 +220,7 @@ class Command(BaseCommand):
             "opponent",
             "is_home",
             "match_display",
+            "match_started_at",
         ])
 
     def handle(self, *args, **options):
@@ -266,8 +291,6 @@ class Command(BaseCommand):
         upserts = 0
         missing = 0
 
-        # Fallback: se não há pontuados, usa atletas/mercado para preencher cartola_club_id
-        # e já salva o confronto da rodada atual para aparecer no roster
         if payload is None:
             self.stdout.write(
                 self.style.WARNING(

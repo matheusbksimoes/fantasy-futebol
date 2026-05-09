@@ -451,12 +451,14 @@ class PlayerWeekScore(models.Model):
     opponent = models.CharField(max_length=100, blank=True, default="")
     is_home = models.BooleanField(null=True, blank=True)
     match_display = models.CharField(max_length=100, blank=True, default="")
+    match_started_at = models.DateTimeField(null=True, blank=True)
 
     live_status = models.CharField(
         max_length=20,
         choices=LIVE_STATUS_CHOICES,
         default="pending",
     )
+
     last_points = models.DecimalField(max_digits=6, decimal_places=2, default=0)
     unchanged_polls_count = models.PositiveSmallIntegerField(default=0)
 

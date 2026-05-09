@@ -1,12 +1,12 @@
-# league/services/lock_service.py
+from django.utils import timezone
 
 from league.models import PlayerWeekScore
 
 
 def player_locked(player, round_number: int) -> bool:
     """
-    Retorna True se o jogador já estiver com partida iniciada
-    ou finalizada na rodada atual.
+    Retorna True se o jogador já estiver travado
+    (partida iniciada ou encerrada).
     """
 
     score = (
@@ -21,4 +21,12 @@ def player_locked(player, round_number: int) -> bool:
     if not score:
         return False
 
-    return score.live_status in ["live", "finished"]
+    # Lock imediato por status live/finished
+    if score.live_status in ["live", "finished"]:
+        return True
+
+    # Lock por horário real da partida
+    if score.match_started_at:
+        return score.match_started_at <= timezone.now()
+
+    return False
