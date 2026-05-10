@@ -1,5 +1,6 @@
 import requests
 from decimal import Decimal
+from datetime import timedelta
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
@@ -154,14 +155,53 @@ class Command(BaseCommand):
         )
         return match_map
 
+    def _match_finished(self, confronto):
+        """
+        Considera a partida encerrada 3 horas após o início.
+
+        Isso resolve o caso de jogador que não entrou:
+        - durante o jogo: live/travado
+        - depois do fim estimado: finished
+        - o lock_service decide se jogou ou não pelo score/scouts
+        """
+        started_at = confronto.get("match_started_at")
+
+        if not started_at:
+            return False
+
+        return timezone.now() >= started_at + timedelta(hours=3)
+
+    def _infer_live_status(self, confronto):
+        started_at = confronto.get("match_started_at")
+
+        if not started_at:
+            return "pending"
+
+        now = timezone.now()
+
+        if now < started_at:
+            return "pending"
+
+        if self._match_finished(confronto):
+            return "finished"
+
+        return "live"
+
     def _upsert_player_week_score(self, *, week, player, points, scouts, confronto):
         """
-        Atualiza/salva PlayerWeekScore e infere live_status com base em mudanças recentes:
-        - pending: ainda não pontuou
-        - live: pontuação mudou nesta coleta OU já pontuou e ainda não ficou parada 3 coletas
-        - finished: pontuação > 0 e ficou 3 coletas seguidas sem mudar
+        Atualiza/salva PlayerWeekScore.
+
+        Regra:
+        - antes do jogo: pending
+        - jogo em andamento: live
+        - jogo terminado: finished
+
+        Importante:
+        quem não entrou também vira finished após o fim do jogo.
+        Depois o lock_service libera se points=0 e scouts={}.
         """
         new_points = Decimal(str(points or 0))
+        inferred_status = self._infer_live_status(confronto)
 
         score_obj, created = PlayerWeekScore.objects.get_or_create(
             week=week,
@@ -170,7 +210,7 @@ class Command(BaseCommand):
                 "points": new_points,
                 "last_points": Decimal("0"),
                 "unchanged_polls_count": 0,
-                "live_status": "pending" if new_points == 0 else "live",
+                "live_status": inferred_status,
                 "scouts": scouts or {},
                 "source": "CARTOLA",
                 "opponent": confronto.get("opponent", ""),
@@ -185,23 +225,10 @@ class Command(BaseCommand):
 
         old_points = score_obj.points or Decimal("0")
 
-        if new_points != old_points:
-            score_obj.unchanged_polls_count = 0
-            score_obj.live_status = "live"
-        else:
-            if new_points > 0:
-                score_obj.unchanged_polls_count = (score_obj.unchanged_polls_count or 0) + 1
-
-                if score_obj.unchanged_polls_count >= 3:
-                    score_obj.live_status = "finished"
-                else:
-                    score_obj.live_status = "live"
-            else:
-                score_obj.unchanged_polls_count = 0
-                score_obj.live_status = "pending"
-
         score_obj.last_points = old_points
         score_obj.points = new_points
+        score_obj.unchanged_polls_count = 0
+        score_obj.live_status = inferred_status
         score_obj.scouts = scouts or {}
         score_obj.source = "CARTOLA"
         score_obj.opponent = confronto.get("opponent", "")
@@ -222,6 +249,40 @@ class Command(BaseCommand):
             "match_display",
             "match_started_at",
         ])
+
+    def _upsert_players_not_in_pontuados(self, *, week, players, processed_player_ids, match_map):
+        """
+        Atualiza jogadores que NÃO vieram em atletas/pontuados.
+
+        Esse é o ponto principal do ajuste:
+        - se o clube ainda está jogando: live/travado
+        - se o jogo terminou e ele não pontuou/scoutou: finished + points 0 + scouts {}
+        - o lock_service libera depois por entender que não jogou
+        """
+        count = 0
+
+        for player in players:
+            if player.id in processed_player_ids:
+                continue
+
+            clube_id = player.cartola_club_id
+            if not clube_id:
+                continue
+
+            confronto = match_map.get(clube_id)
+            if not confronto:
+                continue
+
+            self._upsert_player_week_score(
+                week=week,
+                player=player,
+                points=0,
+                scouts={},
+                confronto=confronto,
+            )
+            count += 1
+
+        return count
 
     def handle(self, *args, **options):
         draft_id = options["draft_id"]
@@ -282,7 +343,7 @@ class Command(BaseCommand):
             self.stderr.write(self.style.ERROR(f"Erro ao buscar atletas/pontuados: {e}"))
             return
 
-        players = Player.objects.exclude(cartola_id__isnull=True)
+        players = list(Player.objects.exclude(cartola_id__isnull=True))
         players_by_cartola_id = {
             str(p.cartola_id): p for p in players if p.cartola_id is not None
         }
@@ -290,6 +351,7 @@ class Command(BaseCommand):
         club_updates = 0
         upserts = 0
         missing = 0
+        non_pontuados_upserts = 0
 
         if payload is None:
             self.stdout.write(
@@ -372,6 +434,8 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS(f"Cartola retornou {len(atletas)} atletas pontuados."))
 
+        processed_player_ids = set()
+
         with transaction.atomic():
             for atleta_id, data in atletas.items():
                 player = players_by_cartola_id.get(str(atleta_id))
@@ -396,11 +460,21 @@ class Command(BaseCommand):
                     scouts=scouts,
                     confronto=confronto,
                 )
+
+                processed_player_ids.add(player.id)
                 upserts += 1
+
+            non_pontuados_upserts = self._upsert_players_not_in_pontuados(
+                week=week,
+                players=players,
+                processed_player_ids=processed_player_ids,
+                match_map=match_map,
+            )
 
         self.stdout.write(
             self.style.SUCCESS(
                 f"Sincronização concluída: {upserts} upserts | "
+                f"{non_pontuados_upserts} não pontuados atualizados | "
                 f"{club_updates} players com cartola_club_id atualizado | "
                 f"{missing} atletas no payload sem player correspondente no banco"
             )
