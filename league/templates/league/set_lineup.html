@@ -220,28 +220,25 @@
             </select>
           {% endif %}
 
-                    {% if s.player and s.player.id in locked_player_ids %}
+                              {% if s.player and s.player.id in locked_player_ids %}
             <input
               type="hidden"
               name="slot_{{ s.slot_type }}_{{ s.slot_index }}"
               value="{{ s.player.id }}"
             >
 
-            {% with ps=player_scores|get_item:s.player.id %}
-              {% if ps.live_status == "live" %}
-                <small class="lineup-lock">
-                  🔒 Travado (jogo em andamento)
-                </small>
-              {% elif ps.live_status == "finished" %}
-                <small class="lineup-lock">
-                  🔒 Travado (partida encerrada)
-                </small>
+            <small class="lineup-lock">
+              {% if s.player_score.live_status == "live" %}
+                🔒 Travado (jogo em andamento)
+
+              {% elif s.player_score.live_status == "finished" %}
+                🔒 Travado (partida encerrada)
+
               {% else %}
-                <small class="lineup-lock">
-                  🔒 Travado
-                </small>
+                🔒 Travado
+
               {% endif %}
-            {% endwith %}
+            </small>
           {% endif %}
         </div>
       {% endfor %}
