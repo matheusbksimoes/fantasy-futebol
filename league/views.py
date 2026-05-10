@@ -951,7 +951,6 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
         )
     else:
         week = Week.objects.filter(draft=draft, is_current=True).first()
-
         if not week:
             week, _ = Week.objects.get_or_create(
                 draft=draft,
@@ -960,9 +959,7 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
             )
 
     if week.is_locked and not request.user.is_superuser:
-        return HttpResponseForbidden(
-            "Esta Week está travada. Não é possível editar a escalação."
-        )
+        return HttpResponseForbidden("Esta Week está travada. Não é possível editar a escalação.")
 
     round_number = week.number
 
@@ -973,7 +970,6 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
     )
 
     preview_formation = request.GET.get("formation")
-
     selected_formation = preview_formation or lineup.formation
 
     if selected_formation not in FORMATION_MAP:
@@ -981,20 +977,13 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
 
     roster_spots = (
         RosterSpot.objects
-        .filter(
-            draft=draft,
-            team=team,
-            dropped_at__isnull=True,
-        )
+        .filter(draft=draft, team=team, dropped_at__isnull=True)
         .select_related("player")
         .order_by("player__position", "player__name")
     )
 
     roster_player_ids = [rs.player_id for rs in roster_spots]
-
-    all_players = Player.objects.filter(
-        id__in=roster_player_ids
-    )
+    all_players = Player.objects.filter(id__in=roster_player_ids)
 
     gols = all_players.filter(position="GOL")
     zags = all_players.filter(position="ZAG")
@@ -1004,212 +993,116 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
     tecs = all_players.filter(position="TEC")
 
     if request.method == "POST":
-
-        new_formation = request.POST.get(
-            "formation",
-            lineup.formation,
-        )
+        new_formation = request.POST.get("formation", lineup.formation)
 
         try:
-
             with transaction.atomic():
-
                 if new_formation != lineup.formation:
-
                     if new_formation not in FORMATION_MAP:
-                        raise ValidationError(
-                            "Formação inválida."
-                        )
+                        raise ValidationError("Formação inválida.")
 
-                    new_expected_slots = set(
-                        expected_slots_for_formation(
-                            new_formation
-                        )
-                    )
+                    new_expected_slots = set(expected_slots_for_formation(new_formation))
 
                     current_players = (
                         LineupSpot.objects
-                        .filter(
-                            lineup=lineup,
-                            player__isnull=False,
-                        )
+                        .filter(lineup=lineup, player__isnull=False)
                         .select_related("player")
                     )
 
                     for s in current_players:
-
                         if not s.player:
                             continue
 
-                        if not player_locked(
-                            s.player,
-                            round_number,
-                        ):
+                        if not player_locked(s.player, round_number):
                             continue
 
-                        current_slot = (
-                            s.slot_type,
-                            s.slot_index,
-                        )
+                        locked_player_still_has_slot = False
 
-                        if current_slot not in new_expected_slots:
+                        for expected_slot_type, expected_slot_index in new_expected_slots:
+                            field_name = f"slot_{expected_slot_type}_{expected_slot_index}"
+                            submitted_player_id = request.POST.get(field_name)
 
+                            if submitted_player_id and int(submitted_player_id) == s.player.id:
+                                locked_player_still_has_slot = True
+                                break
+
+                        if not locked_player_still_has_slot:
                             raise ValidationError(
-                                f"Não é possível mudar para essa "
-                                f"formação porque "
-                                f"{s.player.name} está travado em um "
-                                f"slot que deixaria de existir "
-                                f"({s.get_slot_type_display()} "
-                                f"{s.slot_index})."
+                                f"Não é possível mudar para essa formação porque "
+                                f"{s.player.name} está travado e não foi mantido "
+                                f"em um slot válido da nova formação."
                             )
 
                     lineup.formation = new_formation
-
                     lineup.full_clean()
-
-                    lineup.save(
-                        update_fields=[
-                            "formation",
-                            "updated_at",
-                        ]
-                    )
+                    lineup.save(update_fields=["formation", "updated_at"])
 
                 ensure_spots_for_lineup(lineup)
 
-                limits = FORMATION_MAP.get(
-                    lineup.formation,
-                    {},
-                )
-
-                for slot_type in (
-                    "ZAG",
-                    "LAT",
-                    "MEI",
-                    "ATA",
-                ):
-
-                    allowed = limits.get(
-                        slot_type,
-                        0,
-                    )
-
+                limits = FORMATION_MAP.get(lineup.formation, {})
+                for slot_type in ("ZAG", "LAT", "MEI", "ATA"):
+                    allowed = limits.get(slot_type, 0)
                     LineupSpot.objects.filter(
                         lineup=lineup,
                         slot_type=slot_type,
                         slot_index__gt=allowed,
                     ).update(player=None)
 
-                expected = expected_slots_for_formation(
-                    lineup.formation
-                )
+                expected = expected_slots_for_formation(lineup.formation)
 
                 spots = {
                     (s.slot_type, s.slot_index): s
-                    for s in (
-                        LineupSpot.objects
-                        .filter(lineup=lineup)
-                        .select_related("player")
-                    )
+                    for s in LineupSpot.objects.filter(lineup=lineup).select_related("player")
                 }
 
                 chosen_ids = []
 
                 for (t, idx) in expected:
-
                     field = f"slot_{t}_{idx}"
-
                     pid = request.POST.get(field) or None
-
                     pid = int(pid) if pid else None
 
                     if not pid:
-                        raise ValidationError(
-                            "Preencha todos os slots antes de salvar."
-                        )
+                        raise ValidationError("Preencha todos os slots antes de salvar.")
 
-                    player = get_object_or_404(
-                        Player,
-                        id=pid,
-                    )
+                    player = get_object_or_404(Player, id=pid)
 
                     if player.id not in roster_player_ids:
-                        raise ValidationError(
-                            f"{player.name} não está no roster "
-                            f"do seu time."
-                        )
+                        raise ValidationError(f"{player.name} não está no roster do seu time.")
 
                     if player.position != t:
                         raise ValidationError(
-                            f"{player.name} é "
-                            f"{player.position} e não pode ser "
-                            f"escalado em {t}{idx}."
+                            f"{player.name} é {player.position} e não pode ser escalado em {t}{idx}."
                         )
 
                     spot = spots[(t, idx)]
-
                     old_player = spot.player
 
-                    if (
-                        old_player
-                        and old_player.id != player.id
-                        and player_locked(
-                            old_player,
-                            round_number,
-                        )
-                    ):
-                        raise ValidationError(
-                            f"Você não pode remover/trocar "
-                            f"{old_player.name}: jogo já começou."
-                        )
+                    if old_player and old_player.id != player.id and player_locked(old_player, round_number):
+                        raise ValidationError(f"Você não pode remover/trocar {old_player.name}: jogo já começou.")
 
-                    if (
-                        (not old_player or old_player.id != player.id)
-                        and player_locked(
-                            player,
-                            round_number,
-                        )
-                    ):
-                        raise ValidationError(
-                            f"Você não pode escalar "
-                            f"{player.name}: jogo já começou."
-                        )
+                    if (not old_player or old_player.id != player.id) and player_locked(player, round_number):
+                        raise ValidationError(f"Você não pode escalar {player.name}: jogo já começou.")
 
                     chosen_ids.append(player.id)
 
                     spot.player = player
-
                     spot.full_clean()
-
-                    spot.save(
-                        update_fields=[
-                            "player",
-                            "set_at",
-                        ]
-                    )
+                    spot.save(update_fields=["player", "set_at"])
 
                 if len(chosen_ids) != len(set(chosen_ids)):
-                    raise ValidationError(
-                        "Você não pode repetir o mesmo jogador "
-                        "em mais de um slot."
-                    )
+                    raise ValidationError("Você não pode repetir o mesmo jogador em mais de um slot.")
 
-            messages.success(
-                request,
-                "Escalação salva!",
-            )
+            messages.success(request, "Escalação salva!")
 
             matchup = (
                 Matchup.objects
                 .filter(week=week)
-                .filter(
-                    Q(home_team=team)
-                    | Q(away_team=team)
-                )
+                .filter(Q(home_team=team) | Q(away_team=team))
                 .first()
             )
 
             if matchup:
-
                 return redirect(
                     "matchup_detail",
                     draft_id=draft.id,
@@ -1217,127 +1110,56 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
                     matchup_id=matchup.id,
                 )
 
-            return redirect(
-                "current_week",
-                draft_id=draft.id,
-            )
+            return redirect("current_week", draft_id=draft.id)
 
-        except (
-            ValidationError,
-            Player.DoesNotExist,
-        ) as e:
-
-            messages.error(
-                request,
-                str(e),
-            )
+        except (ValidationError, Player.DoesNotExist) as e:
+            messages.error(request, str(e))
 
     try:
+        expected = expected_slots_for_formation(selected_formation)
 
-        expected = expected_slots_for_formation(
-            selected_formation
-        )
-
-        existing_qs = (
-            LineupSpot.objects
-            .filter(lineup=lineup)
-            .select_related("player")
-        )
-
-        existing = {
-            (s.slot_type, s.slot_index): s
-            for s in existing_qs
-        }
+        existing_qs = LineupSpot.objects.filter(lineup=lineup).select_related("player")
+        existing = {(s.slot_type, s.slot_index): s for s in existing_qs}
 
         slots = []
-
         for (t, idx) in expected:
-
             s = existing.get((t, idx))
-
             if s:
                 slots.append(s)
-
             else:
-                slots.append(
-                    LineupSpot(
-                        lineup=lineup,
-                        slot_type=t,
-                        slot_index=idx,
-                        player=None,
-                    )
-                )
+                slots.append(LineupSpot(lineup=lineup, slot_type=t, slot_index=idx, player=None))
 
     except ValidationError as e:
+        messages.error(request, str(e))
+        slots = list(LineupSpot.objects.filter(lineup=lineup).select_related("player"))
 
-        messages.error(
-            request,
-            str(e),
-        )
-
-        slots = list(
-            LineupSpot.objects
-            .filter(lineup=lineup)
-            .select_related("player")
-        )
-
-    slots.sort(
-        key=lambda s: (
-            SLOT_ORDER.get(s.slot_type, 99),
-            s.slot_index or 999,
-        )
-    )
+    slots.sort(key=lambda s: (SLOT_ORDER.get(s.slot_type, 99), s.slot_index or 999))
 
     locked_player_ids = set()
+    for s in LineupSpot.objects.filter(lineup=lineup).select_related("player"):
+        if s.player_id and player_locked(s.player, round_number):
+            locked_player_ids.add(s.player_id)
 
-    for s in (
-        LineupSpot.objects
-        .filter(lineup=lineup)
-        .select_related("player")
-    ):
+    formation_choices = Lineup._meta.get_field("formation").choices
 
-        if (
-            s.player_id
-            and player_locked(
-                s.player,
-                round_number,
-            )
-        ):
-            locked_player_ids.add(
-                s.player_id
-            )
-
-    formation_choices = (
-        Lineup._meta
-        .get_field("formation")
-        .choices
-    )
-
-    return render(
-        request,
-        "league/set_lineup.html",
-        {
-            "draft": draft,
-            "team": team,
-            "week": week,
-            "active_tab": "lineup",
-            "lineup": lineup,
-            "formation_choices": formation_choices,
-            "selected_formation": selected_formation,
-            "slots": slots,
-            "locked_player_ids": locked_player_ids,
-            "gols": gols,
-            "zags": zags,
-            "lats": lats,
-            "meis": meis,
-            "atas": atas,
-            "tecs": tecs,
-            "my_matchup": get_team_matchup_for_week(
-                week,
-                team,
-            ),
-        },
-    )
+    return render(request, "league/set_lineup.html", {
+        "draft": draft,
+        "team": team,
+        "week": week,
+        "active_tab": "lineup",
+        "lineup": lineup,
+        "formation_choices": formation_choices,
+        "selected_formation": selected_formation,
+        "slots": slots,
+        "locked_player_ids": locked_player_ids,
+        "gols": gols,
+        "zags": zags,
+        "lats": lats,
+        "meis": meis,
+        "atas": atas,
+        "tecs": tecs,
+        "my_matchup": get_team_matchup_for_week(week, team),
+    })
 # ============================================================
 # Week controls
 # ============================================================
