@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
@@ -26,7 +27,7 @@ class Team(models.Model):
         related_name="teams",
     )
     name = models.CharField(max_length=100)
-    budget = models.IntegerField(default=100)
+    budget = models.IntegerField(default=100)  # TODO: avaliar renomear -> auction_budget (ver nota de revisão)
 
     def __str__(self):
         return self.name
@@ -218,6 +219,9 @@ class RosterSpot(models.Model):
     class Meta:
         ordering = ["manual_order", "id"]
         constraints = [
+            # ⚠️ REVISAR: hoje impede que o mesmo Player esteja ativo em QUALQUER liga
+            # ao mesmo tempo, não só na mesma liga/draft. Ver nota de revisão antes
+            # de mudar — pode ser intencional se o produto ainda é "uma liga só".
             models.UniqueConstraint(
                 fields=["player"],
                 condition=Q(dropped_at__isnull=True),
@@ -259,7 +263,7 @@ FORMATIONS = [
     ("352", "3-5-2"),
     ("442", "4-4-2"),
     ("433", "4-3-3"),
-    ("451", "4-5-1"),  # ✅ NOVA
+    ("451", "4-5-1"),
     ("532", "5-3-2"),
     ("541", "5-4-1"),
 ]
@@ -270,7 +274,7 @@ FORMATION_MAP = {
     "352": {"ZAG": 3, "LAT": 0, "MEI": 5, "ATA": 2},
     "442": {"ZAG": 2, "LAT": 2, "MEI": 4, "ATA": 2},
     "433": {"ZAG": 2, "LAT": 2, "MEI": 3, "ATA": 3},
-    "451": {"ZAG": 2, "LAT": 2, "MEI": 5, "ATA": 1},  # ✅ NOVA
+    "451": {"ZAG": 2, "LAT": 2, "MEI": 5, "ATA": 1},
     "532": {"ZAG": 3, "LAT": 2, "MEI": 3, "ATA": 2},
     "541": {"ZAG": 3, "LAT": 2, "MEI": 4, "ATA": 1},
 }
@@ -292,50 +296,33 @@ class Lineup(models.Model):
             models.UniqueConstraint(fields=["week", "team"], name="uniq_lineup_week_team"),
         ]
 
-    def _cleanup_spots_for_current_formation(self):
+    def apply_formation(self):
         """
-        ✅ Corrige o bug: ao trocar para formações sem LAT (343/352),
-        remove/desassocia slots que ficaram "sobrando" no banco.
+        Ao trocar para formações sem LAT (343/352) ou com menos slots de uma
+        posição, remove/desassocia slots que ficaram "sobrando" no banco.
 
-        Observação: nesta fase, como LineupSpot permite nulls para não quebrar legado,
-        vamos "limpar" o slot extra setando player=None.
-        (Assim o slot não atrapalha e nem pontua.)
-
-        Se você preferir deletar os slots extras em vez de zerar player,
-        dá pra trocar por .delete() abaixo.
+        ⚠️ Renomeado de `_cleanup_spots_for_current_formation` (chamado antes
+        de dentro de `clean()`). Agora é um método explícito — chame-o
+        deliberadamente na view quando o usuário confirma a troca de formação,
+        nunca dentro de validação. `clean()` não deve ter side effects.
         """
         limits = FORMATION_MAP.get(self.formation)
-        if not limits:
+        if not limits or not self.pk:
             return
 
-        # Só faz limpeza se já existir no banco
-        if not self.pk:
-            return
-
-        # Importante: não mexe em GOL/TEC aqui (sempre 1 e normalmente você controla na view)
         for slot_type in ("ZAG", "LAT", "MEI", "ATA"):
             allowed = limits.get(slot_type, 0)
-
-            # Qualquer spot com índice maior que o permitido vira "extra"
-            extras_qs = self.spots.filter(slot_type=slot_type, slot_index__gt=allowed)
-
-            # Se existirem extras preenchidos, limpa
-            # (mantemos o registro, mas remove player para não bloquear a troca de formação)
-            extras_qs.update(player=None)
-
-            # Alternativa (se quiser deletar):
-            # extras_qs.delete()
+            self.spots.filter(slot_type=slot_type, slot_index__gt=allowed).update(player=None)
 
     def clean(self):
         if self.formation not in FORMATION_MAP:
             raise ValidationError("Formação inválida.")
-
-        # ✅ limpa slots extras automaticamente ao aplicar formação
-        # (resolve 343/352 acusando LAT1/LAT2 extra quando vinha de 433/442/451/etc)
-        self._cleanup_spots_for_current_formation()
+        # Nota: apply_formation() NÃO é mais chamado aqui. Chame explicitamente
+        # na view após confirmar a troca de formação.
 
     def __str__(self):
         return f"Week {self.week.number} — {self.team.name} ({self.formation})"
+
 
 class LineupSpot(models.Model):
     """
@@ -357,8 +344,9 @@ class LineupSpot(models.Model):
         ("TEC", "Técnico"),
     ]
 
-    # ✅ Nesta fase, deixamos NULL permitido para NÃO quebrar banco legado.
-    # A view nova sempre cria LineupSpot já com lineup+slot_type+slot_index, e depois atribui player.
+    # Nesta fase, deixamos NULL permitido para NÃO quebrar banco legado.
+    # A view nova sempre cria LineupSpot já com lineup+slot_type+slot_index,
+    # e depois atribui player.
     lineup = models.ForeignKey(
         "Lineup",
         on_delete=models.CASCADE,
@@ -379,7 +367,6 @@ class LineupSpot(models.Model):
         blank=True,
     )
 
-    # ✅ PRECISA ser NULL para podermos criar os slots da formação primeiro
     player = models.ForeignKey(
         "Player",
         on_delete=models.CASCADE,
@@ -392,13 +379,11 @@ class LineupSpot(models.Model):
 
     class Meta:
         constraints = [
-            # ✅ só aplica unicidade quando lineup/slot_type/slot_index estiverem preenchidos
             models.UniqueConstraint(
                 fields=["lineup", "slot_type", "slot_index"],
                 condition=Q(lineup__isnull=False, slot_type__isnull=False, slot_index__isnull=False),
                 name="uniq_lineup_slot_filled",
             ),
-            # ✅ só aplica unicidade quando player existir (evita “bloquear” slots vazios)
             models.UniqueConstraint(
                 fields=["lineup", "player"],
                 condition=Q(lineup__isnull=False, player__isnull=False),
@@ -407,7 +392,6 @@ class LineupSpot(models.Model):
         ]
 
     def clean(self):
-        # enquanto estiver em transição, não valida registros incompletos
         if not self.lineup_id or not self.player_id or not self.slot_type or not self.slot_index:
             return
 
@@ -421,7 +405,6 @@ class LineupSpot(models.Model):
         player_label = self.player.name if self.player_id else "Player(NULL)"
         slot_label = f"{self.slot_type}{self.slot_index}" if self.slot_type and self.slot_index else "Slot(NULL)"
         return f"{lineup_label} — {slot_label}: {player_label}"
-
 
 
 # -----------------------------
@@ -469,15 +452,7 @@ class PlayerWeekScore(models.Model):
 
     def __str__(self):
         return f"Week {self.week.number} — {self.player.name}: {self.points}"
-    
-# league/models.py
-from django.db import models
-from django.core.validators import MinValueValidator
 
-# -----------------------------
-# FAAB / Waivers
-# -----------------------------
-from django.core.validators import MinValueValidator
 
 # -----------------------------
 # FAAB / Waivers
@@ -498,8 +473,6 @@ class TeamBudget(models.Model):
     )
 
     faab_balance = models.PositiveIntegerField(default=100)
-
-    # ✅ desempate por prioridade (1 é melhor)
     waiver_priority = models.PositiveIntegerField(default=999, db_index=True)
 
     def __str__(self):
@@ -552,41 +525,14 @@ class WaiverClaim(models.Model):
             models.Index(fields=["status", "add_player", "-bid", "created_at"]),
             models.Index(fields=["team", "status", "created_at"]),
         ]
-        # (se você NÃO quer bloquear múltiplos claims PENDING no mesmo jogador,
-        #  NÃO coloque constraints aqui)
 
     def __str__(self):
         return f"{self.team} -> ADD {self.add_player} (${self.bid}) [{self.status}]"
 
-class TradeProposal(models.Model):
-    draft = models.ForeignKey("Draft", on_delete=models.CASCADE)
-    from_team = models.ForeignKey("Team", on_delete=models.CASCADE, related_name="trades_sent")
-    to_team = models.ForeignKey("Team", on_delete=models.CASCADE, related_name="trades_received")
 
-    status = models.CharField(
-        max_length=20,
-        choices=[
-            ("pending", "Pendente"),
-            ("accepted", "Aceita"),
-            ("rejected", "Recusada"),
-        ],
-        default="pending"
-    )
-
-    created_at = models.DateTimeField(auto_now_add=True)
-
-
-class TradeItem(models.Model):
-    trade = models.ForeignKey(TradeProposal, on_delete=models.CASCADE, related_name="items")
-    player = models.ForeignKey("Player", on_delete=models.CASCADE)
-
-    # quem está enviando esse jogador
-    from_team = models.ForeignKey("Team", on_delete=models.CASCADE)
-
-    # =========================
-# TRADE SYSTEM
-# =========================
-
+# -----------------------------
+# Trades
+# -----------------------------
 class TradeProposal(models.Model):
     STATUS_CHOICES = [
         ("pending", "Pendente"),
@@ -618,10 +564,9 @@ class TradeItem(models.Model):
         return f"{self.player} saindo de {self.from_team}"
 
 
-# =========================
-# NOTIFICATIONS
-# =========================
-
+# -----------------------------
+# Notifications
+# -----------------------------
 class Notification(models.Model):
     TYPE_CHOICES = [
         ("trade_received", "Trade recebida"),

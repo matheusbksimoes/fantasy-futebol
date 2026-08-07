@@ -1,3 +1,6 @@
+import json
+from collections import defaultdict
+from datetime import timedelta
 from types import SimpleNamespace
 
 from django.contrib import messages
@@ -5,11 +8,10 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models, transaction
 from django.db.models import Avg, Q, Sum
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
-from collections import defaultdict
 
 from .models import (
     Draft,
@@ -32,6 +34,17 @@ from .models import (
 )
 
 from league.services.lock_service import player_locked
+
+# ============================================================
+# ⚠️ DÍVIDA TÉCNICA CONHECIDA (não corrigida nesta limpeza):
+# Várias views abaixo usam Draft.objects.order_by("-id").first()
+# para descobrir "o draft atual", assumindo que existe apenas UM
+# draft/liga no sistema inteiro. Funciona hoje (uma liga só), mas
+# vai quebrar assim que houver múltiplas ligas por usuário (ex: app
+# mobile estilo Sleeper). Cada ocorrência está marcada com # TODO.
+# ============================================================
+
+
 # ============================================================
 # 🔒 Permissões: só dono do time (ou admin) pode mexer no time
 # ============================================================
@@ -51,6 +64,19 @@ def forbid_if_not_team_owner(request, team: Team):
         return HttpResponseForbidden("Você não tem permissão para mexer neste time.")
 
     return None
+
+
+def get_team_matchup_for_week(week, team):
+    if not week or not team:
+        return None
+
+    return (
+        Matchup.objects
+        .filter(week=week)
+        .filter(Q(home_team=team) | Q(away_team=team))
+        .select_related("home_team", "away_team", "week")
+        .first()
+    )
 
 
 # ============================================================
@@ -282,13 +308,6 @@ def make_pick(request, draft_id: int):
 # ============================================================
 # Roster / Free agents / Transactions
 # ============================================================
-from django.contrib.auth.decorators import login_required
-from django.db.models import Sum, Avg
-from django.shortcuts import get_object_or_404, render
-
-from .models import Draft, Team, Week, RosterSpot, PlayerWeekScore, TeamBudget
-
-
 @login_required
 def team_roster(request, draft_id: int, team_id: int):
     draft = get_object_or_404(Draft, id=draft_id)
@@ -407,6 +426,7 @@ def team_roster(request, draft_id: int, team_id: int):
         "faab_balance": faab_balance,
     })
 
+
 @login_required
 @require_POST
 def drop_player(request, team_id: int, player_id: int):
@@ -429,7 +449,7 @@ def drop_player(request, team_id: int, player_id: int):
     spot.save(update_fields=["dropped_at"])
 
     messages.success(request, f"{player.name} foi dropado do {team.name}.")
-    draft = Draft.objects.order_by("-id").first()
+    draft = Draft.objects.order_by("-id").first()  # TODO: assume liga única, ver nota no topo do arquivo
     return redirect("team_roster", draft_id=draft.id, team_id=team.id)
 
 
@@ -441,7 +461,7 @@ def free_agents_list(request, team_id: int):
     if forbidden:
         return forbidden
 
-    draft = Draft.objects.order_by("-id").first()
+    draft = Draft.objects.order_by("-id").first()  # TODO: assume liga única, ver nota no topo do arquivo
     if not draft:
         return render(request, "league/free_agents.html", {
             "team": team,
@@ -544,6 +564,7 @@ def free_agents_list(request, team_id: int):
         "player_stats": player_stats,
     })
 
+
 @login_required
 @require_POST
 def add_free_agent(request, team_id: int, player_id: int):
@@ -555,7 +576,7 @@ def add_free_agent(request, team_id: int, player_id: int):
 
     player = get_object_or_404(Player, id=player_id)
 
-    draft = Draft.objects.order_by("-id").first()
+    draft = Draft.objects.order_by("-id").first()  # TODO: assume liga única, ver nota no topo do arquivo
     if not draft:
         messages.error(request, "Nenhum draft encontrado.")
         return redirect("free_agents_list", team_id=team.id)
@@ -597,7 +618,7 @@ def add_free_agent(request, team_id: int, player_id: int):
             messages.error(request, "Você não pode dropar o mesmo jogador que está tentando adicionar.")
             return redirect("free_agents_list", team_id=team.id)
 
-    # ✅ valida FAAB do time (impede bid maior que saldo)
+    # valida FAAB do time (impede bid maior que saldo)
     budget, _ = TeamBudget.objects.get_or_create(team=team)
     if budget.faab_balance is None:
         budget.faab_balance = 100
@@ -607,7 +628,7 @@ def add_free_agent(request, team_id: int, player_id: int):
         messages.error(request, f"FAAB insuficiente. Seu saldo: ${budget.faab_balance}.")
         return redirect("free_agents_list", team_id=team.id)
 
-    # ✅ cria claim
+    # cria claim
     try:
         WaiverClaim.objects.create(
             team=team,
@@ -630,19 +651,10 @@ def add_free_agent(request, team_id: int, player_id: int):
 
 @login_required
 def team_roster_legacy(request, team_id: int):
-    draft = Draft.objects.order_by("-id").first()
+    draft = Draft.objects.order_by("-id").first()  # TODO: assume liga única, ver nota no topo do arquivo
     if not draft:
         return HttpResponseForbidden("Nenhum draft encontrado.")
     return redirect("team_roster", draft_id=draft.id, team_id=team_id)
-
-
-from collections import defaultdict
-from types import SimpleNamespace
-from django.utils import timezone
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, render
-
-from .models import Draft, Week, Transaction, WaiverClaim
 
 
 @login_required
@@ -702,11 +714,10 @@ def transactions_list(request, draft_id: int):
     })
 
 
-
-
-
 # ============================================================
-# Compat: criar waiver claim (não usado no urls.py atual, mas mantido)
+# Compat: criar waiver claim
+# ⚠️ Não está roteada em urls.py hoje. Decidir: conectar a uma rota
+# ou remover — mantida por enquanto para não perder a lógica.
 # ============================================================
 @require_POST
 @login_required
@@ -742,7 +753,7 @@ def create_waiver_claim(request, team_id: int, player_id: int):
 
 
 # ============================================================
-# ✅ MEUS CLAIMS (listar / editar / cancelar)  (usado no urls.py)
+# Meus claims (listar / editar / cancelar)
 # ============================================================
 @login_required
 def my_claims(request, team_id: int):
@@ -752,7 +763,7 @@ def my_claims(request, team_id: int):
     if forbidden:
         return forbidden
 
-    draft = Draft.objects.order_by("-id").first()
+    draft = Draft.objects.order_by("-id").first()  # TODO: assume liga única, ver nota no topo do arquivo
     week = Week.objects.filter(draft=draft, is_current=True).first() if draft else None
 
     # FAAB
@@ -761,7 +772,7 @@ def my_claims(request, team_id: int):
         budget.faab_balance = 100
         budget.save(update_fields=["faab_balance"])
 
-    # ✅ Ordena por maior bid -> menor
+    # Ordena por maior bid -> menor
     claims = (
         WaiverClaim.objects
         .filter(team=team, status=WaiverClaim.Status.PENDING)
@@ -806,7 +817,7 @@ def update_claim(request, team_id: int, claim_id: int):
         messages.error(request, "Só é possível editar claims pendentes.")
         return redirect("my_claims", team_id=team.id)
 
-    draft = Draft.objects.order_by("-id").first()
+    draft = Draft.objects.order_by("-id").first()  # TODO: assume liga única, ver nota no topo do arquivo
 
     # bid
     try:
@@ -851,11 +862,10 @@ def update_claim(request, team_id: int, claim_id: int):
 
     claim.bid = bid
     claim.drop_player = drop_player
-    # se você tem updated_at no model, ok; se não tiver, remova updated_at daqui
-    try:
-        claim.save(update_fields=["bid", "drop_player", "updated_at"])
-    except Exception:
-        claim.save(update_fields=["bid", "drop_player"])
+    # ✅ FIX: WaiverClaim não tem campo `updated_at` no model, então a
+    # tentativa anterior com esse campo sempre lançava exceção e caía
+    # no fallback. Removido o try/except morto — vai direto pro save correto.
+    claim.save(update_fields=["bid", "drop_player"])
 
     messages.success(request, f"Claim atualizado: {claim.add_player.name} (bid ${bid}).")
     return redirect("my_claims", team_id=team.id)
@@ -882,7 +892,7 @@ def cancel_claim(request, team_id: int, claim_id: int):
 
 
 # ============================================================
-# ✅ ESCALAÇÃO (Week + Lineup + Formation + LineupSpot indexado)
+# Escalação (Week + Lineup + Formation + LineupSpot indexado)
 # ============================================================
 SLOT_ORDER = {"GOL": 0, "ZAG": 1, "LAT": 2, "MEI": 3, "ATA": 4, "TEC": 5}
 
@@ -1210,6 +1220,8 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
         "tecs": tecs,
         "my_matchup": get_team_matchup_for_week(week, team),
     })
+
+
 # ============================================================
 # Week controls
 # ============================================================
@@ -1266,6 +1278,7 @@ def current_week_view(request, draft_id: int):
         "active_tab": "current_week",
         "error": None,
     })
+
 
 @login_required
 def rounds_view(request, draft_id: int):
@@ -1359,8 +1372,12 @@ def rounds_view(request, draft_id: int):
         "rounds": rounds,
         "active_tab": "rounds",
     })
+
+
 # ============================================================
 # Admin edit matchup scores (manual override)
+# ⚠️ Não está roteada em urls.py hoje. Decidir: conectar a uma rota
+# ou remover — mantida por enquanto para não perder a lógica.
 # ============================================================
 @login_required
 @transaction.atomic
@@ -1398,19 +1415,6 @@ def edit_week_scores(request, draft_id: int, week_number: int):
         "team": None,
         "active_tab": "current_week",
     })
-
-
-def get_team_matchup_for_week(week, team):
-    if not week or not team:
-        return None
-
-    return (
-        Matchup.objects
-        .filter(week=week)
-        .filter(Q(home_team=team) | Q(away_team=team))
-        .select_related("home_team", "away_team", "week")
-        .first()
-    )
 
 
 def lineup_display_data(week, team):
@@ -1468,68 +1472,153 @@ def calculate_win_probability(home_points, away_points, home_projected_remaining
     return home_prob, away_prob
 
 
-def _get_item_player(item):
-    if isinstance(item, dict):
-        return item.get("player")
-    return getattr(item, "player", None)
-
-
-def _get_item_points(item):
-    if isinstance(item, dict):
-        value = item.get("points")
-    else:
-        value = getattr(item, "points", None)
-
-    try:
-        return float(value or 0)
-    except (TypeError, ValueError):
-        return 0.0
-
-
-def _get_item_projection(item):
-    if isinstance(item, dict):
-        for key in ("projected_points", "projection", "projected_score", "expected_points"):
-            value = item.get(key)
-            if value is not None:
-                try:
-                    return float(value)
-                except (TypeError, ValueError):
-                    return 0.0
-    else:
-        for attr in ("projected_points", "projection", "projected_score", "expected_points"):
-            value = getattr(item, attr, None)
-            if value is not None:
-                try:
-                    return float(value)
-                except (TypeError, ValueError):
-                    return 0.0
-
+def get_player_week_score_value(score_obj):
+    """
+    Tenta encontrar o campo de pontuação do PlayerWeekScore
+    sem depender de um nome único.
+    """
+    for attr in ("points", "score", "fantasy_points", "total_points"):
+        value = getattr(score_obj, attr, None)
+        if value is not None:
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                return 0.0
     return 0.0
 
 
-def sum_remaining_projection(spots, status_map):
+def build_player_projection_map(week, player_ids):
+    """
+    Projeção real baseada no histórico:
+    - 60% média ponderada das últimas até 4 rodadas
+    - 40% média geral da temporada anterior à rodada atual
+    """
+    projection_map = {player_id: 0.0 for player_id in player_ids}
+
+    if not player_ids:
+        return projection_map
+
+    historical_scores = (
+        PlayerWeekScore.objects
+        .filter(
+            week__draft=week.draft,
+            week__number__lt=week.number,
+            player_id__in=player_ids,
+            live_status="finished",
+        )
+        .select_related("week")
+        .order_by("player_id", "-week__number")
+    )
+
+    scores_by_player = defaultdict(list)
+
+    for score in historical_scores:
+        points = get_player_week_score_value(score)
+        scores_by_player[score.player_id].append(points)
+
+    for player_id in player_ids:
+        scores = scores_by_player.get(player_id, [])
+
+        if not scores:
+            projection_map[player_id] = 0.0
+            continue
+
+        season_avg = sum(scores) / len(scores)
+
+        recent_scores = scores[:4]
+        weights = [4, 3, 2, 1][:len(recent_scores)]
+        weighted_recent = sum(s * w for s, w in zip(recent_scores, weights)) / sum(weights)
+
+        projection = (weighted_recent * 0.60) + (season_avg * 0.40)
+        projection_map[player_id] = round(projection, 2)
+
+    return projection_map
+
+
+def sum_remaining_projection(spots, status_map, points_map, projection_map):
     total_remaining = 0.0
 
     for spot in spots:
-        if not spot.player:
+        if not spot.player_id:
             continue
 
-        player_id = spot.player.id
+        player_id = spot.player_id
         status = status_map.get(player_id, "pending")
-
-        current_points = 0
-        projected_points = getattr(spot.player, "projected_points", 0) or 0
+        current_points = float(points_map.get(player_id, 0) or 0)
+        projected_total = float(projection_map.get(player_id, 0) or 0)
 
         if status == "finished":
             continue
 
         if status == "pending":
-            total_remaining += projected_points
-
+            total_remaining += projected_total
         elif status == "live":
-            total_remaining += max(projected_points - current_points, 0)
+            total_remaining += max(projected_total - current_points, 0)
 
     return round(total_remaining, 2)
+
+
+def get_player_emotion(points, projection, status):
+    if projection == 0:
+        return None
+
+    if status == "finished":
+        if points <= projection * 0.4:
+            return "💣"
+        if points >= projection * 1.3:
+            return "🔥"
+        if points <= 1:
+            return "🧊"
+
+    if status == "live":
+        if points >= projection * 1.2:
+            return "🔥"
+
+    return None
+
+
+# ============================================================
+# Clutch + MVP
+# ============================================================
+def get_clutch_player(spots, points_map, projection_map):
+    best_player = None
+    best_impact = float("-inf")
+
+    for spot in spots:
+        if not spot.player_id:
+            continue
+
+        pts = float(points_map.get(spot.player_id, 0) or 0)
+        proj = float(projection_map.get(spot.player_id, 0) or 0)
+
+        impact = pts - proj
+
+        if impact > best_impact:
+            best_impact = impact
+            best_player = spot.player
+
+    return best_player
+
+
+def get_mvp_player(home_spots, away_spots, home_points_map, away_points_map):
+    best_player = None
+    best_points = float("-inf")
+
+    for spot in home_spots + away_spots:
+        if not spot.player_id:
+            continue
+
+        pts = float(
+            home_points_map.get(spot.player_id)
+            or away_points_map.get(spot.player_id)
+            or 0
+        )
+
+        if pts > best_points:
+            best_points = pts
+            best_player = spot.player
+
+    return best_player
 
 
 @login_required
@@ -1720,6 +1809,7 @@ def matchup_detail(request, draft_id: int, week_number: int, matchup_id: int):
         },
     )
 
+
 def build_standings(draft):
     teams = list(Team.objects.filter(league=draft.league).order_by("id"))
 
@@ -1787,7 +1877,6 @@ def build_standings(draft):
 
     return standings
 
-from .models import Draft, Team, Week, TeamBudget
 
 @login_required
 def standings_view(request, draft_id: int):
@@ -1830,6 +1919,7 @@ def standings_view(request, draft_id: int):
         "standings": standings,
         "active_tab": "standings",
     })
+
 
 @login_required
 def propose_trade_player(request, draft_id: int, target_team_id: int, target_player_id: int):
@@ -1944,6 +2034,7 @@ def propose_trade_player(request, draft_id: int, target_team_id: int, target_pla
         "active_tab": "roster",
     })
 
+
 @login_required
 def notifications_view(request, draft_id: int):
     draft = get_object_or_404(Draft, id=draft_id)
@@ -1974,6 +2065,8 @@ def notifications_view(request, draft_id: int):
         "notifications": notifications,
         "active_tab": "notifications",
     })
+
+
 @login_required
 @require_POST
 @transaction.atomic
@@ -2090,6 +2183,8 @@ def accept_trade(request, trade_id: int):
 
     messages.success(request, "Trade aceita com sucesso.")
     return redirect("notifications_view", draft_id=trade.draft.id)
+
+
 @login_required
 @require_POST
 def reject_trade(request, trade_id: int):
@@ -2133,11 +2228,12 @@ def reject_trade(request, trade_id: int):
     messages.success(request, "Trade rejeitada.")
     return redirect("notifications_view", draft_id=trade.draft.id)
 
+
 @login_required
 def player_detail(request, player_id: int):
     player = get_object_or_404(Player, id=player_id)
 
-    draft = Draft.objects.order_by("-id").first()
+    draft = Draft.objects.order_by("-id").first()  # TODO: assume liga única, ver nota no topo do arquivo
 
     scores = PlayerWeekScore.objects.filter(player=player)
 
@@ -2162,12 +2258,6 @@ def player_detail(request, player_id: int):
         "chart_labels": chart_labels,
         "chart_points": chart_points,
     })
-
-import json
-
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, HttpResponseForbidden
-from django.views.decorators.http import require_POST
 
 
 @login_required
@@ -2214,22 +2304,10 @@ def reorder_roster(request, draft_id: int, team_id: int):
 
     return JsonResponse({"ok": True})
 
-    from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from .models import Draft, Week, Team, Matchup, TeamBudget, RosterSpot
-
-def get_team_matchup_for_week(week, team):
-    if not week or not team:
-        return None
-
-    return Matchup.objects.filter(week=week).filter(
-        models.Q(home_team=team) | models.Q(away_team=team)
-    ).first()
-
 
 @login_required
 def dashboard(request):
-    draft = Draft.objects.order_by("-id").first()
+    draft = Draft.objects.order_by("-id").first()  # TODO: assume liga única, ver nota no topo do arquivo
     if not draft:
         return render(request, "league/dashboard.html", {
             "draft": None,
@@ -2273,8 +2351,6 @@ def dashboard(request):
         "active_tab": "dashboard",
     })
 
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect
 
 @login_required
 def delete_notification(request, notification_id: int):
@@ -2285,30 +2361,13 @@ def delete_notification(request, notification_id: int):
     )
 
     if request.method == "POST":
-        notification.delete()
-
-    return redirect(request.META.get("HTTP_REFERER", "/"))
-
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect
-
-@login_required
-def delete_notification(request, notification_id: int):
-    notification = get_object_or_404(
-        Notification,
-        id=notification_id,
-        team__user=request.user,
-    )
-
-    if request.method == "POST":
+        # não deixa apagar notificação de trade pendente (usuário precisa
+        # responder aceitar/rejeitar antes de conseguir limpar)
         if not (notification.trade and notification.type == "trade_received" and notification.trade.status == "pending"):
             notification.delete()
 
     return redirect(request.META.get("HTTP_REFERER", "/"))
 
-
-from django.utils import timezone
-from datetime import timedelta
 
 @login_required
 def clear_old_notifications(request):
@@ -2335,150 +2394,3 @@ def clear_all_notifications(request):
         ).delete()
 
     return redirect(request.META.get("HTTP_REFERER", "/"))
-
-def get_player_week_score_value(score_obj):
-    """
-    Tenta encontrar o campo de pontuação do PlayerWeekScore
-    sem depender de um nome único.
-    """
-    for attr in ("points", "score", "fantasy_points", "total_points"):
-        value = getattr(score_obj, attr, None)
-        if value is not None:
-            try:
-                return float(value)
-            except (TypeError, ValueError):
-                return 0.0
-    return 0.0
-
-
-def build_player_projection_map(week, player_ids):
-    """
-    Projeção real baseada no histórico:
-    - 60% média ponderada das últimas até 4 rodadas
-    - 40% média geral da temporada anterior à rodada atual
-    """
-    projection_map = {player_id: 0.0 for player_id in player_ids}
-
-    if not player_ids:
-        return projection_map
-
-    historical_scores = (
-        PlayerWeekScore.objects
-        .filter(
-            week__draft=week.draft,
-            week__number__lt=week.number,
-            player_id__in=player_ids,
-            live_status="finished",
-        )
-        .select_related("week")
-        .order_by("player_id", "-week__number")
-    )
-
-    scores_by_player = defaultdict(list)
-
-    for score in historical_scores:
-        points = get_player_week_score_value(score)
-        scores_by_player[score.player_id].append(points)
-
-    for player_id in player_ids:
-        scores = scores_by_player.get(player_id, [])
-
-        if not scores:
-            projection_map[player_id] = 0.0
-            continue
-
-        season_avg = sum(scores) / len(scores)
-
-        recent_scores = scores[:4]
-        weights = [4, 3, 2, 1][:len(recent_scores)]
-        weighted_recent = sum(s * w for s, w in zip(recent_scores, weights)) / sum(weights)
-
-        projection = (weighted_recent * 0.60) + (season_avg * 0.40)
-        projection_map[player_id] = round(projection, 2)
-
-    return projection_map
-
-
-def sum_remaining_projection(spots, status_map, points_map, projection_map):
-    total_remaining = 0.0
-
-    for spot in spots:
-        if not spot.player_id:
-            continue
-
-        player_id = spot.player_id
-        status = status_map.get(player_id, "pending")
-        current_points = float(points_map.get(player_id, 0) or 0)
-        projected_total = float(projection_map.get(player_id, 0) or 0)
-
-        if status == "finished":
-            continue
-
-        if status == "pending":
-            total_remaining += projected_total
-        elif status == "live":
-            total_remaining += max(projected_total - current_points, 0)
-
-    return round(total_remaining, 2)
-
-def get_player_emotion(points, projection, status):
-    if projection == 0:
-        return None
-
-    if status == "finished":
-        if points <= projection * 0.4:
-            return "💣"
-        if points >= projection * 1.3:
-            return "🔥"
-        if points <= 1:
-            return "🧊"
-
-    if status == "live":
-        if points >= projection * 1.2:
-            return "🔥"
-
-    return None
-
-# =========================
-# CLUTCH + MVP
-# =========================
-
-def get_clutch_player(spots, points_map, projection_map):
-    best_player = None
-    best_impact = float("-inf")
-
-    for spot in spots:
-        if not spot.player_id:
-            continue
-
-        pts = float(points_map.get(spot.player_id, 0) or 0)
-        proj = float(projection_map.get(spot.player_id, 0) or 0)
-
-        impact = pts - proj
-
-        if impact > best_impact:
-            best_impact = impact
-            best_player = spot.player
-
-    return best_player
-
-
-def get_mvp_player(home_spots, away_spots, home_points_map, away_points_map):
-    best_player = None
-    best_points = float("-inf")
-
-    for spot in home_spots + away_spots:
-        if not spot.player_id:
-            continue
-
-        pts = float(
-            home_points_map.get(spot.player_id)
-            or away_points_map.get(spot.player_id)
-            or 0
-        )
-
-        if pts > best_points:
-            best_points = pts
-            best_player = spot.player
-
-    return best_player

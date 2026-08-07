@@ -19,7 +19,7 @@ urlpatterns = [
         name="team_roster_legacy",
     ),
 
-    # 🔥 NOVA ROTA (drag and drop)
+    # drag and drop
     path(
         "draft/<int:draft_id>/team/<int:team_id>/reorder-roster/",
         views.reorder_roster,
@@ -89,14 +89,13 @@ urlpatterns = [
         name="cancel_claim",
     ),
 
-        # semanas
+    # semanas
     path(
         "draft/<int:draft_id>/weeks/postpone/",
         views.postpone_current_week,
         name="postpone_current_week",
     ),
 
-    # 🔥 NOVA PÁGINA DE RODADAS
     path(
         "draft/<int:draft_id>/rounds/",
         views.rounds_view,
@@ -144,9 +143,11 @@ urlpatterns = [
         views.player_detail,
         name="player_detail",
     ),
+
     path("dashboard/", views.dashboard, name="dashboard"),
+
+    # notifications
     path("notifications/<int:notification_id>/delete/", views.delete_notification, name="delete_notification"),
-    path("notifications/<int:notification_id>/delete/", views.delete_notification, name="delete_notification"),
-path("notifications/clear-old/", views.clear_old_notifications, name="clear_old_notifications"),
-path("notifications/clear-all/", views.clear_all_notifications, name="clear_all_notifications"),
+    path("notifications/clear-old/", views.clear_old_notifications, name="clear_old_notifications"),
+    path("notifications/clear-all/", views.clear_all_notifications, name="clear_all_notifications"),
 ]
