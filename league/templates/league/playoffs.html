@@ -1,0 +1,497 @@
+{% extends "league/base.html" %}
+
+{% block title %}Playoffs{% endblock %}
+
+{% block page_title %}
+  Playoffs
+{% endblock %}
+
+{% block page_subtitle %}
+  Chaveamento, confrontos e classificados
+{% endblock %}
+
+{% block content %}
+
+<style>
+.playoffs-page {
+  display: grid;
+  gap: 18px;
+}
+
+.po-card {
+  border-radius: 22px;
+  border: 1px solid rgba(51, 65, 85, 0.9);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(2, 6, 23, 0.96));
+  overflow: hidden;
+}
+
+.po-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.7);
+}
+
+.po-title {
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.po-subtitle {
+  margin-top: 4px;
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.po-status {
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.po-status.finished {
+  background: rgba(34, 197, 94, 0.14);
+  color: #bbf7d0;
+  border: 1px solid rgba(34, 197, 94, 0.35);
+}
+
+.po-status.current {
+  background: rgba(14, 165, 233, 0.16);
+  color: #bae6fd;
+  border: 1px solid rgba(14, 165, 233, 0.38);
+}
+
+.po-status.upcoming {
+  background: rgba(148, 163, 184, 0.12);
+  color: #cbd5e1;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+/* campeão */
+.po-champion {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 22px;
+  border-radius: 22px;
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(15, 23, 42, 0.96));
+}
+
+.po-champion__icon {
+  font-size: 40px;
+}
+
+.po-champion__label {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #fcd34d;
+}
+
+.po-champion__name {
+  font-size: 26px;
+  font-weight: 900;
+}
+
+/* classificados */
+.po-qualifiers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 18px 20px;
+}
+
+.po-qualifier {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(51, 65, 85, 0.7);
+  background: rgba(30, 41, 59, 0.45);
+}
+
+.po-qualifier.is-me {
+  border-color: rgba(34, 197, 94, 0.45);
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.po-seed {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(59, 130, 246, 0.18);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: #dbeafe;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.po-qualifier__name {
+  font-weight: 800;
+}
+
+.po-qualifier__meta {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.po-bye {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #fef3c7;
+  background: rgba(245, 158, 11, 0.14);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  border-radius: 999px;
+  padding: 4px 9px;
+  white-space: nowrap;
+}
+
+/* confrontos */
+.po-ties {
+  display: grid;
+}
+
+.po-tie {
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.45);
+  display: grid;
+  gap: 14px;
+}
+
+.po-tie:last-child {
+  border-bottom: 0;
+}
+
+.po-tie__main {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 14px;
+}
+
+.po-side {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.po-side.right {
+  text-align: right;
+}
+
+.po-team {
+  font-weight: 900;
+  font-size: 17px;
+}
+
+.po-team-seed {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.po-total {
+  font-size: 28px;
+  font-weight: 950;
+}
+
+.po-total.winner {
+  color: #86efac;
+}
+
+.po-total.loser {
+  color: #94a3b8;
+}
+
+.po-total.pending {
+  color: #e2e8f0;
+}
+
+.po-versus {
+  color: #64748b;
+  font-weight: 900;
+  font-size: 13px;
+}
+
+.po-winner-tag {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #dcfce7;
+  background: rgba(34, 197, 94, 0.14);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 999px;
+  padding: 3px 9px;
+}
+
+.po-side.right .po-winner-tag {
+  align-self: flex-end;
+}
+
+.po-legs {
+  display: grid;
+  gap: 8px;
+}
+
+.po-leg {
+  display: grid;
+  grid-template-columns: 110px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: rgba(30, 41, 59, 0.4);
+  font-size: 14px;
+}
+
+.po-leg__label {
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.po-leg__score {
+  font-weight: 800;
+  text-align: center;
+}
+
+.po-leg__link {
+  border-radius: 999px;
+  padding: 5px 10px;
+  background: rgba(34, 197, 94, 0.14);
+  border: 1px solid rgba(34, 197, 94, 0.28);
+  color: #dcfce7;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.po-note {
+  font-size: 12px;
+  color: #fcd34d;
+}
+
+.po-empty {
+  padding: 20px;
+  color: #94a3b8;
+}
+
+.po-byes {
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.45);
+  color: #cbd5e1;
+  font-size: 14px;
+}
+
+@media (max-width: 900px) {
+  .po-qualifiers {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .po-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .po-qualifiers {
+    grid-template-columns: 1fr;
+  }
+
+  .po-tie__main {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .po-side.right {
+    text-align: left;
+  }
+
+  .po-side.right .po-winner-tag {
+    align-self: flex-start;
+  }
+
+  .po-versus {
+    display: none;
+  }
+
+  .po-leg {
+    grid-template-columns: 1fr auto;
+  }
+
+  .po-leg__label {
+    grid-column: 1 / -1;
+  }
+}
+</style>
+
+<div class="playoffs-page">
+
+  {% if bracket.champion %}
+    <div class="po-champion">
+      <div class="po-champion__icon">🏆</div>
+      <div>
+        <div class="po-champion__label">Campeão</div>
+        <div class="po-champion__name">{{ bracket.champion.name }}</div>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if bracket.qualifiers %}
+    <section class="po-card">
+      <div class="po-header">
+        <div>
+          <div class="po-title">Classificados</div>
+          <div class="po-subtitle">Os 6 melhores da fase regular • seeds 1 e 2 folgam a 1ª fase</div>
+        </div>
+      </div>
+
+      <div class="po-qualifiers">
+        {% for q in bracket.qualifiers %}
+          <div class="po-qualifier {% if team and q.team.id == team.id %}is-me{% endif %}">
+            <div class="po-seed">{{ q.seed }}º</div>
+            <div>
+              <div class="po-qualifier__name">{{ q.team.name }}</div>
+              <div class="po-qualifier__meta">
+                {{ q.wins }}V {{ q.ties }}E {{ q.losses }}D • {{ q.points_for|floatformat:2 }} pts
+              </div>
+            </div>
+            {% if q.bye %}
+              <span class="po-bye">Folga</span>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  {% if not bracket.configured %}
+    <div class="empty-state">
+      Os playoffs ainda não foram configurados. Assim que as rodadas de playoff forem criadas, o chaveamento aparece aqui.
+    </div>
+  {% endif %}
+
+  {% for phase in bracket.phases %}
+    <section class="po-card">
+      <div class="po-header">
+        <div>
+          <div class="po-title">{{ phase.label }}</div>
+          <div class="po-subtitle">
+            {{ phase.weeks_label }}
+            {% if phase.legs_needed == 1 %}• jogo único{% else %}• soma dos {{ phase.legs_needed }} jogos{% endif %}
+          </div>
+        </div>
+
+        <div class="po-status {{ phase.status }}">{{ phase.status_label }}</div>
+      </div>
+
+      {% if phase.byes %}
+        <div class="po-byes">
+          Folgam nesta fase:
+          {% for b in phase.byes %}<strong>{{ b.team.name }}</strong> ({{ b.seed }}º){% if not forloop.last %}, {% endif %}{% endfor %}
+        </div>
+      {% endif %}
+
+      {% if phase.ties %}
+        <div class="po-ties">
+          {% for tie in phase.ties %}
+            <div class="po-tie">
+              <div class="po-tie__main">
+
+                <div class="po-side">
+                  <div class="po-team">{{ tie.team_a.name }}</div>
+                  {% if tie.seed_a %}<div class="po-team-seed">{{ tie.seed_a }}º colocado</div>{% endif %}
+                  <div class="po-total {% if tie.decided %}{% if tie.winner.id == tie.team_a.id %}winner{% else %}loser{% endif %}{% else %}pending{% endif %}">
+                    {{ tie.total_a|floatformat:2 }}
+                  </div>
+                  {% if tie.decided and tie.winner.id == tie.team_a.id %}
+                    <span class="po-winner-tag">Avança</span>
+                  {% endif %}
+                </div>
+
+                <div class="po-versus">x</div>
+
+                <div class="po-side right">
+                  <div class="po-team">{{ tie.team_b.name }}</div>
+                  {% if tie.seed_b %}<div class="po-team-seed">{{ tie.seed_b }}º colocado</div>{% endif %}
+                  <div class="po-total {% if tie.decided %}{% if tie.winner.id == tie.team_b.id %}winner{% else %}loser{% endif %}{% else %}pending{% endif %}">
+                    {{ tie.total_b|floatformat:2 }}
+                  </div>
+                  {% if tie.decided and tie.winner.id == tie.team_b.id %}
+                    <span class="po-winner-tag">Avança</span>
+                  {% endif %}
+                </div>
+
+              </div>
+
+              {% if phase.legs_needed > 1 %}
+                <div class="po-legs">
+                  {% for leg in tie.legs %}
+                    <div class="po-leg">
+                      <div class="po-leg__label">Jogo {{ leg.leg }} • Rodada {{ leg.week.number }}</div>
+                      <div class="po-leg__score">
+                        {% if leg.finished or leg.a_points or leg.b_points %}
+                          {{ tie.team_a.name }} {{ leg.a_points|floatformat:2 }} x {{ leg.b_points|floatformat:2 }} {{ tie.team_b.name }}
+                        {% else %}
+                          Aguardando
+                        {% endif %}
+                      </div>
+                      <a class="po-leg__link" href="{% url 'matchup_detail' draft.id leg.week.number leg.matchup.id %}">Ver matchup</a>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% else %}
+                {% for leg in tie.legs %}
+                  <div class="po-legs">
+                    <div class="po-leg">
+                      <div class="po-leg__label">Rodada {{ leg.week.number }}</div>
+                      <div class="po-leg__score">
+                        {% if leg.finished or leg.a_points or leg.b_points %}
+                          Jogo único
+                        {% else %}
+                          Aguardando
+                        {% endif %}
+                      </div>
+                      <a class="po-leg__link" href="{% url 'matchup_detail' draft.id leg.week.number leg.matchup.id %}">Ver matchup</a>
+                    </div>
+                  </div>
+                {% endfor %}
+              {% endif %}
+
+              {% if tie.decided_by_tiebreak %}
+                <div class="po-note">Empate nos pontos: avança quem fez mais pontos na temporada.</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="po-empty">
+          {% if phase.has_weeks %}
+            Confrontos ainda não definidos.
+          {% else %}
+            Rodadas ainda não definidas.
+          {% endif %}
+        </div>
+      {% endif %}
+    </section>
+  {% endfor %}
+
+</div>
+
+{% endblock %}

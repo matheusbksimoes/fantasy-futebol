@@ -604,6 +604,14 @@
     </a>
 
     <a
+      href="{% url 'playoffs_view' draft.id %}"
+      class="sidebar__link {% if active_tab == 'playoffs' %}is-active{% endif %}"
+    >
+      <span class="sidebar__icon">🏆</span>
+      <span>Playoffs</span>
+    </a>
+
+    <a
       href="{% url 'transactions_list' draft.id %}"
       class="sidebar__link {% if active_tab == 'transactions' %}is-active{% endif %}"
     >
