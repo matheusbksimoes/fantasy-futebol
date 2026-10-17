@@ -4,14 +4,15 @@ Chaveamento dos playoffs.
 Formato definido com o dono da liga:
 - 6 times classificados pela tabela da fase regular
 - seeds 1 e 2 folgam a 1ª fase (3º x 6º e 4º x 5º)
-- cada fase vale a soma de 2 rodadas (ida e volta, soma dos pontos)
+- 1ª fase e semifinais valem a soma de 2 rodadas (ida e volta, soma dos pontos)
+- a final é em jogo único (1 rodada)
 - empate no agregado: avança quem fez mais pontos na temporada (fase regular)
 - os confrontos são criados no admin (Matchup em semanas com is_playoff=True);
   aqui só lemos e organizamos para exibição
 
-As semanas de playoff (is_playoff=True, ordenadas por número) são agrupadas de
-2 em 2: as 2 primeiras formam a 1ª fase, as 2 seguintes as semifinais e as 2
-últimas a final.
+As semanas de playoff (is_playoff=True, ordenadas por número) são distribuídas
+pelas fases: as 2 primeiras formam a 1ª fase, as 2 seguintes as semifinais e a
+última a final (jogo único). Total: 5 semanas de playoff.
 """
 from collections import defaultdict
 
@@ -19,11 +20,10 @@ from league.models import Matchup, Week
 
 PLAYOFF_TEAMS = 6
 BYE_SEEDS = (1, 2)
-LEGS_PER_PHASE = 2
 PHASES = (
-    {"key": "round1", "label": "1ª fase"},
-    {"key": "semis", "label": "Semifinais"},
-    {"key": "final", "label": "Final"},
+    {"key": "round1", "label": "1ª fase", "legs": 2},
+    {"key": "semis", "label": "Semifinais", "legs": 2},
+    {"key": "final", "label": "Final", "legs": 1},
 )
 
 
@@ -84,9 +84,12 @@ def build_playoff_bracket(draft, standings, current_week=None):
         return bool(current_week and m.week.number < current_week.number)
 
     phases = []
+    offset = 0
 
     for index, meta in enumerate(PHASES):
-        weeks = playoff_weeks[index * LEGS_PER_PHASE:(index + 1) * LEGS_PER_PHASE]
+        legs_needed = meta["legs"]
+        weeks = playoff_weeks[offset:offset + legs_needed]
+        offset += legs_needed
         ties = {}
 
         for leg_number, week in enumerate(weeks, start=1):
@@ -135,8 +138,8 @@ def build_playoff_bracket(draft, standings, current_week=None):
             tie["total_b"] = round(tie["total_b"], 2)
 
             tie["decided"] = (
-                len(weeks) == LEGS_PER_PHASE
-                and len(tie["legs"]) == LEGS_PER_PHASE
+                len(weeks) == legs_needed
+                and len(tie["legs"]) == legs_needed
                 and all(leg["finished"] for leg in tie["legs"])
             )
             tie["winner"] = None
@@ -174,6 +177,7 @@ def build_playoff_bracket(draft, standings, current_week=None):
         phases.append({
             "key": meta["key"],
             "label": meta["label"],
+            "legs_needed": legs_needed,
             "weeks": weeks,
             "weeks_label": _weeks_label(weeks),
             "has_weeks": bool(weeks),
