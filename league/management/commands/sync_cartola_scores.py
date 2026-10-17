@@ -327,20 +327,48 @@ class Command(BaseCommand):
             )
         )
 
-        if rodada_atual and week.number != rodada_atual:
+        # Rodada passada: busca a pontuação FINAL em /atletas/pontuados/<rodada>.
+        # Rodada futura: não há o que sincronizar.
+        is_past = bool(rodada_atual and week.number < rodada_atual)
+
+        if rodada_atual and week.number > rodada_atual:
             self.stdout.write(
                 self.style.WARNING(
-                    f"Pulando: Week do app ({week.number}) != rodada_atual do Cartola ({rodada_atual})."
+                    f"Pulando: Week do app ({week.number}) é futura em relação à rodada_atual do Cartola ({rodada_atual})."
                 )
             )
             return
 
+        if is_past:
+            self.stdout.write(
+                self.style.WARNING(
+                    f"Week {week.number} é passada (Cartola está na {rodada_atual}). "
+                    "Buscando pontuação final da rodada."
+                )
+            )
+
         match_map = self._build_match_map(week.number, timeout=timeout)
 
+        pontuados_url = (
+            f"{CARTOLA_BASE}/atletas/pontuados/{week.number}"
+            if is_past
+            else f"{CARTOLA_BASE}/atletas/pontuados"
+        )
+
         try:
-            payload = self._get_json_or_none(f"{CARTOLA_BASE}/atletas/pontuados", timeout=timeout)
+            payload = self._get_json_or_none(pontuados_url, timeout=timeout)
         except Exception as e:
-            self.stderr.write(self.style.ERROR(f"Erro ao buscar atletas/pontuados: {e}"))
+            self.stderr.write(self.style.ERROR(f"Erro ao buscar {pontuados_url}: {e}"))
+            return
+
+        # Em rodada passada nunca cai no fallback (ele gravaria pontos=0 por cima
+        # das pontuações existentes).
+        if is_past and not payload:
+            self.stderr.write(
+                self.style.ERROR(
+                    "Cartola não devolveu a pontuação final dessa rodada. Nada foi alterado."
+                )
+            )
             return
 
         players = list(Player.objects.exclude(cartola_id__isnull=True))
