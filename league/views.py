@@ -34,6 +34,7 @@ from .models import (
 )
 
 from league.services.lock_service import player_locked
+from league.services.playoffs import build_playoff_bracket
 
 # ============================================================
 # ⚠️ DÍVIDA TÉCNICA CONHECIDA (não corrigida nesta limpeza):
@@ -1053,8 +1054,9 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
                     lineup.full_clean()
                     lineup.save(update_fields=["formation", "updated_at"])
 
-                ensure_spots_for_lineup(lineup)
-
+                # Esvazia os slots que sobram na formação atual (ex.: LAT1/LAT2 ao
+                # ir de 433 para 343/352). TEM que vir ANTES do ensure_spots_for_lineup,
+                # que recusa a formação se ainda houver jogador em slot extra.
                 limits = FORMATION_MAP.get(lineup.formation, {})
                 for slot_type in ("ZAG", "LAT", "MEI", "ATA"):
                     allowed = limits.get(slot_type, 0)
@@ -1063,6 +1065,8 @@ def set_lineup(request, draft_id: int, team_id: int, week_number: int = None):
                         slot_type=slot_type,
                         slot_index__gt=allowed,
                     ).update(player=None)
+
+                ensure_spots_for_lineup(lineup)
 
                 expected = expected_slots_for_formation(lineup.formation)
 
@@ -1371,6 +1375,39 @@ def rounds_view(request, draft_id: int):
         "my_matchup": my_matchup,
         "rounds": rounds,
         "active_tab": "rounds",
+    })
+
+
+# ============================================================
+# Playoffs (6 times, 2 rodadas por fase, soma dos pontos)
+# ============================================================
+@login_required
+def playoffs_view(request, draft_id: int):
+    draft = get_object_or_404(Draft, id=draft_id)
+
+    current_week = Week.objects.filter(draft=draft, is_current=True).first()
+
+    team = Team.objects.filter(
+        league=draft.league,
+        user=request.user,
+    ).first()
+
+    if request.user.is_superuser and not team:
+        team = Team.objects.filter(league=draft.league).order_by("id").first()
+
+    my_matchup = get_team_matchup_for_week(current_week, team) if current_week and team else None
+
+    standings = build_standings(draft)
+    bracket = build_playoff_bracket(draft, standings, current_week)
+
+    return render(request, "league/playoffs.html", {
+        "draft": draft,
+        "week": current_week,
+        "current_week": current_week,
+        "team": team,
+        "my_matchup": my_matchup,
+        "bracket": bracket,
+        "active_tab": "playoffs",
     })
 
 
@@ -1828,7 +1865,8 @@ def build_standings(draft):
 
     matchups = (
         Matchup.objects
-        .filter(week__draft=draft)
+        # só fase regular: jogos de playoff não podem mexer na tabela/seeds
+        .filter(week__draft=draft, week__is_playoff=False)
         .select_related("home_team", "away_team", "week")
         .order_by("week__number", "id")
     )

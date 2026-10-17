@@ -103,6 +103,12 @@ urlpatterns = [
     ),
 
     path(
+        "draft/<int:draft_id>/playoffs/",
+        views.playoffs_view,
+        name="playoffs_view",
+    ),
+
+    path(
         "draft/<int:draft_id>/week/",
         views.current_week_view,
         name="current_week_matchups",
